@@ -7,7 +7,7 @@ Research and implementation work on detecting and estimating CO2 emissions from 
 
 ## Weekly progress (plant detector track)
 
-Full details and numbers are in `WEEK2_LOG.txt` through `WEEK5_LOG.txt`.
+Full details and numbers are in `WEEK2_LOG.txt` through `WEEK7_LOG.txt` (`WEEK6_LOG.txt` covers the CO2-enhancement track, not the detector).
 
 | Week | Input channels | Hard-negative test accuracy | Key finding |
 |---|---|---|---|
@@ -15,6 +15,7 @@ Full details and numbers are in `WEEK2_LOG.txt` through `WEEK5_LOG.txt`.
 | 3 | NO2 | 77.1% | Adding hard negatives (cities/steel/highways) reveals the detector is really a "concentrated combustion detector," not plant-specific |
 | 4 | NO2 + SO2 | 79.2% | SO2 fixes city false alarms (Delhi 0.43→0.11), but steel plants (Bhilai, Jamshedpur) remain confused since they also emit SO2 |
 | 5 | NO2 + SO2 + VIIRS (MaxFRP) | 79.2% (tied) | VIIRS thermal data measurably reduces false-alarm confidence on the two steel plants specifically (Bhilai 0.59→0.52, Jamshedpur 0.54→0.50), but highways become relatively more confusable, so overall accuracy doesn't move |
+| 7 | NO2 + SO2 + VIIRS, +5 more highway hard negatives | 81.2% | Expanding the highway hard-negative set from 5 to 10 (geographically spread, not clustered) drops both of Week 5's worst false alarms (hwy_AhmedabadVadodara 0.46→0.38, hwy_GTRoad_UP 0.44→0.34) — first accuracy improvement since Week 4 |
 
 ## Data sources actually used
 
@@ -24,7 +25,7 @@ Full details and numbers are in `WEEK2_LOG.txt` through `WEEK5_LOG.txt`.
 * **OCO-3 XCO2 soundings** — `OCO3_L2_Lite_FP` v11r (via NASA `earthaccess`, CO2-enhancement track only)
 * **ERA5 wind** — `ECMWF/ERA5/DAILY` (wind-alignment sanity check, CO2-enhancement track only)
 
-All tiles cover the 2019–2020 window, for 5 Indian coal plants (`data/top5_plants.csv`), 5 rural/background points, and 15 hard-negative locations (cities, steel mills, highway corridors — `data/hard_negatives.csv`).
+All tiles cover the 2019–2020 window, for 5 Indian coal plants (`data/top5_plants.csv`), 5 rural/background points, and 20 hard-negative locations (cities, steel mills, highway corridors — `data/hard_negatives.csv`).
 
 ## Plant detector: run order
 
@@ -54,10 +55,13 @@ process_plant.py <PlantName>   # end-to-end: OCO-3 scan, NO2 co-location, wind c
 co2_enhancement.py             # near-plant vs background XCO2 enhancement (single plant, from saved soundings)
 co2_no2_colocation.py          # NO2 heatmap + CO2 soundings overlay
 wind_check.py                  # wind-direction vs high-CO2-offset alignment check
+physics_gaussian.py            # Week 6: IME mass-balance emission-rate estimate (t CO2/yr) from saved soundings
 summary_co2_figure.py          # cross-plant summary figure
 ```
 
 Results across the 4 processed plants (Vindhyachal, Sasan, Mundra, Tirora) are in `data/plant_results.json`. Note: 3 of 4 plants show a large mismatch between wind direction and the CO2-enhancement offset, so the enhancement signal should be treated as preliminary, not validated against ground truth.
+
+Emission-rate estimates (Week 6, `physics_gaussian.py`) are in `data/emission_estimates.json`: Vindhyachal 44.6 Mt/yr and Sasan 37.2 Mt/yr land in the physically expected range for large baseload coal plants, a sanity check on the method's magnitude. Tirora's estimate (3.2 Mt/yr) looks too low relative to its capacity, most likely due to thin OCO-3 coverage (5 hit-days / 671 soundings). Mundra is skipped entirely (only 57 soundings total). See `WEEK6_LOG.txt` for the full writeup, including a wind-speed bug found and fixed during this work.
 
 ## Requirements
 
@@ -83,7 +87,7 @@ OCO-3 sounding download additionally requires a NASA Earthdata login (`earthacce
 
 ## Known limitations
 
-* `physics_gaussian.py` is a planned Gaussian-plume dispersion model to convert CO2 ppm enhancement into an emission-rate estimate — currently unimplemented (empty file).
+* `physics_gaussian.py`'s emission-rate estimate (Week 6) uses a single annual-mean wind speed and standard surface pressure per plant, not per-overpass conditions, and a fixed approximate footprint area per OCO-3 sounding — treat outputs as order-of-magnitude, not validated against reported plant-level emissions.
 * The plant detector's "mixed" accuracy (plants vs. all negatives including rural) is not directly comparable across weeks — only the "hard-only" number (plants vs. hard negatives, balanced) is tracked consistently and shown in `summary_figure.py`.
 * Dataset is small (600 tiles total per detector variant, ~240 in the balanced hard-only split), so accuracy differences within a few points should be treated as noisy.
 

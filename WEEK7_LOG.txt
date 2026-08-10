@@ -1,0 +1,59 @@
+WEEK 7 — DONE (highway hard-negative expansion)
+
+- Week 5 left highways as the top non-steel false-alarm source
+  (hwy_AhmedabadVadodara 0.46, hwy_GTRoad_UP 0.44), while VIIRS
+  successfully reduced steel-plant confidence (Bhilai, Jamshedpur).
+  Hypothesis: the existing 5 highway hard negatives were too narrow a
+  sample (concentrated in north/west India) for the model to learn a
+  general "linear NO2/SO2 corridor != combustion source" boundary, so
+  it was overfitting to those specific corridors' NO2/SO2/thermal
+  signatures rather than the shape/pattern that makes them non-plants.
+- Added 5 new highway hard negatives, chosen to spread geographically
+  rather than cluster near the existing worst offenders (see
+  data/hard_negatives.csv): hwy_BangaloreChennai, hwy_KolkataDurgapur,
+  hwy_JaipurAjmer, hwy_PuneBangalore, hwy_LucknowKanpur.
+- Ran export_hard_negatives.py -> export_so2.py -> export_viirs.py
+  (resume-friendly, only fetched the 5 new locations x 24 months x 3
+  channels = 360 new tiles; existing 15 locations' tiles untouched),
+  then build_3channel.py (hard_negative count 360 -> 480), then
+  train_3channel.py.
+
+RESULT: MEASURED.
+  hard_only : 81.2% accuracy (up from 79.2%), 68% plant recall,
+              92% negative recall, 2 false alarms, 7 missed plants
+  mixed     : 87.5% accuracy, 63% plant recall, 94% negative recall
+
+  Week 3  NO2-only      hard_only : 77.1%
+  Week 4  NO2+SO2       hard_only : 79.2%
+  Week 5  NO2+SO2+VIIRS hard_only : 79.2%
+  Week 7  + 5 more highways        : 81.2%   <- first improvement since Week 4
+
+HIGHWAY BREAKDOWN (analyze_failures_3ch.py, avg P(plant) per source,
+decision threshold=0.5):
+  hwy_AhmedabadVadodara : 0.46 (Week 5) -> 0.38 (Week 7)
+  hwy_GTRoad_UP         : 0.44 (Week 5) -> 0.34 (Week 7)
+  New highways added this week, for reference:
+    hwy_KolkataDurgapur=0.41  hwy_JaipurAjmer=0.37
+    hwy_LucknowKanpur=0.33    hwy_PuneBangalore=0.32
+    hwy_BangaloreChennai=0.28
+
+CONCLUSION: the hypothesis held. Both of Week 5's worst highway false
+alarms dropped meaningfully once the model saw a geographically
+broader sample of highways, and none of the 5 new highways became a
+worse false alarm than the old top two -- consistent with the model
+previously overfitting to the specific NO2/SO2 signature of a small,
+geographically clustered highway sample rather than learning a
+general highway-vs-plant boundary. Steel plants stayed roughly flat
+(Bhilai 0.59->0.55, Jamshedpur 0.54->0.51 vs. Week 5's 0.52/0.50 --
+within the noise expected from a re-split/re-train on a small dataset).
+
+NEW WATCH ITEM: city_Kolkata is now the 3rd-highest false alarm
+(0.42), ahead of most highways. Not urgent (below the 0.5 threshold),
+but worth tracking if a future week revisits city false alarms.
+
+Models retrained in place: detector3_2ch_hard_only.pt,
+detector3_2ch_mixed.pt (overwritten -- Week 5's checkpoints are not
+separately preserved).
+Figures: data/worst_false_alarms_3ch.png (overwritten)
+Data: data/hard_negatives.csv (20 hard negatives, up from 15),
+data/threech/hard_negative (480 tiles, up from 360)

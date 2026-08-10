@@ -1,0 +1,63 @@
+WEEK 6 — DONE (Gaussian-plume emission-rate estimate)
+
+- Implemented physics_gaussian.py, previously an empty placeholder file
+  flagged in README's Known Limitations. This closes the gap between the
+  CO2-enhancement track (near-plant vs. background XCO2, ppm) and an
+  actual quantitative emission-rate number (t CO2/yr), which is what the
+  cited paper (Deb & Das 2025) is ultimately about.
+- Method: Integrated Mass Enhancement (IME), not a classic ground-level
+  Gaussian plume. OCO-3 XCO2 is a dry-air *column* average, not a surface
+  concentration, so a textbook Gaussian plume (which models ground-level
+  concentration) doesn't apply directly. IME is the column-consistent
+  analogue used for satellite point-source plumes (Varon et al. 2018 for
+  CH4; the same mass-balance logic underlies the OCO-2/3 power-plant CO2
+  estimates in Nassar et al. 2017 and Reuter et al. 2019):
+
+    Q = U_eff * IME / L_eff
+
+  IME   = total column-mass CO2 enhancement over near-plant soundings (kg)
+  L_eff = effective plume length, sqrt(footprint area covered) (m)
+  U_eff = effective advection speed (m/s), alpha * wind speed, alpha=0.5
+
+  Reads data/plant_results.json + per-plant data/<Plant>_soundings.npz
+  (already saved by process_plant.py), writes data/emission_estimates.json.
+
+BUG FOUND AND FIXED: the first version of _fetch_wind_speed copied
+wind_check.py's pattern of averaging ERA5 (u,v) vector components over
+the full year, then taking the magnitude. That cancels out most of the
+speed as wind direction rotates through the year -- fine for
+wind_check.py, which only needs a *direction*, but wrong here, since an
+emission-rate estimate needs the actual mean wind speed. Fixed to
+average the daily speed magnitude (mean of |wind|) instead of the
+magnitude of the daily-averaged vector.
+
+RESULT:
+  Before fix (vector-averaged wind, U_eff understated by ~3x):
+    Sasan        14.5 Mt/yr
+    Vindhyachal  14.0 Mt/yr
+    Tirora        0.47 Mt/yr
+
+  After fix (daily-speed-averaged wind):
+    Vindhyachal  44.6 Mt/yr   (4760 MW)
+    Sasan        37.2 Mt/yr   (3960 MW)
+    Tirora        3.2 Mt/yr   (3300 MW)
+    Mundra       skipped -- only 57 soundings total, consistent with its
+                 existing null co2_enhancement_ppm in plant_results.json
+
+CONCLUSION: Vindhyachal and Sasan's post-fix estimates land in the
+physically expected range for large baseload coal plants (roughly
+25-45 Mt CO2/yr), which is a meaningful sanity check that the IME
+method's output magnitude is right, not just internally consistent.
+
+Tirora's estimate looks too low relative to its capacity. Most likely
+explanation: much thinner OCO-3 coverage than Vindhyachal (5 hit-days /
+671 soundings vs. 17 hit-days / 7114 soundings), which shrinks both the
+IME sum and the L_eff footprint term. Flagged as a data-coverage
+limitation of this plant's estimate, not a resolved finding.
+
+CAVEATS (documented in physics_gaussian.py's header):
+  - standard surface pressure assumed (no local met pressure per plant/day)
+  - annual-mean wind speed used, not per-overpass wind
+  - fixed, approximate footprint area per OCO-3 sounding
+
+Artifacts: physics_gaussian.py, data/emission_estimates.json
