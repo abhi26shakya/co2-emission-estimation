@@ -1,5 +1,5 @@
 import ee, numpy as np, pandas as pd, os, urllib.request, io
-ee.Initialize(project="co2detectionusingsatellitedata")
+ee.Initialize(project="opportune-lore-415218")
 
 YEARS  = [2019, 2020]
 MONTHS = list(range(1, 13))

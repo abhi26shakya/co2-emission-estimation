@@ -1,0 +1,33 @@
+WEEK 4 — DONE (NO2+SO2 fusion)
+
+- Added SO2 as a 2nd input channel to separate coal plants from
+  steel/urban sources (export_so2.py -> build_2channel.py -> train_2channel.py)
+- 2-channel tiles built: plants=120, hard_negative=360, rural=120
+  (data/twoch/{positive,negative,hard_negative})
+- hard-only accuracy: 79.2%  (vs. 77.1% NO2-only in Week 3)
+- mixed accuracy: computed by train_2channel.py each run but not
+  persisted to a results file (unlike the hard-only number, which is
+  hardcoded into summary_figure.py's acc=[91.2, 77.1, 79.2])
+
+FINDING: adding SO2 fixed the city false-alarm problem but not the
+steel-plant one.
+  avg P(plant), Week3 NO2-only -> Week4 NO2+SO2 (summary_figure.py):
+    Delhi      0.43 -> 0.11   (fixed)
+    Mumbai     0.53 -> 0.30   (improved)
+    Bangalore  0.55 -> 0.40   (improved)
+    Kolkata    0.33 -> 0.32   (unchanged)
+    Bhilai     0.55 -> 0.59   (still confused, slightly worse)
+    Jamshedpur 0.58 -> 0.54   (still confused)
+
+CONCLUSION: SO2 disambiguates power plants from traffic/urban NO2
+sources (cities emit little SO2), but steel plants emit SO2 too, so
+NO2+SO2 alone can't separate "coal power plant" from "steel mill."
+
+Models: detector2_2ch_hard_only.pt, detector2_2ch_mixed.pt
+Figures: summary_weeks2to4.png
+
+NEXT (Week 5):
+- Add a 3rd input channel from VIIRS active-fire/thermal data
+  (NASA/VIIRS/002/VNP14A1, MaxFRP band) to target the steel-plant
+  confusion specifically, since it captures the combustion source's
+  actual thermal signature rather than just its gas emissions.

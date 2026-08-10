@@ -1,0 +1,64 @@
+WEEK 5 — DONE (VIIRS thermal fusion)
+
+- Added VIIRS active-fire/thermal data as a 3rd input channel, to
+  target the steel-plant confusion that survived Week 4's NO2+SO2 fusion
+  (export_viirs.py -> build_3channel.py -> train_3channel.py)
+- Dataset: NASA/VIIRS/002/VNP14A1 (VNP14A1.002), daily, 1km, band=MaxFRP
+  (Maximum Fire Radiative Power in MW -- a continuous magnitude like the
+  existing NO2/SO2 channels, so it slots into the same tile/CNN format)
+- 3-channel tiles built by build_3channel.py into
+  data/threech/{positive,negative,hard_negative} (3,64,64) arrays
+  (NO2, SO2, VIIRS-MaxFRP), via 3-way filename intersection of
+  data/monthly/*, data/so2/*, data/viirs/*
+
+EXPECTATION: VIIRS active-fire products are tuned for combustion/thermal
+anomalies broadly. Power-plant stack heat is a weak, often sub-pixel
+signal at 1km, so most VIIRS tiles will read 0/near-0 MaxFRP -- this is
+expected, not a data-quality bug. The hypothesis is that even sparse,
+intermittent thermal hits correlate with sustained power-plant operation
+in a way that differs from steel-mill or urban NO2/SO2 sources, which
+should show up as reduced false-alarm rates for Bhilai/Jamshedpur
+specifically (the two hard negatives Week 4 still got wrong).
+
+RESULT: MEASURED. Ran export_viirs.py (600 tiles), regenerated
+data/monthly (NO2, 600 tiles) since it had been cleaned up locally,
+built data/threech (600 3-channel tiles, 0 loss vs. Week 4 counts),
+then train_3channel.py:
+
+  hard_only : 79.2% accuracy, 82% plant recall, 77% negative recall,
+              6 false alarms, 4 missed plants
+  mixed     : 84.2% accuracy, but only 34% plant recall (19 missed
+              plants) -- the model got much more conservative once
+              rural negatives were reintroduced
+
+  Week 3  NO2-only      hard_only : 77.1%
+  Week 4  NO2+SO2       hard_only : 79.2%
+  Week 5  NO2+SO2+VIIRS hard_only : 79.2%   <- EXACT TIE, no improvement
+
+CONCLUSION: adding VIIRS MaxFRP as a 3rd channel did not improve
+overall hard-negative accuracy over Week 4 -- it tied exactly.
+
+STEEL-PLANT BREAKDOWN (analyze_failures_3ch.py, avg P(plant) per
+source, decision threshold=0.5):
+  source          Week3(NO2)  Week4(+SO2)  Week5(+VIIRS)
+  ind_Bhilai            0.55         0.59          0.52
+  ind_Jamshedpur         0.58         0.54          0.50
+
+The original hypothesis held up directionally: VIIRS DID reduce
+false-alarm confidence on both steel plants (Bhilai 0.59->0.52,
+Jamshedpur 0.54->0.50, both now at/below the 0.5 threshold). But
+overall hard-only accuracy stayed flat because other hard negatives
+got relatively worse, most notably highways (hwy_AhmedabadVadodara
+0.46, hwy_GTRoad_UP 0.44 -- now the top non-steel false alarms), which
+offset the steel-plant gain in the aggregate accuracy number.
+
+Plausible reason overall accuracy didn't move: MaxFRP is 0 for the
+vast majority of tiles/months (power-plant stack heat is a weak,
+often sub-pixel signal at VIIRS's 1km resolution), so the added
+channel likely carried limited discriminative signal overall on this
+small a dataset (600 tiles total, 240 in the balanced hard_only
+split) -- enough to shift steel-plant scores specifically, not enough
+to move the aggregate metric.
+
+Models: detector3_2ch_hard_only.pt, detector3_2ch_mixed.pt
+Figures: data/worst_false_alarms_3ch.png

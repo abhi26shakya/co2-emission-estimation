@@ -1,5 +1,5 @@
 import ee, geemap
-ee.Initialize(project="co2detectionusingsatellitedata")
+ee.Initialize(project="opportune-lore-415218")
 
 # Singrauli / Vindhyachal area — one of India's largest coal complexes
 plant_lat, plant_lon = 24.10, 82.67

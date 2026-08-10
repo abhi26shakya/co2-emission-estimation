@@ -6,9 +6,13 @@ fig, (ax1, ax2) = plt.subplots(1, 2, figsize=(15, 6))
 # ---- Panel 1: accuracy progression ----
 labels = ["Week 2\n(easy:\nplant vs forest)",
           "Week 3\n(hard:\nNO2 only)",
-          "Week 4\n(hard:\nNO2+SO2)"]
-acc = [91.2, 77.1, 79.2]
-colors = ["#7f8c8d", "#c0392b", "#27ae60"]
+          "Week 4\n(hard:\nNO2+SO2)",
+          "Week 5\n(hard:\nNO2+SO2+VIIRS)"]
+# Week 5 measured via train_3channel.py: 79.2% hard-only -- an exact
+# tie with Week 4, i.e. VIIRS MaxFRP did not improve accuracy here
+# (see WEEK5_LOG.txt for the full breakdown).
+acc = [91.2, 77.1, 79.2, 79.2]
+colors = ["#7f8c8d", "#c0392b", "#27ae60", "#2980b9"]
 bars = ax1.bar(labels, acc, color=colors)
 ax1.axhline(50, ls="--", color="gray", label="chance (50%)")
 ax1.set_ylabel("Test accuracy (%)"); ax1.set_ylim(0, 100)

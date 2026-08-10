@@ -1,5 +1,5 @@
 import ee, numpy as np, pandas as pd, os, urllib.request, io
-ee.Initialize(project="co2detectionusingsatellitedata")
+ee.Initialize(project="opportune-lore-415218")
 
 os.makedirs("data/monthly/positive", exist_ok=True)
 os.makedirs("data/monthly/negative", exist_ok=True)

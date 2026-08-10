@@ -1,5 +1,5 @@
 import ee, numpy as np, pandas as pd, os, urllib.request, io
-ee.Initialize(project="co2detectionusingsatellitedata")
+ee.Initialize(project="opportune-lore-415218")
 
 os.makedirs("data/tiles", exist_ok=True)
 plants = pd.read_csv("data/top5_plants.csv")

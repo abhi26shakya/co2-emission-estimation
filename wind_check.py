@@ -1,7 +1,7 @@
 import ee, numpy as np
 import matplotlib.pyplot as plt
 
-ee.Initialize(project="co2detectionusingsatellitedata")
+ee.Initialize(project="opportune-lore-415218")
 
 PLANT_LAT, PLANT_LON = 24.10, 82.67
 

@@ -57,7 +57,7 @@ else:
 np.savez(f"data/{NAME}_soundings.npz", lat=klat, lon=klon, xco2=kco2)
 
 # ---------- 2. NO2: co-location ----------
-ee.Initialize(project="co2detectionusingsatellitedata")
+ee.Initialize(project="opportune-lore-415218")
 region = ee.Geometry.Rectangle([PLON-BOX, PLAT-BOX, PLON+BOX, PLAT+BOX])
 no2img = (ee.ImageCollection("COPERNICUS/S5P/OFFL/L3_NO2")
           .select("tropospheric_NO2_column_number_density")

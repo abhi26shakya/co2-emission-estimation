@@ -1,5 +1,5 @@
 import ee, numpy as np, os, urllib.request, io
-ee.Initialize(project="co2detectionusingsatellitedata")
+ee.Initialize(project="opportune-lore-415218")
 
 os.makedirs("data/tiles_negative", exist_ok=True)
 
