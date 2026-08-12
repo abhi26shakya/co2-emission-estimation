@@ -1,0 +1,99 @@
+{
+  "n_facilities": 7,
+  "feature_table": [
+    {
+      "plant": "Sasan",
+      "q_rel_std": 0.4479684707666235,
+      "activity_prob_mean": 0.8201683561007181,
+      "activity_prob_std": 0.2377384608722279,
+      "wind_co2_diff_deg": 54.0,
+      "hit_days": 19,
+      "n_soundings": 7379,
+      "capacity_mw": 3960.0
+    },
+    {
+      "plant": "Tirora",
+      "q_rel_std": 0.5275925101135394,
+      "activity_prob_mean": 0.289015993475914,
+      "activity_prob_std": 0.13467803134965725,
+      "wind_co2_diff_deg": 92.0,
+      "hit_days": 5,
+      "n_soundings": 671,
+      "capacity_mw": 3300.0
+    },
+    {
+      "plant": "Vindhyachal",
+      "q_rel_std": 0.5954457668228308,
+      "activity_prob_mean": 0.8501675700147947,
+      "activity_prob_std": 0.2121208778583912,
+      "wind_co2_diff_deg": 33.0,
+      "hit_days": 17,
+      "n_soundings": 7114,
+      "capacity_mw": 4760.0
+    },
+    {
+      "plant": "Talcher",
+      "q_rel_std": 0.2306888278709128,
+      "activity_prob_mean": 0.5916086789220572,
+      "activity_prob_std": 0.31446961272747304,
+      "wind_co2_diff_deg": 25.0,
+      "hit_days": 21,
+      "n_soundings": 2165,
+      "capacity_mw": 3000.0
+    },
+    {
+      "plant": "Rihand",
+      "q_rel_std": 0.7404500535279132,
+      "activity_prob_mean": 0.8938823404411474,
+      "activity_prob_std": 0.20537263920426904,
+      "wind_co2_diff_deg": 109.0,
+      "hit_days": 16,
+      "n_soundings": 6072,
+      "capacity_mw": 3000.0
+    },
+    {
+      "plant": "ChandrapurCoal",
+      "q_rel_std": 0.49399112945285567,
+      "activity_prob_mean": 0.34866679925471544,
+      "activity_prob_std": 0.26591843920496294,
+      "wind_co2_diff_deg": 177.0,
+      "hit_days": 14,
+      "n_soundings": 1136,
+      "capacity_mw": 2920.0
+    },
+    {
+      "plant": "Anpara",
+      "q_rel_std": 0.6769219616494417,
+      "activity_prob_mean": 0.8256148733198643,
+      "activity_prob_std": 0.22277025160060487,
+      "wind_co2_diff_deg": 80.0,
+      "hit_days": 16,
+      "n_soundings": 5768,
+      "capacity_mw": 2630.0
+    }
+  ],
+  "correlations_with_q_rel_std": {
+    "activity_prob_mean": 0.4158293926386504,
+    "activity_prob_std": -0.6171153568925866,
+    "wind_co2_diff_deg": 0.3461457803785848,
+    "hit_days": -0.30656282342816044,
+    "n_soundings": 0.44068125697135585,
+    "capacity_mw": -0.02267020484270985
+  },
+  "best_single_feature": "activity_prob_std",
+  "loo_cv": {
+    "feature": "activity_prob_std",
+    "predictions": {
+      "Sasan": 0.5226500327744693,
+      "Tirora": 0.976529522478,
+      "Vindhyachal": 0.552467058908978,
+      "Talcher": 0.538558478697642,
+      "Rihand": 0.5372579329208665,
+      "ChandrapurCoal": 0.44926641990766014,
+      "Anpara": 0.5162167294636109
+    },
+    "mae": 0.1832984279215659,
+    "r2": -1.22240627350426
+  },
+  "caveat": "N=7 facilities. This is a reliability/uncertainty-prediction exercise, not a Q-correcting model -- no ground-truth emissions are available yet to fit or validate a true correction against. Results are indicative, not a validated predictive model."
+}
