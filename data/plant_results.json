@@ -115,5 +115,31 @@
     "wind_deg": 108.0,
     "co2_offset_deg": 188.0,
     "wind_co2_diff_deg": 80.0
+  },
+  {
+    "plant": "RGundem",
+    "lat": 18.7572,
+    "lon": 79.456,
+    "hit_days": 5,
+    "soundings": 172,
+    "co2_enhancement_ppm": 0.589,
+    "bg_std_ppm": 0.814,
+    "no2_peak_km": 1.0,
+    "wind_deg": 14.0,
+    "co2_offset_deg": 59.0,
+    "wind_co2_diff_deg": 46.0
+  },
+  {
+    "plant": "Korba",
+    "lat": 22.3881,
+    "lon": 82.6858,
+    "hit_days": 5,
+    "soundings": 384,
+    "co2_enhancement_ppm": 0.361,
+    "bg_std_ppm": 0.943,
+    "no2_peak_km": 4.1,
+    "wind_deg": 133.0,
+    "co2_offset_deg": 47.0,
+    "wind_co2_diff_deg": 86.0
   }
 ]
