@@ -1,0 +1,73 @@
+{
+  "per_facility": [
+    {
+      "plant": "Vindhyachal",
+      "group": "in_training_both",
+      "orig_activity_prob": 0.8501675700147947,
+      "facility_split_activity_prob": 0.8536404681702455,
+      "delta": 0.003472898155450821
+    },
+    {
+      "plant": "Sasan",
+      "group": "in_training_both",
+      "orig_activity_prob": 0.8201683561007181,
+      "facility_split_activity_prob": 0.7939636384447416,
+      "delta": -0.02620471765597654
+    },
+    {
+      "plant": "Mundra",
+      "group": "in_training_both",
+      "orig_activity_prob": 0.34759697938958806,
+      "facility_split_activity_prob": 0.3648529959221681,
+      "delta": 0.01725601653258002
+    },
+    {
+      "plant": "Tirora",
+      "group": "held_out_in_facility_split",
+      "orig_activity_prob": 0.289015993475914,
+      "facility_split_activity_prob": 0.17179605062119663,
+      "delta": -0.11721994285471737
+    },
+    {
+      "plant": "Talcher",
+      "group": "never_in_training",
+      "orig_activity_prob": 0.5916086789220572,
+      "facility_split_activity_prob": 0.48781489829222363,
+      "delta": -0.10379378062983352
+    },
+    {
+      "plant": "Rihand",
+      "group": "never_in_training",
+      "orig_activity_prob": 0.8938823404411474,
+      "facility_split_activity_prob": 0.8940867607792219,
+      "delta": 0.00020442033807444027
+    },
+    {
+      "plant": "Sipat",
+      "group": "never_in_training",
+      "orig_activity_prob": 0.5777107495814562,
+      "facility_split_activity_prob": 0.35818658249460594,
+      "delta": -0.21952416708685024
+    },
+    {
+      "plant": "ChandrapurCoal",
+      "group": "never_in_training",
+      "orig_activity_prob": 0.34866679925471544,
+      "facility_split_activity_prob": 0.13229736591650484,
+      "delta": -0.2163694333382106
+    },
+    {
+      "plant": "Anpara",
+      "group": "never_in_training",
+      "orig_activity_prob": 0.8256148733198643,
+      "facility_split_activity_prob": 0.8599802056948344,
+      "delta": 0.03436533237497008
+    }
+  ],
+  "mean_abs_delta_by_group": {
+    "in_training_both": 0.015644544114669128,
+    "held_out_in_facility_split": 0.11721994285471737,
+    "never_in_training": 0.11485142675358777
+  },
+  "conclusion": "in_training_both facilities show near-zero deltas (stable, as expected if the model reliably recognizes sites it was trained on in both runs). Tirora (held out only in the facility-split run) drops meaningfully, direct evidence the original signal was inflated by having seen this exact facility during training. The 5 never-in-training facilities show the largest and most inconsistent deltas of any group (up to 0.22), meaning the activity signal for genuinely novel facilities is unstable across reasonable training variation, not just weak on average -- confirms WEEK11_LOG.txt's concern about the Week 10 activity signal for the 5 new facilities directly, rather than leaving it inferred."
+}

@@ -23,13 +23,19 @@ computation itself, only in the train/test split), so it exactly
 reproduces the training-time normalization.
 """
 import json
+import sys
 import glob
 import numpy as np
 import torch
 import torch.nn as nn
 
 DEVICE = "cpu"
-CHECKPOINT = "detector3_2ch_mixed.pt"
+# CLI-overridable so the same script can be re-run against the Week 11
+# facility-split checkpoint for direct comparison against the original
+# (Week 10) activity signal -- see WEEK11_LOG.txt's NEXT section.
+CHECKPOINT = sys.argv[1] if len(sys.argv) > 1 else "detector3_2ch_mixed.pt"
+OUTPUT_PATH = (f"data/activity_signals_facility_split.json"
+               if "facility_split" in CHECKPOINT else "data/activity_signals.json")
 
 # facility short name (data/plant_results.json) -> Track A export filename
 # prefix, for the 4 facilities already covered by the original 5-plant
@@ -160,8 +166,8 @@ def main():
         print(f"[{name}] n_months={len(probs)}  activity_prob={result['activity_prob_mean']:.3f} "
               f"+/- {result['activity_prob_std']:.3f}")
 
-    json.dump(results, open("data/activity_signals.json", "w"), indent=2)
-    print(f"\n[SAVED] {len(results)} facility activity signals -> data/activity_signals.json")
+    json.dump(results, open(OUTPUT_PATH, "w"), indent=2)
+    print(f"\n[SAVED] {len(results)} facility activity signals -> {OUTPUT_PATH}")
 
 
 if __name__ == "__main__":

@@ -68,13 +68,41 @@ WEEK 11 — DONE (facility-level train/test split for Track A, fixing a
   (Track B) at all, only the CNN-derived activity-signal cross-check
   layered on top of them.
 
+UPDATE (same session): re-ran extract_activity_signal.py against
+detector3_2ch_mixed_facility_split.pt (extract_activity_signal.py now
+takes an optional checkpoint-path argument, defaulting to the original
+checkpoint so nothing else changes) and wrote
+compare_activity_signal_checkpoints.py to diff the two runs directly, per
+facility, split into three groups by training exposure:
+
+  in_training_both (Vindhyachal, Sasan, Mundra -- seen by both
+  checkpoints): mean |delta| = 0.016. Near-zero, as expected.
+
+  held_out_in_facility_split (Tirora -- seen by the original checkpoint,
+  genuinely held out by the facility-split one): delta = -0.117
+  (0.289 -> 0.172). A real, meaningful drop the moment this exact facility
+  stops being memorized -- direct confirmation the original signal was
+  inflated, not inferred from recall numbers alone.
+
+  never_in_training (Talcher, Rihand, Sipat, ChandrapurCoal, Anpara --
+  unseen by both checkpoints): mean |delta| = 0.115, with Sipat (-0.220)
+  and ChandrapurCoal (-0.216) swinging the most of any facility in the
+  whole comparison. Rihand, by contrast, is exactly stable (0.894 both
+  times). This is a distinct finding from the Tirora case -- it's not
+  memorization (neither model saw these facilities), it's instability:
+  the model's verdict on a genuinely novel facility depends meaningfully
+  on which other data happened to be held out during training, which is
+  itself a reliability problem independent of the recall numbers.
+
+Conclusion: the Week 10 activity signal for the 5 new Week 9 facilities
+should be treated as low-confidence for two compounding reasons -- weak
+average performance on unseen facilities (8% recall, Week 11's main
+result) AND high variance in what that weak signal actually outputs for
+any given novel facility (this comparison). Both point the same direction:
+more positive-class training facilities, not a different checkpoint or
+threshold choice, is what this needs.
+
 NEXT:
-  - Re-run extract_activity_signal.py against detector3_2ch_mixed_facility_split.pt
-    (or detector3_2ch_hard_only_facility_split.pt) instead of the original
-    checkpoint, and compare the resulting activity signals -- if they
-    diverge substantially from Week 10's data/activity_signals.json,
-    that would confirm the memorization concern directly rather than
-    leaving it as a plausible inference from the recall numbers alone.
   - The underlying data problem (5 positive-class facilities is too few
     for any train/test split to give a stable estimate of plant recall)
     won't go away without more facilities -- this is the same N-too-small
