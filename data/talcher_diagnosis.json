@@ -1,0 +1,61 @@
+{
+  "climate_trace_match": {
+    "plant": "Talcher",
+    "climate_trace_name": "Talcher Kaniha Super Thermal Power Station",
+    "climate_trace_id": 25453799,
+    "climate_trace_year": 2021,
+    "climate_trace_co2_t": 14235000,
+    "match_dist_deg": 0.0011180339887552333,
+    "our_q_t_per_year": 7163462.163807527,
+    "our_q_year": 2020,
+    "ratio_ours_over_ct": 0.5032288137553584,
+    "bracketed_by_our_interval": false
+  },
+  "climate_trace_year_trend": {
+    "2021": 14235000,
+    "2022": 15690000,
+    "2023": 16503000,
+    "2024": 17037000
+  },
+  "near_bg_stats": {
+    "Talcher": {
+      "near_n": 252,
+      "bg_n": 1352,
+      "bg_mean": 413.56121826171875,
+      "bg_std": 1.3874952793121338,
+      "near_mean": 413.8055419921875,
+      "n_used": 130,
+      "frac_near_above_bg": 0.5158730158730159,
+      "excess_used_mean": 0.9564136266708374,
+      "excess_used_median": 0.566192626953125,
+      "signal_to_noise": 0.17608977854251862
+    },
+    "Rihand": {
+      "near_n": 1543,
+      "bg_n": 2463,
+      "bg_mean": 413.2850646972656,
+      "bg_std": 1.481845498085022,
+      "near_mean": 415.1727600097656,
+      "n_used": 1166,
+      "frac_near_above_bg": 0.7556707712248866,
+      "excess_used_mean": 2.8950681686401367,
+      "excess_used_median": 1.973968505859375,
+      "signal_to_noise": 1.2738813161849976
+    }
+  },
+  "bg_definition_sensitivity": {
+    "Talcher": {
+      "definitions_tested": 5,
+      "ime_proxy_min": 122.72686767578125,
+      "ime_proxy_max": 147.900390625,
+      "ime_proxy_range_pct_of_default": 20.246730069371203
+    },
+    "Rihand": {
+      "definitions_tested": 5,
+      "ime_proxy_min": 3304.4716796875,
+      "ime_proxy_max": 3449.43994140625,
+      "ime_proxy_range_pct_of_default": 4.2945295537750985
+    }
+  },
+  "conclusion": "Talcher's estimate is low primarily because its raw CO2 enhancement (near_mean - bg_mean) is tiny relative to background noise (signal/noise ~0.18, vs ~1.27 for Rihand), and only ~half of near-plant soundings exceed background at all -- a near coin-flip. The IME estimate is correspondingly far more sensitive to the background-annulus definition than a robust plant's. physics_gaussian.py's reported q_rel_std does not include this background-definition structural uncertainty, so the tight (+/-20%) interval understates the real uncertainty for this specific plant. The 2020-vs-2021 year offset (Climate TRACE has no 2020 asset data) explains only a modest fraction of the gap once Climate TRACE's own multi-year growth trend for this asset is extrapolated back to 2020."
+}

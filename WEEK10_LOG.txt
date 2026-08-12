@@ -1,0 +1,120 @@
+WEEK 10 — DONE (activity signal, reliability check, Climate TRACE benchmark,
+                 Talcher diagnosis)
+
+- Continuation of the same session as Week 9's facility-set expansion.
+  RESEARCH_PLAN.md's roadmap (Sec 14) calls for steps 3 (activity-signal
+  extraction), 4 (correction model), and 6 (Climate TRACE benchmark) next.
+  This week worked through all three, plus an unplanned but necessary
+  fourth piece: diagnosing the one facility whose Climate TRACE comparison
+  came back genuinely wrong.
+
+- Roadmap step 3 -- activity signal (export_facility_tiles.py,
+  extract_activity_signal.py): reused Track A's already-trained 3-channel
+  CNN (detector3_2ch_mixed.pt) as-is, per RESEARCH_PLAN.md Sec 15's
+  explicit instruction not to retrain it yet. Exported 2020-only NO2/SO2/
+  VIIRS tiles for the 5 facilities not already covered by Track A's
+  original 5-plant export (180 tiles, much faster than the OCO-3 scans --
+  small array downloads, not large granule files). Extracted a per-
+  facility activity probability + 64-dim embedding for all 9 Track B
+  facilities, carefully reproducing train_3channel.py's per-channel
+  normalization (which is computed at train time but never saved to disk
+  with the checkpoint -- reconstructed by reloading the original training
+  tiles and recomputing the same mean/std). Result: the activity signal
+  broadly tracks the physics-based Q estimate (the 4 highest-activity
+  facilities are also the 4 highest-emission estimates), and separately
+  flagged ChandrapurCoal (low activity signal despite a moderate Q
+  estimate) as a plant whose IME result might be less trustworthy --
+  a flag that the Climate TRACE comparison later complicated rather than
+  confirmed (see below).
+
+- Roadmap step 4 -- correction model, scoped down (reliability_model.py):
+  RESEARCH_PLAN.md describes a "correction model" that outputs a
+  corrected Q_final, but that needs a training target we don't have --
+  Climate TRACE wasn't pulled yet at this point in the week, and
+  RESEARCH_PLAN.md Sec 7 says it must not be used as a training label
+  regardless. Scoped the question down to something answerable now: does
+  the activity signal, wind/CO2 alignment, or facility metadata predict
+  physics_gaussian.py's own self-reported q_rel_std? Not circular --
+  q_rel_std is derived purely from ERA5 wind variance and IME bootstrap
+  noise, independent of the candidate features. Result: a real negative
+  finding. Best single-feature correlation (activity_prob_std, r=-0.62)
+  does not survive leave-one-out CV at N=7 (LOO R^2 = -1.22, worse than
+  predicting the mean). Documents, rather than papers over, that 7
+  facilities is too few for this kind of modeling -- reinforces
+  RESEARCH_PLAN.md's original argument for expanding past the current set.
+
+- Roadmap step 6 -- Climate TRACE benchmark (pull_climate_trace.py):
+  API endpoint discovered empirically (api.climatetrace.org/v6/assets,
+  found via the site's beta API reference and verified live with curl
+  before writing any code -- not guessed). Pulled India power-sector CO2
+  for all 9 Track B facilities, matched by lat/lon centroid (exact
+  matches, e.g. Vindhyachal's Climate TRACE centroid is identical to our
+  own coordinates). Year caveat: Climate TRACE's asset API has no 2020
+  coverage (year=2020 returns zero assets) -- used 2021, the nearest
+  available year, against Track B's 2020 estimates. Result: 5/7 facilities
+  with a Track B estimate have Climate TRACE's value within our stated
+  uncertainty interval -- a reasonable hit rate given how wide those
+  intervals are (+/-45-74% for most plants). The two misses are the
+  interesting part: Sasan overestimates (2.13x Climate TRACE) and Talcher
+  underestimates (0.50x) despite having the TIGHTEST, most confident
+  interval of any plant this session (+/-20%) -- confidence and
+  correctness pulled apart on exactly the plant that looked most solid.
+  ChandrapurCoal, flagged earlier via the activity signal as our least-
+  trustworthy estimate, actually has the closest ratio to 1.0 (0.81x) --
+  a complication for that narrative, not confirmation of it. Framed
+  throughout as benchmark-vs-benchmark, not ground truth, per
+  RESEARCH_PLAN.md Sec 10/12 -- Climate TRACE's own accuracy on Indian
+  plants is itself unvalidated.
+
+- Talcher diagnosis (diagnose_talcher.py), prompted by asking "why is the
+  most confident estimate also the most wrong":
+  1. Ruled out a plant-identity mismatch -- Climate TRACE's match distance
+     is 0.0011 deg (~120m), same 3000MW plant, same coordinates.
+  2. Ruled out the 2020-vs-2021 year offset as the primary cause. Climate
+     TRACE's own multi-year trend for this exact asset (14.24M in 2021 ->
+     17.04M in 2024, 6.2% CAGR) extrapolates back to ~13.4M for 2020 --
+     still a 1.9x gap versus our 7.16M, so the year mismatch explains only
+     a modest fraction of the discrepancy, not most of it.
+  3. Found the real cause: Talcher's raw CO2 enhancement (near-plant mean
+     minus background mean) is tiny relative to background noise --
+     signal-to-noise ratio 0.18, versus 1.27 for Rihand (a well-bracketed
+     comparison plant). Only 51.6% of near-plant soundings exceed the
+     background mean at all (a near coin-flip), versus 75.6% for Rihand.
+  4. Directly measured what physics_gaussian.py's docstring already warns
+     about but doesn't quantify: sensitivity to the background-annulus
+     definition. Testing 5 reasonable background-radius choices, Talcher's
+     IME estimate swings 20% of its default value; Rihand's swings only
+     4%. Talcher's tight +/-20% reported uncertainty (wind + IME-sampling
+     noise only) doesn't include this structural sensitivity at all, so
+     the interval understates the real uncertainty specifically for this
+     plant.
+  5. One point in favor of the signal being real rather than pure noise:
+     Talcher has the best wind/CO2 offset alignment of any plant this
+     session (25 deg, from Week 9) -- the faint pattern detected is at
+     least directionally consistent with wind-driven transport.
+  Conclusion: not a code bug, not a plant mismatch, and only partly a year
+  effect. A genuine case where the IME method's implicit assumption
+  (background cleanly separable from signal) breaks down for a plant with
+  a thin OCO-3 CO2 signature, and the uncertainty model's blind spot
+  (background-definition structural uncertainty, already documented in
+  physics_gaussian.py's own docstring since Week 8) turns out to matter
+  most exactly where it's least visible -- a facility whose OTHER
+  diagnostics (uncertainty band, wind alignment) look fine.
+
+NEXT: the background-definition-sensitivity check in diagnose_talcher.py
+is currently a one-off diagnostic, not a per-plant automated flag. Per
+RESEARCH_PLAN.md's priority order (scientific validity first), a natural
+follow-up is running this same sensitivity test across all 9 facilities
+and folding a background-sensitivity term into physics_gaussian.py's
+reported uncertainty, rather than leaving it as a manual investigation
+triggered only when a plant looks suspicious after the fact. Facility-set
+expansion (10 candidates remaining from Week 9's shortlist) and
+retrying the reliability-model exercise at higher N both remain open,
+per Week 9's NEXT section.
+
+Files changed: export_facility_tiles.py (new), extract_activity_signal.py
+(new), reliability_model.py (new), pull_climate_trace.py (new),
+diagnose_talcher.py (new), data/activity_tiles/ (180 new .npy files),
+data/activity_signals.json (new), data/reliability_model_results.json
+(new), data/climate_trace_comparison.json (new), data/talcher_diagnosis.json
+(new).
