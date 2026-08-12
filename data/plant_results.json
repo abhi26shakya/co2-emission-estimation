@@ -141,5 +141,31 @@
     "wind_deg": 133.0,
     "co2_offset_deg": 47.0,
     "wind_co2_diff_deg": 86.0
+  },
+  {
+    "plant": "ShriSingajiMalwa",
+    "lat": 22.0971,
+    "lon": 76.5317,
+    "hit_days": 5,
+    "soundings": 228,
+    "co2_enhancement_ppm": -1.052,
+    "bg_std_ppm": 1.894,
+    "no2_peak_km": 1.0,
+    "wind_deg": 121.0,
+    "co2_offset_deg": 50.0,
+    "wind_co2_diff_deg": 71.0
+  },
+  {
+    "plant": "Koradi",
+    "lat": 21.2414,
+    "lon": 79.096,
+    "hit_days": 25,
+    "soundings": 3672,
+    "co2_enhancement_ppm": -0.131,
+    "bg_std_ppm": 1.713,
+    "no2_peak_km": 2.0,
+    "wind_deg": 143.0,
+    "co2_offset_deg": 27.0,
+    "wind_co2_diff_deg": 115.0
   }
 ]
