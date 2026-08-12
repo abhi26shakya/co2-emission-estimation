@@ -50,5 +50,70 @@
     "wind_deg": 110.0,
     "co2_offset_deg": 143.0,
     "wind_co2_diff_deg": 33.0
+  },
+  {
+    "plant": "Talcher",
+    "lat": 21.0966,
+    "lon": 85.074,
+    "hit_days": 21,
+    "soundings": 2165,
+    "co2_enhancement_ppm": 0.244,
+    "bg_std_ppm": 1.387,
+    "no2_peak_km": 34.7,
+    "wind_deg": 318.0,
+    "co2_offset_deg": 343.0,
+    "wind_co2_diff_deg": 25.0
+  },
+  {
+    "plant": "Rihand",
+    "lat": 24.027,
+    "lon": 82.7915,
+    "hit_days": 16,
+    "soundings": 6072,
+    "co2_enhancement_ppm": 1.888,
+    "bg_std_ppm": 1.482,
+    "no2_peak_km": 8.1,
+    "wind_deg": 108.0,
+    "co2_offset_deg": 217.0,
+    "wind_co2_diff_deg": 109.0
+  },
+  {
+    "plant": "Sipat",
+    "lat": 22.13,
+    "lon": 82.293,
+    "hit_days": 1,
+    "soundings": 63,
+    "co2_enhancement_ppm": null,
+    "bg_std_ppm": 0.877,
+    "no2_peak_km": 55.1,
+    "wind_deg": 149.0,
+    "co2_offset_deg": 48.0,
+    "wind_co2_diff_deg": 101.0
+  },
+  {
+    "plant": "ChandrapurCoal",
+    "lat": 20.0063,
+    "lon": 79.29,
+    "hit_days": 14,
+    "soundings": 1136,
+    "co2_enhancement_ppm": 0.649,
+    "bg_std_ppm": 1.977,
+    "no2_peak_km": 2.0,
+    "wind_deg": 63.0,
+    "co2_offset_deg": 247.0,
+    "wind_co2_diff_deg": 177.0
+  },
+  {
+    "plant": "Anpara",
+    "lat": 24.201,
+    "lon": 82.7891,
+    "hit_days": 16,
+    "soundings": 5768,
+    "co2_enhancement_ppm": 1.261,
+    "bg_std_ppm": 1.733,
+    "no2_peak_km": 16.7,
+    "wind_deg": 108.0,
+    "co2_offset_deg": 188.0,
+    "wind_co2_diff_deg": 80.0
   }
 ]

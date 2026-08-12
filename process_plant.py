@@ -1,14 +1,17 @@
 import sys, os, json, time
 import ee, numpy as np, requests, io
 import earthaccess, xarray as xr
+import pandas as pd
 
 # ---------- plant registry ----------
-PLANTS = {
-    "Vindhyachal": (24.10, 82.67),
-    "Sasan":       (23.98, 82.62),
-    "Mundra":      (22.82, 69.55),
-    "Tirora":      (21.41, 79.94),
-}
+# Loaded from data/candidate_plants.csv (Week 9 facility-set expansion,
+# built by pick_plants.py) instead of a hardcoded 4-entry dict. The first 4
+# plants processed in Weeks 6-8 (Vindhyachal, Sasan, Mundra, Tirora) keep
+# their existing short aliases in that CSV, so this generalization doesn't
+# change their lat/lon keys or break already-saved data/plant_results.json
+# rows / data/<Plant>_soundings.npz files.
+_candidates = pd.read_csv("data/candidate_plants.csv")
+PLANTS = {row["name"]: (row["latitude"], row["longitude"]) for _, row in _candidates.iterrows()}
 
 if len(sys.argv) < 2 or sys.argv[1] not in PLANTS:
     print("Usage: python process_plant.py <PlantName>")

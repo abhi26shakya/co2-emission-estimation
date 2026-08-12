@@ -1,0 +1,142 @@
+[
+  {
+    "plant": "Vindhyachal",
+    "capacity_mw": 4760.0,
+    "latitude": 24.0983,
+    "longitude": 82.6719,
+    "granules": 360
+  },
+  {
+    "plant": "Mundra",
+    "capacity_mw": 4620.0,
+    "latitude": 22.823,
+    "longitude": 69.5532,
+    "granules": 360
+  },
+  {
+    "plant": "Sasan",
+    "capacity_mw": 3960.0,
+    "latitude": 23.9784,
+    "longitude": 82.6275,
+    "granules": 360
+  },
+  {
+    "plant": "Tirora",
+    "capacity_mw": 3300.0,
+    "latitude": 21.4129,
+    "longitude": 79.9671,
+    "granules": 360
+  },
+  {
+    "plant": "Talcher",
+    "capacity_mw": 3000.0,
+    "latitude": 21.0966,
+    "longitude": 85.074,
+    "granules": 360
+  },
+  {
+    "plant": "Rihand",
+    "capacity_mw": 3000.0,
+    "latitude": 24.027,
+    "longitude": 82.7915,
+    "granules": 360
+  },
+  {
+    "plant": "Sipat",
+    "capacity_mw": 2980.0,
+    "latitude": 22.13,
+    "longitude": 82.293,
+    "granules": 360
+  },
+  {
+    "plant": "ChandrapurCoal",
+    "capacity_mw": 2920.0,
+    "latitude": 20.0063,
+    "longitude": 79.29,
+    "granules": 360
+  },
+  {
+    "plant": "Anpara",
+    "capacity_mw": 2630.0,
+    "latitude": 24.201,
+    "longitude": 82.7891,
+    "granules": 360
+  },
+  {
+    "plant": "RGundem",
+    "capacity_mw": 2600.0,
+    "latitude": 18.7572,
+    "longitude": 79.456,
+    "granules": 360
+  },
+  {
+    "plant": "Korba",
+    "capacity_mw": 2600.0,
+    "latitude": 22.3881,
+    "longitude": 82.6858,
+    "granules": 360
+  },
+  {
+    "plant": "ShriSingajiMalwa",
+    "capacity_mw": 2520.0,
+    "latitude": 22.0971,
+    "longitude": 76.5317,
+    "granules": 360
+  },
+  {
+    "plant": "Koradi",
+    "capacity_mw": 2400.0,
+    "latitude": 21.2414,
+    "longitude": 79.096,
+    "granules": 360
+  },
+  {
+    "plant": "Tamnar",
+    "capacity_mw": 2400.0,
+    "latitude": 22.0987,
+    "longitude": 83.4513,
+    "granules": 360
+  },
+  {
+    "plant": "Kudgi",
+    "capacity_mw": 2400.0,
+    "latitude": 16.4994,
+    "longitude": 75.8349,
+    "granules": 360
+  },
+  {
+    "plant": "Kahalgaon",
+    "capacity_mw": 2340.0,
+    "latitude": 25.2349,
+    "longitude": 87.2635,
+    "granules": 360
+  },
+  {
+    "plant": "Mouda",
+    "capacity_mw": 2320.0,
+    "latitude": 21.1797,
+    "longitude": 79.3978,
+    "granules": 360
+  },
+  {
+    "plant": "Chhabra",
+    "capacity_mw": 2320.0,
+    "latitude": 24.6217,
+    "longitude": 77.0357,
+    "granules": 360
+  },
+  {
+    "plant": "Farakka",
+    "capacity_mw": 2100.0,
+    "latitude": 24.772,
+    "longitude": 87.894,
+    "granules": 360
+  },
+  {
+    "plant": "Simhadri",
+    "capacity_mw": 2000.0,
+    "latitude": 17.591,
+    "longitude": 83.0917,
+    "granules": 360
+  }
+]

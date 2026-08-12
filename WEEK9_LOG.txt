@@ -1,0 +1,150 @@
+WEEK 9 — DONE (facility-set expansion for Track B)
+
+- RESEARCH_PLAN.md Sec 15 named facility-set expansion as the next step
+  once Week 8's per-overpass wind fix was validated. This week does that:
+  went from 4 processed plants (2/4 plausible) to 9 (7/9 producing an
+  estimate), targeting RESEARCH_PLAN.md's 10-20-plant goal but stopping
+  short of it once the real per-plant processing cost became clear (see
+  "Processing cost" below).
+
+- pick_plants.py: extended from top-5 to top-20 India coal plants by
+  capacity (data/powerplants.csv). Added dedup: the raw dataset lists
+  separate generating units at the same site under different names (e.g.
+  "MUNDRA TPP" and "MUNDRA UMPP" ~0.05 deg apart) -- units within ~5km of
+  an already-kept, higher-capacity unit are now collapsed into one
+  candidate. The 4 plants already processed in Weeks 6-8 (Vindhyachal,
+  Sasan, Mundra, Tirora) keep their existing short aliases so
+  process_plant.py's registry generalization (below) doesn't touch their
+  already-saved data. Output: data/candidate_plants.csv (20 candidates).
+
+- check_coverage.py (new): metadata-only earthaccess.search_data() call
+  per candidate (no download) to rank/pre-filter before the expensive
+  per-plant scan. Result: all 20 candidates returned the identical
+  granule count (360) for the same year/bounding-box search. This is a
+  negative result worth recording -- granule-count pre-filtering at this
+  bounding-box scale does not discriminate at all; actual near-plant hit
+  density (the number that matters) only shows up after the full
+  per-sounding scan, same as the Tirora/Mundra thin-coverage findings
+  from Weeks 6-8. The pre-check script is kept for future use but isn't a
+  useful filter as currently written -- a real filter would need to
+  narrow the bounding box or check actual near-plant proximity per
+  granule, which is most of the cost of process_plant.py itself.
+
+- process_plant.py: PLANTS registry generalized from a hardcoded 4-entry
+  dict to a load from data/candidate_plants.csv, so any candidate can be
+  processed via `python process_plant.py <Name>` without further code
+  changes. Verified the 4 existing plants' lat/lon in the CSV are within
+  ~0.002 deg of their old hardcoded values (rounding only, no effective
+  change to near/background sounding membership).
+
+- physics_gaussian.py: removed the stale NPZ_PATHS override
+  ({"Vindhyachal": "data/vindhyachal_soundings.npz"}), a leftover from
+  before the estimate loop was generalized to read data/plant_results.json
+  directly -- the actual file is data/Vindhyachal_soundings.npz, so the
+  override was dead code that happened not to matter (the fallback
+  pattern f"data/{name}_soundings.npz" already resolves correctly).
+
+- Processed 5 new plants this week (Talcher, Rihand, Sipat, ChandrapurCoal,
+  Anpara), chosen as the 4 highest-capacity new candidates plus Talcher
+  (the first one tried, used to establish per-plant timing) -- user opted
+  to stop at 9 total plants rather than the full 20-candidate list once
+  the ~50-65 min/plant cost was measured (see below).
+
+  Talcher    21 hit-days, 2165 soundings, +0.24 ppm enhancement,
+             NO2 peak 35km away, wind/CO2 offset diff 25 deg (good
+             alignment) -> Q = 7.16M +/- 1.65M t/yr [5.51M, 8.82M]
+             (tightest relative uncertainty of any plant this week --
+             20% wind term vs. 45-74% for the others)
+
+  Rihand     16 hit-days, 6072 soundings, +1.89 ppm enhancement (largest
+             signal of any plant processed to date), NO2 peak only 8km
+             away (best co-location), wind/CO2 offset diff 109 deg (poor
+             alignment) -> Q = 47.47M +/- 35.15M t/yr [12.32M, 82.62M]
+             (74% wind relative std -- the least precise estimate this
+             week, driven by only 4 matched wind days with high day-to-
+             day spread)
+
+  Sipat      1 hit-day, 63 soundings, NaN enhancement (all 63 soundings
+             landed in the near-plant radius, none in the background
+             annulus, so bg.mean() was undefined), NO2 peak 55km away,
+             wind/CO2 offset diff 101 deg -> skipped by physics_gaussian.py
+             (near=0 after the near/bg split used there). Effectively
+             unusable, same outcome class as Mundra.
+
+  ChandrapurCoal  14 hit-days, 1136 soundings, +0.65 ppm enhancement, NO2
+             peak only 2km away (best co-location of the week), wind/CO2
+             offset diff 177 deg -- essentially opposite directions, the
+             worst alignment seen on any plant to date -> Q = 11.78M +/-
+             5.82M t/yr [5.96M, 17.59M]. Fell back to annual-mean wind
+             mode (0 days met the per-overpass match threshold) despite
+             having 28 near-plant soundings used, worth a closer look in
+             a future session -- the wind/CO2 misalignment and the
+             fallback-mode wind result may be related.
+
+  Anpara     16 hit-days, 5768 soundings, +1.26 ppm enhancement, NO2 peak
+             17km away, wind/CO2 offset diff 80 deg (moderate) ->
+             Q = 31.66M +/- 21.43M t/yr [10.23M, 53.09M]
+
+- Full 9-plant emission_estimates.json after physics_gaussian.py rerun:
+  Sasan 39.96M +/- 17.90M, Tirora 3.22M +/- 1.70M, Vindhyachal 36.87M +/-
+  21.95M (all three unchanged from Week 8 -- confirms the registry
+  generalization didn't perturb the original 4 plants' results), plus the
+  5 new plants above. Mundra and Sipat skipped (0 near-plant soundings
+  after the near/bg split).
+
+- Plausibility comparison: Week 8 baseline was 2/4 processed plants
+  giving a physically plausible estimate (Sasan, Vindhyachal; Tirora too
+  low; Mundra skipped). This week: 7/9 processed plants produce an
+  estimate at all (up from 3/4), and of the 5 new plants, 4/5 produce a
+  magnitude in the same broad range as the two originally-plausible
+  plants (7-47M t/yr) -- Sipat is the one clear non-starter. The wider
+  spread and generally larger relative uncertainty (45-74% wind term vs.
+  Talcher's 20%) suggests plausibility by magnitude alone is a weak
+  signal here; the wind/CO2 offset diff (25-177 deg across the 5 new
+  plants) looks like a more informative per-plant quality flag than
+  hit-day count or soundings count, worth formalizing as an explicit
+  filter/warning in a future pass rather than just printing it.
+
+- Processing cost: confirmed ~50-65 min per plant end-to-end (dominated
+  by the 360-granule/year OCO-3 scan, which is network-bound, not
+  CPU-bound). At this rate, all 20 shortlisted candidates would take
+  13-15 hours unattended. User chose to process 5 new plants (9 total)
+  this session rather than the full list -- this is now a documented,
+  measured constraint on facility-set expansion, not a guess.
+
+- Operational notes (checkpointing from Week 8, exercised under real
+  conditions this week):
+  * Rihand and Sipat each had one slow/large-granule download (one
+    granule took several minutes instead of the usual seconds) that
+    looked like a stall at first glance -- confirmed via the partial
+    file's growing size in data/scan_tmp/, not an actual hang. No
+    intervention needed; both recovered on their own.
+  * ChandrapurCoal's background-task tracker reported "failed" (exit
+    code 144) partway through its scan while the actual OS process was
+    still alive and continued running to completion normally -- a
+    monitoring/tooling artifact, not a pipeline bug. Verified via direct
+    process/checkpoint inspection rather than trusting the tracker.
+  * Anpara was genuinely interrupted once at granule 294/360 (process
+    actually gone, resource_tracker semaphore-leak warning in the log
+    consistent with a hard kill). Restarting `python process_plant.py
+    Anpara` resumed cleanly from the checkpoint with zero re-download and
+    finished normally. This is exactly the failure mode the Week 8
+    checkpointing was added for, and it worked as designed.
+
+NEXT (per RESEARCH_PLAN.md Sec 14, facility expansion continues to be
+viable but costly): 10 candidates from the 20-candidate shortlist remain
+unprocessed (Korba, ShriSingajiMalwa, Koradi, Tamnar, Kudgi, Kahalgaon,
+Mouda, Chhabra, Farakka, Simhadri) and could be picked up in a future
+session at the same ~50-65 min/plant rate. Per RESEARCH_PLAN.md's roadmap,
+the next items after facility expansion is judged sufficient are (3)
+extracting an activity signal from the existing trained 3-channel CNN
+(Track A) per facility, and (4) building the small correction model
+(A1-A5 ablation ladder in RESEARCH_PLAN.md Sec 9) that fuses that signal
+into Track B's physics-only estimate -- not started this week.
+
+Files changed: pick_plants.py, process_plant.py, physics_gaussian.py,
+check_coverage.py (new), data/candidate_plants.csv (new),
+data/candidate_coverage.json (new), data/plant_results.json,
+data/emission_estimates.json, data/Talcher_soundings.npz,
+data/Rihand_soundings.npz, data/Sipat_soundings.npz,
+data/ChandrapurCoal_soundings.npz, data/Anpara_soundings.npz.

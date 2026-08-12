@@ -64,9 +64,7 @@ MIN_WIND_DAYS_MATCHED = 3    # below this, fall back to the full-series mean/std
 NEAR = 0.25
 BG_IN, BG_OUT = 0.4, 0.9
 
-NPZ_PATHS = {
-    "Vindhyachal": "data/vindhyachal_soundings.npz",
-}
+NPZ_PATHS = {}
 
 
 def column_mass_enhancement(dppm):
