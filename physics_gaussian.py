@@ -34,17 +34,27 @@ Wind handling (updated from the Week 6 annual-mean-scalar version):
 Uncertainty: Q is linear in U_eff (IME and L_eff held fixed), so the wind
 speed's relative std maps directly to Q's relative std from that term. A
 second, independent term captures IME sampling noise (background/near-plant
-population size) via bootstrap resampling. The two relative stds are
-combined in quadrature (independent-error assumption) into a single sigma,
-reported as q_t_per_year_std alongside the point estimate q_t_per_year.
+population size) via bootstrap resampling. A third term (added Week 10,
+after diagnose_talcher.py found the first two badly understated Talcher's
+real uncertainty) captures background-annulus definition sensitivity: IME
+is recomputed under several alternate, equally-reasonable background-zone
+definitions (holding the near-plant zone fixed), and the relative std
+across those alternates is the third term. This matters most for plants
+with a thin/weak plume signal -- Talcher's IME swung 20% across background
+definitions vs. 4% for a well-bracketed plant (Rihand), and its old,
+narrower two-term uncertainty missed its Climate TRACE benchmark by ~2x.
+The three relative stds are combined in quadrature (independent-error
+assumption) into a single sigma, reported as q_t_per_year_std alongside
+the point estimate q_t_per_year.
 
 Caveats (still a coarse, single-scalar estimate, not a fitted plume image):
   - assumes standard surface pressure (no local met pressure)
   - fixed, approximate footprint area per OCO-3 sounding (not per-overpass)
   - only "hits" whichever soundings happen to fall in the near-plant/
     background zones already used by co2_enhancement.py / process_plant.py
-  - the reported sigma covers wind and IME-sampling noise only, not
-    boundary-layer-height or background-subtraction structural uncertainty
+  - the reported sigma now covers wind, IME-sampling noise, and background-
+    definition sensitivity, but still not boundary-layer-height uncertainty
+    (no per-overpass PBL height data is used anywhere in this pipeline)
 """
 import json
 import time
@@ -63,6 +73,13 @@ MIN_WIND_DAYS_MATCHED = 3    # below this, fall back to the full-series mean/std
 # same near-plant / background zones as co2_enhancement.py and process_plant.py
 NEAR = 0.25
 BG_IN, BG_OUT = 0.4, 0.9
+
+# alternate background-annulus definitions for the sensitivity term (added
+# Week 10, from diagnose_talcher.py) -- same 5 definitions tested there,
+# holding the near-plant zone (NEAR) fixed and varying only where
+# "background" is drawn from
+BG_DEFINITIONS = [(0.4, 0.9), (0.3, 0.8), (0.35, 0.7), (0.4, 1.1), (0.5, 1.0)]
+MIN_BG_DEFINITIONS = 3       # below this many valid alternates, term is 0
 
 NPZ_PATHS = {}
 
@@ -96,6 +113,28 @@ def _bootstrap_ime_rel_std(near, bg, n_boot=N_BOOT, seed=0):
         return 0.0
     mean = boots.mean()
     return float(boots.std(ddof=1) / mean) if mean > 0 else 0.0
+
+
+def _bg_definition_rel_std(dist, xco2, near):
+    """
+    Relative std of IME (kg) across several reasonable background-annulus
+    definitions, holding the near-plant zone fixed -- see
+    diagnose_talcher.py, which found this to be a much larger error source
+    than wind or IME-sampling noise for plants with a thin/weak plume
+    signal. Returns (rel_std, n_definitions_used).
+    """
+    imes = []
+    for bg_in, bg_out in BG_DEFINITIONS:
+        bg = xco2[(dist > bg_in) & (dist < bg_out)]
+        if len(bg) < 5:
+            continue
+        imes.append(_ime_kg(near, bg.mean()))
+    if len(imes) < MIN_BG_DEFINITIONS:
+        return 0.0, len(imes)
+    imes = np.array(imes)
+    mean = imes.mean()
+    rel_std = float(imes.std(ddof=1) / mean) if mean > 0 else 0.0
+    return rel_std, len(imes)
 
 
 def estimate_emission_rate(plant_row, wind_series):
@@ -178,7 +217,8 @@ def estimate_emission_rate(plant_row, wind_series):
 
     wind_rel_std = wind_speed_std / wind_speed_mean if wind_speed_mean > 0 else 0.0
     ime_rel_std = _bootstrap_ime_rel_std(near, bg)
-    q_rel_std = float(np.hypot(wind_rel_std, ime_rel_std))
+    bg_rel_std, n_bg_defs = _bg_definition_rel_std(dist, xco2, near)
+    q_rel_std = float(np.sqrt(wind_rel_std ** 2 + ime_rel_std ** 2 + bg_rel_std ** 2))
     q_t_yr_std = q_t_yr * q_rel_std
 
     result = {
@@ -193,6 +233,8 @@ def estimate_emission_rate(plant_row, wind_series):
         "u_eff_ms": u_eff,
         "wind_rel_std": wind_rel_std,
         "ime_rel_std": ime_rel_std,
+        "bg_rel_std": bg_rel_std,
+        "n_bg_definitions": n_bg_defs,
         "q_rel_std": q_rel_std,
         "q_kg_s": q_kg_s,
         "q_t_per_year": q_t_yr,
@@ -203,7 +245,7 @@ def estimate_emission_rate(plant_row, wind_series):
     print(f"[{name}] IME={ime:,.0f} kg  L_eff={l_eff/1000:.2f} km  "
           f"U_eff={u_eff:.2f} m/s ({wind_mode}, n={n_wind_matched})  ->  "
           f"Q = {q_t_yr:,.1f} +/- {q_t_yr_std:,.1f} t/yr "
-          f"(wind {wind_rel_std:.0%}, IME {ime_rel_std:.0%})")
+          f"(wind {wind_rel_std:.0%}, IME {ime_rel_std:.0%}, bg {bg_rel_std:.0%})")
     return result
 
 
