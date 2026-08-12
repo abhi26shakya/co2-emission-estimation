@@ -1,18 +1,5 @@
 [
   {
-    "plant": "Sasan",
-    "lat": 23.98,
-    "lon": 82.62,
-    "hit_days": 9,
-    "soundings": 3308,
-    "co2_enhancement_ppm": 1.024,
-    "bg_std_ppm": 2.086,
-    "no2_peak_km": 15.5,
-    "wind_deg": 106.0,
-    "co2_offset_deg": 11.0,
-    "wind_co2_diff_deg": 96.0
-  },
-  {
     "plant": "Mundra",
     "lat": 22.82,
     "lon": 69.55,
@@ -24,6 +11,19 @@
     "wind_deg": 98.0,
     "co2_offset_deg": 312.0,
     "wind_co2_diff_deg": 146.0
+  },
+  {
+    "plant": "Sasan",
+    "lat": 23.98,
+    "lon": 82.62,
+    "hit_days": 19,
+    "soundings": 7379,
+    "co2_enhancement_ppm": 0.739,
+    "bg_std_ppm": 1.835,
+    "no2_peak_km": 15.5,
+    "wind_deg": 106.0,
+    "co2_offset_deg": 52.0,
+    "wind_co2_diff_deg": 54.0
   },
   {
     "plant": "Tirora",

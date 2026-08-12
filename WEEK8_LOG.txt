@@ -1,0 +1,109 @@
+WEEK 8 — DONE (per-overpass wind conditioning + uncertainty for Track B)
+
+- RESEARCH_PLAN.md (post-Week-7 planning pass) identified Track B's annual-
+  mean wind assumption as the top priority fix: the literature confirms
+  wind-speed error as the dominant term in point-source flux uncertainty,
+  and this project's own WEEK6_LOG.txt had already flagged the annual-mean
+  scalar as a fragility. This week implements that fix.
+
+- physics_gaussian.py changes:
+  * per-overpass wind matching: each near-plant OCO-3 sounding is now
+    matched to its own overpass day's ERA5 daily wind speed (via a new
+    `day` field per sounding, YYYYMMDD, derived from sounding_id in
+    process_plant.py), instead of a single 2020 annual-mean scalar.
+  * falls back to the annual daily-speed distribution's mean/std when a
+    plant has fewer than MIN_WIND_DAYS_MATCHED=3 unique overpass days
+    with above-background CO2 (still yields an uncertainty term, just a
+    coarser one).
+  * uncertainty: Q's relative std is now reported as q_t_per_year_std,
+    combining (a) the per-overpass wind speed's relative std and (b) a
+    bootstrap estimate of IME sampling noise (500 resamples of the near/
+    background populations), combined in quadrature under an
+    independence assumption. Output is now Q +/- sigma with an explicit
+    [low, high] band, not a bare point estimate.
+
+- process_plant.py changes:
+  * saves a `day` field (YYYYMMDD) per OCO-3 sounding, needed for the
+    per-overpass match above.
+  * added checkpointing to the granule-download loop
+    (data/<Plant>_scan_checkpoint.npz, write-then-rename for atomicity,
+    deleted on clean completion) -- the 360-granule/plant/year OCO-3 scan
+    kept stalling on a flaky connection during re-processing, and without
+    this a killed/stalled run lost all progress and had to restart from
+    granule 0. With checkpointing, a restart resumes from the last
+    completed granule.
+
+- Environment fix (not a code change): the `co2` conda env was missing
+  netCDF4, which made every OCO-3 granule silently unreadable
+  (xr.open_dataset raised a backend-ambiguity error, caught by the loop's
+  broad except and logged as "skip N: found the following matches...").
+  Installed netCDF4 in that env.
+
+- Bug found + fixed during this week's own code review (ecc:python-review
+  agent, run against the diff before committing):
+  * physics_gaussian.py: the per-overpass wind match was built from
+    near_day[used], which has one entry per sounding, not per day -- a
+    single overpass contributes many near-plant soundings on the same
+    day, so the unfixed version both mis-gated MIN_WIND_DAYS_MATCHED (a
+    sounding count masquerading as a day count) and deflated
+    wind_speed_std toward 0 (duplicated identical values pull sample std
+    down), understating wind uncertainty. Fixed by deduping to unique
+    overpass days (np.unique(near_day[used])) before matching against the
+    wind series.
+  * process_plant.py: my own first attempt at atomic checkpoint writes
+    (tmp-then-rename) was itself broken -- np.savez() silently appends
+    ".npz" to a filename that doesn't already end in it, so
+    CKPT_PATH + ".tmp" was actually written as "...checkpoint.npz.tmp.npz",
+    and the subsequent os.replace() looked for a path that was never
+    created, crashing every resumed run. Fixed by using
+    CKPT_PATH.replace(".npz", ".tmp.npz") so the written and renamed
+    paths agree. Caught immediately because the crash surfaced on the
+    very next Tirora retry; the original (pre-atomic-write) checkpoint
+    was untouched by the failed write and resumed cleanly once fixed.
+
+RESULT: MEASURED. All three plants re-processed for the `day` field and
+re-run through physics_gaussian.py. Before -> after (point estimate only
+before, Q +/- sigma after):
+
+  Sasan        before: 37,242,645 t/yr (no uncertainty)
+               after:  39,957,381 +/- 17,899,647 t/yr [22.1M, 57.9M]
+               mode: per-overpass (n=5 unique overpass days)
+
+  Vindhyachal  before: 44,574,429 t/yr (no uncertainty)
+               after:  36,867,164 +/- 21,952,396 t/yr [14.9M, 58.8M]
+               mode: per-overpass (n=5 unique overpass days)
+
+  Tirora       before: 3,224,383 t/yr (no uncertainty)
+               after:  3,224,384 +/- 1,701,161 t/yr [1.5M, 4.9M]
+               mode: annual-mean (fallback) -- Tirora's above-background
+               soundings all fall on a single overpass day (2020-06-07),
+               so per-overpass mode's n>=3-day gate correctly doesn't
+               trigger; this is a genuine coverage limitation (thin OCO-3
+               coverage, previously noted as 5 hit-days/671 soundings),
+               not a processing bug.
+
+  Mundra       still skipped (0 near-plant soundings, unchanged from
+               prior weeks -- too few OCO-3 hits to estimate).
+
+All three re-processed plants moved within their own newly-computed
+uncertainty bands relative to the pre-change point estimate, i.e. nothing
+the new method produced looks like a processing error -- the wind term is
+by far the dominant uncertainty contributor (45-59% relative std vs. 4-6%
+for IME sampling), consistent with the literature review in
+RESEARCH_PLAN.md.
+
+CONCLUSION: the per-overpass wind + uncertainty fix is implemented,
+verified against the pre-change baseline, and the two bugs it surfaced
+(deflated wind std from un-deduped per-sounding matching; broken atomic
+checkpoint rename) were both caught and fixed before committing rather
+than shipped silently.
+
+NEXT (per RESEARCH_PLAN.md Sec 15, not started this week): facility-set
+expansion to 10-20 Indian coal plants with usable OCO-3 coverage, then
+leave-one-facility-out CV, then fusing Track A's activity signal into
+Track B's residual as originally scoped.
+
+Files changed: physics_gaussian.py, process_plant.py,
+data/emission_estimates.json, data/plant_results.json,
+data/Sasan_soundings.npz, data/Tirora_soundings.npz,
+data/Vindhyachal_soundings.npz (added `day` field to all three).

@@ -14,3 +14,5 @@ data/oco3_scan/
 __pycache__/
 *.pyc
 .ipynb_checkpoints/
+.DS_Store
+data/*_scan_checkpoint.npz

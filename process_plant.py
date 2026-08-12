@@ -28,22 +28,61 @@ print(f"[CO2] granules near {NAME}: {len(results)}")
 
 BOX = 0.5
 os.makedirs("data/scan_tmp", exist_ok=True)
-klat, klon, kco2, hits = [], [], [], 0
-for i, g in enumerate(results):
+
+# ---------- checkpointing: resume the granule-download loop after a stall/
+# kill instead of re-downloading everything from granule 0. Progress is
+# flushed to disk after every granule so a restart only redoes the one
+# granule that was in flight, not the whole (slow, network-bound) scan. ----
+CKPT_PATH = f"data/{NAME}_scan_checkpoint.npz"
+start_i = 0
+klat, klon, kco2, kday, hits = [], [], [], [], 0
+if os.path.exists(CKPT_PATH):
+    try:
+        ckpt = np.load(CKPT_PATH)
+        if int(ckpt["n_results"]) == len(results):  # same search, safe to resume
+            klat, klon, kco2, kday = list(ckpt["lat"]), list(ckpt["lon"]), list(ckpt["xco2"]), list(ckpt["day"])
+            hits = int(ckpt["hits"])
+            start_i = int(ckpt["next_i"])
+            print(f"[CO2] resuming from checkpoint: granule {start_i}/{len(results)}, "
+                  f"{len(kco2)} soundings, {hits} hit-days so far")
+        else:
+            print("[CO2] checkpoint doesn't match this search, starting over")
+    except Exception as e:
+        print(f"[CO2] checkpoint unreadable ({str(e)[:60]}), starting over")
+
+for i in range(start_i, len(results)):
+    g = results[i]
     try:
         f = earthaccess.download([g], local_path="data/scan_tmp")[0]
         ds = xr.open_dataset(f)
         lat, lon = ds["latitude"].values, ds["longitude"].values
         xco2, qf = ds["xco2"].values, ds["xco2_quality_flag"].values
+        # sounding_id encodes YYYYMMDDHHMMSSmm; integer-divide down to YYYYMMDD
+        # so each sounding can later be matched to that day's ERA5 wind speed
+        # (per-overpass wind conditioning, see physics_gaussian.py).
+        day = (ds["sounding_id"].values // 10**8).astype(np.int64)
         ds.close(); os.remove(f)
         m = (qf==0)&np.isfinite(xco2)& \
             (lat>PLAT-BOX)&(lat<PLAT+BOX)&(lon>PLON-BOX)&(lon<PLON+BOX)
         if m.sum()>0:
-            klat.extend(lat[m]); klon.extend(lon[m]); kco2.extend(xco2[m]); hits+=1
+            klat.extend(lat[m]); klon.extend(lon[m]); kco2.extend(xco2[m])
+            kday.extend(day[m]); hits+=1
     except Exception as e:
         print(f"  skip {i}: {str(e)[:40]}")
-klat, klon, kco2 = np.array(klat), np.array(klon), np.array(kco2)
+    # write-then-rename: a savez() interrupted mid-write (the exact failure
+    # mode this checkpoint exists to survive) would otherwise leave a
+    # truncated .npz that the next run can't load. np.savez() silently
+    # appends ".npz" to the filename if it isn't already there, so the
+    # tmp name must end in ".npz" itself or the later os.replace() looks
+    # for a path that was never actually written.
+    tmp_ckpt = CKPT_PATH.replace(".npz", ".tmp.npz")
+    np.savez(tmp_ckpt, lat=np.array(klat), lon=np.array(klon), xco2=np.array(kco2),
+             day=np.array(kday, dtype=np.int64), hits=hits, next_i=i+1, n_results=len(results))
+    os.replace(tmp_ckpt, CKPT_PATH)
+
+klat, klon, kco2, kday = np.array(klat), np.array(klon), np.array(kco2), np.array(kday, dtype=np.int64)
 print(f"[CO2] hit-days: {hits}, soundings: {len(kco2)}")
+os.remove(CKPT_PATH)  # scan completed cleanly, no longer needed
 
 if len(kco2) < 20:
     print(f"[!] Too few soundings for {NAME}. Recording as low-coverage.")
@@ -54,7 +93,7 @@ else:
     near_mean, bg_mean = near.mean(), bg.mean()
     enh, bg_std = near_mean-bg_mean, bg.std()
     print(f"[CO2] enhancement = {enh:+.2f} ppm (bg std {bg_std:.2f})")
-np.savez(f"data/{NAME}_soundings.npz", lat=klat, lon=klon, xco2=kco2)
+np.savez(f"data/{NAME}_soundings.npz", lat=klat, lon=klon, xco2=kco2, day=kday)
 
 # ---------- 2. NO2: co-location ----------
 ee.Initialize(project="opportune-lore-415218")
