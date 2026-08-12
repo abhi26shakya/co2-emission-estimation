@@ -1,0 +1,106 @@
+{
+  "year_caveat": "Climate TRACE data is for 2021 (nearest available year; asset-level API has no 2020 coverage). Track B's OCO-3/wind estimates are for 2020. This is a one-year-offset comparison, not same-year.",
+  "benchmark_caveat": "Benchmark-vs-benchmark, not benchmark-vs-ground-truth. Climate TRACE's own accuracy on Indian plants is unvalidated. Per RESEARCH_PLAN.md, not used as a training label.",
+  "facilities": [
+    {
+      "plant": "Mundra",
+      "climate_trace_name": "Mundra Thermal Power Project (Adani)",
+      "climate_trace_id": 25453453,
+      "climate_trace_year": 2021,
+      "climate_trace_co2_t": 21923000,
+      "match_dist_deg": 0.004949747468306858
+    },
+    {
+      "plant": "Sasan",
+      "climate_trace_name": "Sasan Ultra Mega Power Project",
+      "climate_trace_id": 25453691,
+      "climate_trace_year": 2021,
+      "climate_trace_co2_t": 18792000,
+      "match_dist_deg": 0.0069641941385816955,
+      "our_q_t_per_year": 39957380.558211714,
+      "our_q_year": 2020,
+      "ratio_ours_over_ct": 2.1262973902837223,
+      "bracketed_by_our_interval": false
+    },
+    {
+      "plant": "Tirora",
+      "climate_trace_name": "Tiroda Thermal Power Project",
+      "climate_trace_id": 25454050,
+      "climate_trace_year": 2021,
+      "climate_trace_co2_t": 15659000,
+      "match_dist_deg": 0.027414229881574825,
+      "our_q_t_per_year": 3224383.554052351,
+      "our_q_year": 2020,
+      "ratio_ours_over_ct": 0.20591248189873881,
+      "bracketed_by_our_interval": false
+    },
+    {
+      "plant": "Vindhyachal",
+      "climate_trace_name": "Vindhyachal power station",
+      "climate_trace_id": 25451489,
+      "climate_trace_year": 2021,
+      "climate_trace_co2_t": 22589000,
+      "match_dist_deg": 0.0025495097567925407,
+      "our_q_t_per_year": 36867163.595513575,
+      "our_q_year": 2020,
+      "ratio_ours_over_ct": 1.63208480213881,
+      "bracketed_by_our_interval": true
+    },
+    {
+      "plant": "Talcher",
+      "climate_trace_name": "Talcher Kaniha Super Thermal Power Station",
+      "climate_trace_id": 25453799,
+      "climate_trace_year": 2021,
+      "climate_trace_co2_t": 14235000,
+      "match_dist_deg": 0.0011180339887552333,
+      "our_q_t_per_year": 7163462.163807527,
+      "our_q_year": 2020,
+      "ratio_ours_over_ct": 0.5032288137553584,
+      "bracketed_by_our_interval": false
+    },
+    {
+      "plant": "Rihand",
+      "climate_trace_name": "Rihand power station",
+      "climate_trace_id": 448682,
+      "climate_trace_year": 2021,
+      "climate_trace_co2_t": 14237000,
+      "match_dist_deg": 0.0,
+      "our_q_t_per_year": 47473002.294419326,
+      "our_q_year": 2020,
+      "ratio_ours_over_ct": 3.334480739932523,
+      "bracketed_by_our_interval": true
+    },
+    {
+      "plant": "Sipat",
+      "climate_trace_name": "Sipat power station",
+      "climate_trace_id": 25452937,
+      "climate_trace_year": 2021,
+      "climate_trace_co2_t": 14140300,
+      "match_dist_deg": 0.0031064449134024646
+    },
+    {
+      "plant": "ChandrapurCoal",
+      "climate_trace_name": "Chandrapur Thermal Power Station",
+      "climate_trace_id": 25451342,
+      "climate_trace_year": 2021,
+      "climate_trace_co2_t": 14623000,
+      "match_dist_deg": 0.0,
+      "our_q_t_per_year": 11775029.223358631,
+      "our_q_year": 2020,
+      "ratio_ours_over_ct": 0.8052403216411564,
+      "bracketed_by_our_interval": true
+    },
+    {
+      "plant": "Anpara",
+      "climate_trace_name": "Anpara power station",
+      "climate_trace_id": 25452419,
+      "climate_trace_year": 2021,
+      "climate_trace_co2_t": 18173000,
+      "match_dist_deg": 0.002247220505422506,
+      "our_q_t_per_year": 31660051.120184448,
+      "our_q_year": 2020,
+      "ratio_ours_over_ct": 1.7421477532704808,
+      "bracketed_by_our_interval": true
+    }
+  ]
+}
