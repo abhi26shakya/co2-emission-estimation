@@ -1,21 +1,31 @@
-import numpy as np, glob, os, random, torch
+import numpy as np, glob, os, re, random, torch
 import torch.nn as nn
-from torch.utils.data import TensorDataset, DataLoader, random_split
+from torch.utils.data import TensorDataset, DataLoader, random_split, Subset
 
 DEVICE = "cuda" if torch.cuda.is_available() else "cpu"
 print("Device:", DEVICE)
 torch.manual_seed(0); np.random.seed(0); random.seed(0)
 
+# Facility-level group id per tile: filename minus the trailing _YYYY_MM.npy
+# suffix, e.g. "VINDH_CHAL_STPS_2020_01.npy" -> "VINDH_CHAL_STPS",
+# "city_Delhi_2019_01.npy" -> "city_Delhi". Used to keep all of one
+# physical site's monthly tiles on the same side of the train/test split --
+# RESEARCH_PLAN.md flagged since Week 7 that the original random tile-level
+# split lets the same site's tiles land in both train and test, a leakage
+# risk this week fixes.
+_MONTH_SUFFIX = re.compile(r"_\d{4}_\d{2}\.npy$")
+
 def load_folder(path, label):
-    X, y = [], []
+    X, y, groups = [], [], []
     for f in sorted(glob.glob(f"{path}/*.npy")):
         arr = np.load(f).astype(np.float32)      # shape (3,64,64)
         X.append(arr); y.append(label)
-    return X, y
+        groups.append(_MONTH_SUFFIX.sub("", os.path.basename(f)))
+    return X, y, groups
 
-Xp, yp = load_folder("data/threech/positive",      1)   # plants
-Xh, yh = load_folder("data/threech/hard_negative",  0)  # cities/industry/hwy
-Xr, yr = load_folder("data/threech/negative",       0)  # rural
+Xp, yp, gp = load_folder("data/threech/positive",      1)   # plants
+Xh, yh, gh = load_folder("data/threech/hard_negative",  0)  # cities/industry/hwy
+Xr, yr, gr = load_folder("data/threech/negative",       0)  # rural
 
 # 3-CHANNEL detector: note nn.Conv2d(3, ...) as the first layer
 class Detector3(nn.Module):
@@ -29,7 +39,47 @@ class Detector3(nn.Module):
             nn.Dropout(0.3), nn.Linear(64, 2))
     def forward(self, x): return self.net(x)
 
-def run(Xlist, ylist, tag, epochs=30):
+def facility_level_split(groups, labels, test_frac=0.2, seed=0):
+    """
+    Split tile indices by facility/site group, not by individual tile, so
+    all of one physical site's monthly tiles land on the same side --
+    fixes the leakage risk of a random tile-level split (the original
+    split logic below, kept as tile_level_split for a direct before/after
+    comparison of how much it inflated accuracy).
+
+    Stratified by class: with only 5 positive-class facilities, a plain
+    group shuffle risks a degenerate test set with zero positives (or, less
+    likely, zero negatives), making recall/precision undefined. Positive
+    and negative groups are shuffled and held out separately so both
+    classes are guaranteed to appear in test.
+    """
+    rng = random.Random(seed)
+    groups_by_class = {0: set(), 1: set()}
+    for g, y in zip(groups, labels):
+        groups_by_class[int(y)].add(g)
+
+    test_groups = set()
+    for cls, cls_groups in groups_by_class.items():
+        cls_groups = sorted(cls_groups)
+        rng.shuffle(cls_groups)
+        n_test_groups = max(1, round(test_frac * len(cls_groups)))
+        test_groups.update(cls_groups[:n_test_groups])
+
+    train_idx = [i for i, g in enumerate(groups) if g not in test_groups]
+    test_idx = [i for i, g in enumerate(groups) if g in test_groups]
+    return train_idx, test_idx, sorted(test_groups)
+
+
+def tile_level_split(n, test_frac=0.2, seed=0):
+    """Original random-at-the-tile split -- kept only to quantify the
+    leakage's effect on reported accuracy, not used for the saved model."""
+    n_test = max(1, int(test_frac * n)); n_train = n - n_test
+    g = torch.Generator().manual_seed(seed)
+    tr, te = random_split(range(n), [n_train, n_test], generator=g)
+    return list(tr), list(te)
+
+
+def run(Xlist, ylist, groups, tag, epochs=30, split="facility"):
     X = np.stack(Xlist)                           # (N,3,64,64)
     y = np.array(ylist, dtype=np.int64)
     # normalize each channel separately
@@ -38,9 +88,14 @@ def run(Xlist, ylist, tag, epochs=30):
         X[:,c] = (X[:,c]-m)/s
     X = torch.tensor(X); y = torch.tensor(y)
     ds = TensorDataset(X, y)
-    n_test = max(1,int(0.2*len(ds))); n_train=len(ds)-n_test
-    tr, te = random_split(ds,[n_train,n_test],
-                          generator=torch.Generator().manual_seed(0))
+
+    if split == "facility":
+        train_idx, test_idx, test_groups = facility_level_split(groups, ylist)
+        print(f"  split=facility-level  test facilities={test_groups}")
+    else:
+        train_idx, test_idx = tile_level_split(len(ds))
+        print(f"  split=tile-level (leaky baseline, for comparison only)")
+    tr, te = Subset(ds, train_idx), Subset(ds, test_idx)
     tr_dl = DataLoader(tr,batch_size=16,shuffle=True); te_dl=DataLoader(te,batch_size=16)
 
     model = Detector3().to(DEVICE)
@@ -66,18 +121,33 @@ def run(Xlist, ylist, tag, epochs=30):
     print(f"  plants correct (recall): {100*tp/max(tp+fn,1):.0f}%   "
           f"negatives correct: {100*tn/max(tn+fp,1):.0f}%")
     print(f"  false alarms (neg->plant): {fp}   missed plants: {fn}")
-    torch.save(model.state_dict(), f"detector3_{tag}.pt")
+    # facility-split checkpoints get their own filename -- extract_activity_signal.py
+    # already depends on the existing detector3_2ch_mixed.pt (tile-level split);
+    # overwriting it here would silently change what an already-committed
+    # data/activity_signals.json was actually computed from.
+    suffix = "_facility_split" if split == "facility" else ""
+    torch.save(model.state_dict(), f"detector3_{tag}{suffix}.pt")
     return acc
 
 # --- balanced plants vs HARD negatives (same fair test as Week 3/4) ---
 idx=list(range(len(Xh))); random.shuffle(idx); idx=idx[:len(Xp)]
-Xh_bal=[Xh[i] for i in idx]; yh_bal=[0]*len(Xh_bal)
-acc_hard = run(Xp+Xh_bal, yp+yh_bal, "2ch_hard_only")
+Xh_bal=[Xh[i] for i in idx]; yh_bal=[0]*len(Xh_bal); gh_bal=[gh[i] for i in idx]
+
+print("\n--- 2ch_hard_only: tile-level (leaky) split, for comparison ---")
+acc_hard_leaky = run(Xp+Xh_bal, yp+yh_bal, gp+gh_bal, "2ch_hard_only", split="tile")
+print("\n--- 2ch_hard_only: facility-level split (fixed) ---")
+acc_hard = run(Xp+Xh_bal, yp+yh_bal, gp+gh_bal, "2ch_hard_only", split="facility")
 
 # --- plants vs ALL negatives ---
-acc_mix = run(Xp+Xh+Xr, yp+yh+yr, "2ch_mixed")
+print("\n--- 2ch_mixed: tile-level (leaky) split, for comparison ---")
+acc_mix_leaky = run(Xp+Xh+Xr, yp+yh+yr, gp+gh+gr, "2ch_mixed", split="tile")
+print("\n--- 2ch_mixed: facility-level split (fixed) ---")
+acc_mix = run(Xp+Xh+Xr, yp+yh+yr, gp+gh+gr, "2ch_mixed", split="facility")
 
 print("\n================ COMPARISON ================")
-print(f"  Week 3  NO2-only      hard_only : 77.1%")
-print(f"  Week 4  NO2+SO2       hard_only : 79.2%")
-print(f"  Week 5  NO2+SO2+VIIRS hard_only : {acc_hard:.1f}%")
+print(f"  Week 3  NO2-only      hard_only (tile-level split)     : 77.1%")
+print(f"  Week 4  NO2+SO2       hard_only (tile-level split)     : 79.2%")
+print(f"  Week 5  NO2+SO2+VIIRS hard_only (tile-level split)     : {acc_hard_leaky:.1f}%")
+print(f"  Week 10 NO2+SO2+VIIRS hard_only (facility-level split) : {acc_hard:.1f}%")
+print(f"  Week 10 NO2+SO2+VIIRS mixed     (tile-level split)     : {acc_mix_leaky:.1f}%")
+print(f"  Week 10 NO2+SO2+VIIRS mixed     (facility-level split) : {acc_mix:.1f}%")

@@ -1,0 +1,91 @@
+WEEK 11 — DONE (facility-level train/test split for Track A, fixing a
+                 leakage risk flagged since Week 7)
+
+- RESEARCH_PLAN.md flagged since Week 7 that Track A's classifier
+  (train_3channel.py) used a random tile-level train/test split, meaning
+  the same physical plant's monthly tiles could land in both train and
+  test -- a leakage risk that inflates reported accuracy. This week fixes
+  it and, per the project's convention of measuring deltas rather than
+  just swapping in a fix silently, runs BOTH the old (leaky) and new
+  (facility-level) split side by side for a direct before/after
+  comparison.
+
+- train_3channel.py changes:
+  * load_folder() now returns a facility/site group id per tile (filename
+    minus the trailing _YYYY_MM.npy suffix), e.g. "VINDH_CHAL_STPS" or
+    "city_Delhi".
+  * facility_level_split(): splits by group, not by tile, so a site's
+    tiles never appear on both sides. Stratified by class -- with only 5
+    positive-class facilities, a plain group shuffle risked a degenerate
+    test set with zero positive examples (making recall undefined), so
+    positive and negative groups are held out separately, guaranteeing
+    both classes appear in test.
+  * tile_level_split(): the original random-split logic, kept (not
+    removed) specifically to reproduce the old number for comparison.
+  * Facility-split checkpoints are saved under new filenames
+    (detector3_{tag}_facility_split.pt) rather than overwriting the
+    existing detector3_2ch_hard_only.pt / detector3_2ch_mixed.pt --
+    extract_activity_signal.py already depends on the latter (used to
+    build the already-committed data/activity_signals.json), and silently
+    changing what that checkpoint contains would invalidate a committed
+    result without a corresponding re-extraction. See NEXT.
+
+- Result: the leakage was real and substantial, and the "mixed" model in
+  particular is far weaker than its reported accuracy suggested.
+
+  hard_only  tile-level (leaky, reproduces the historical number exactly):
+             81.2% accuracy, 68% plant recall, 92% negative recall
+             facility-level (fixed):
+             67.3% accuracy, 54% plant recall, 80% negative recall
+             -- a genuine ~14-point drop, not noise.
+
+  mixed      tile-level (leaky):
+             86.8% accuracy, 53% plant recall, 96% negative recall
+             facility-level (fixed):
+             83.3% accuracy, 8% plant recall, 98% negative recall
+             -- overall accuracy barely moves, but plant recall collapses
+             from 53% to 8%. The model is essentially guessing "not a
+             plant" for a genuinely unseen facility and getting away with
+             it because negatives vastly outnumber positive-class
+             facilities in the tile-count-weighted accuracy metric (25
+             negative sites vs. 5 positive). This is exactly the kind of
+             leakage-driven overconfidence RESEARCH_PLAN.md's Sec 3 warned
+             about, and it's a much bigger effect for "mixed" than for
+             "hard_only".
+
+- Consequence for Week 10's activity-signal work: detector3_2ch_mixed.pt
+  -- the exact checkpoint extract_activity_signal.py used to build
+  data/activity_signals.json -- was trained on tiles from the SAME 4
+  facilities already used as Track B's original positive-class examples
+  (Vindhyachal, Sasan, Mundra, Tirora). Only the 5 new Week 9 facilities
+  (Talcher, Rihand, Sipat, ChandrapurCoal, Anpara) were genuinely unseen
+  to it. Given this week's 8% held-out-facility recall for that exact
+  checkpoint, the activity signal computed for those 5 facilities should
+  be treated with real skepticism -- the "activity signal broadly tracks
+  Q" finding from Week 10 may reflect the model recognizing 4 memorized
+  sites rather than detecting genuine combustion activity at novel
+  locations. This doesn't invalidate the physics-based Q estimates
+  (Track B) at all, only the CNN-derived activity-signal cross-check
+  layered on top of them.
+
+NEXT:
+  - Re-run extract_activity_signal.py against detector3_2ch_mixed_facility_split.pt
+    (or detector3_2ch_hard_only_facility_split.pt) instead of the original
+    checkpoint, and compare the resulting activity signals -- if they
+    diverge substantially from Week 10's data/activity_signals.json,
+    that would confirm the memorization concern directly rather than
+    leaving it as a plausible inference from the recall numbers alone.
+  - The underlying data problem (5 positive-class facilities is too few
+    for any train/test split to give a stable estimate of plant recall)
+    won't go away without more facilities -- this is the same N-too-small
+    conclusion reliability_model.py reached for Track B, now confirmed
+    independently for Track A.
+  - Facility-set expansion (10 candidates remaining from Week 9's
+    shortlist) would help both tracks at once: more Track B facilities
+    for the reliability-model retry, and -- if their NO2/SO2/VIIRS tiles
+    were also exported for Track A -- more positive-class facilities for
+    a less degenerate classifier evaluation.
+
+Files changed: train_3channel.py, detector3_2ch_hard_only_facility_split.pt
+(new), detector3_2ch_mixed_facility_split.pt (new). Existing
+detector3_2ch_hard_only.pt / detector3_2ch_mixed.pt left untouched.
