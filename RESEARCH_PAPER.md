@@ -1,0 +1,239 @@
+# Wind-Conditioned, Activity-Corrected CO2 Emission Estimation from OCO-3: An Uncertainty-Aware, Facility-Generalizing Study of Indian Coal Power Plants
+
+*Working paper. Compiled 2026-08-14 from the project's git history, weekly research logs, source code, and result files. Updated same-day following a facility-set-expansion follow-up session that took the positive-class facility count from 4 to 20 and added an exhaustive leave-one-facility-out (LOFO) evaluation. All figures and claims below are sourced from these artifacts; anything not found in the repository is explicitly marked "Not documented / needs verification" rather than inferred.*
+
+---
+
+## Abstract
+
+Coal-fired power plants are among the largest single-facility sources of CO2 emissions, yet in many regions — including India — there is no independent, satellite-derived, per-facility emissions estimate to cross-check reported figures. This project develops two complementary, currently unfused pipelines toward that goal. **Track A** is a small convolutional neural network that classifies 64×64 pixel satellite tiles as "coal power plant" or "not," built by incrementally fusing Sentinel-5P NO2, Sentinel-5P SO2, and VIIRS thermal channels, and stress-tested against confounding "hard negative" sources (cities, steel plants, highways). **Track B** is a physics-based Integrated Mass Enhancement (IME) mass-balance pipeline that converts NASA OCO-3 XCO2 column soundings into a per-plant emission-rate estimate (tons CO2/year) with propagated uncertainty, cross-checked against NO2 co-location, ERA5 wind alignment, and the independent Climate TRACE dataset. Across 17 of 20 candidate facilities with a usable Track B estimate, 9 (53%) fall within their own stated uncertainty bounds when benchmarked against Climate TRACE. Track A's positive-class facility count was expanded from 4 physical sites to 20 mid-project, which resolved an earlier facility-level generalization collapse (plant recall on a single random held-out test set rose from 8% to 88%) — but a subsequent **exhaustive** leave-one-facility-out evaluation (21 folds, one per facility) shows that single-split figure was itself an artifact of an easy draw: true mean recall across all facilities is 47.2%, ranging from 0% to 100% by facility. A follow-up analysis found this per-facility variation is strongly predicted by the detector's own confidence on that facility (r=+0.90), suggesting the failure mode is intrinsic signal ambiguity rather than memorization. This paper documents the methodology, results, and honestly-reported findings — including a facility-count-limited reliability model that flipped from negative to positive once the facility set grew (N=7→17), and three plants showing unexplained negative CO2 enhancement — produced over the course of this work, and lays out the specific gaps that remain before the two tracks can be fused into a single, validated estimation system.
+
+---
+
+## 1. Introduction
+
+### 1.1 Motivation
+
+Independent verification of industrial CO2 emissions matters for climate policy, especially in regions where self-reported facility-level emissions data is sparse or unverified. Satellite remote sensing — NO2 and SO2 as combustion co-emitted tracers, thermal infrared as an activity proxy, and direct CO2 column measurement from missions like OCO-2/3 — offers, in principle, an independent channel for this kind of verification. This project targets India's largest coal-fired power plants as a test case, motivated in part by the observation (documented in this project's own `RESEARCH_PLAN.md`) that an India-specific per-facility benchmark of this kind does not appear to exist in the literature surveyed.
+
+### 1.2 Problem Statement
+
+Two related but distinct sub-problems are addressed:
+
+1. **Detection:** given a satellite image tile, is there a coal power plant in it? This is useful both as a standalone monitoring tool and, potentially, as an independent activity signal that could inform or correct an emissions estimate.
+2. **Quantification:** given satellite CO2 column measurements over a known plant location, what is the plant's annual CO2 emission rate, and with what uncertainty?
+
+### 1.3 Contributions
+
+- A reproducible, checkpointed, facility-CSV-driven pipeline (`process_plant.py`) that scans, downloads, and processes OCO-3 granules for an arbitrary Indian coal plant, computing a full IME-based emission-rate estimate with three-term propagated uncertainty.
+- A CNN-based detector fused across three physically distinct satellite channels (NO2, SO2, VIIRS thermal), with an explicit, quantified demonstration of the difference between tile-level and facility-level evaluation — a methodological point with direct relevance to any similar satellite-tile classification study.
+- A worked uncertainty-diagnosis case study (the "Talcher" plant) showing how a tight confidence interval can still be badly wrong, and identifying background-annulus-definition sensitivity as a previously unmodeled uncertainty source.
+- A demonstration that a single random facility-level train/test split, while methodologically correct in expectation, can itself substantially overstate real generalization at small facility counts: an **exhaustive** leave-one-facility-out harness (`lofo_track_a.py`) built after expanding the positive class to 20 facilities shows true mean recall (47.2%) is roughly half the single-split figure (88%) it superseded.
+- A feasibility experiment predicting the emission estimator's own uncertainty from an independent activity signal, first reported as an honest negative result at N=7 facilities, then re-run and found positive (LOO R²=0.212) once the facility set grew to N=17 — illustrating how a facility-count-limited negative result should be revisited, not treated as final, once more data becomes available.
+- A working benchmark of the estimator's output against Climate TRACE for the Indian power sector across 17 facilities — with results, including a recalibrated (and less flattering) uncertainty-bracketing rate at the larger sample size, stated explicitly.
+
+### 1.4 Scope and Framing
+
+The two tracks (detection and quantification) are developed and validated **separately** in this work. A one-directional bridge exists — the trained detector is used purely for inference to produce an "activity signal" for Track B's facilities — but no joint or corrective model has yet been trained combining the two. This is a deliberate scope decision, not an oversight: `RESEARCH_PLAN.md` explicitly instructs against retraining the detector prematurely, and the fusion step is treated as a distinct, still-open piece of future work (§8).
+
+---
+
+## 2. Related Work
+
+*Summarized from `RESEARCH_PLAN.md` §3–6, a literature-grounded gap analysis produced partway through this project (after what is referred to internally as "Week 7"). Full citation detail for entries not fully captured below should be verified directly against `RESEARCH_PLAN.md`.*
+
+### 2.1 Established Prior Work
+
+| Work | Established contribution | Relation to this project |
+|---|---|---|
+| Deb & Das (2025), arXiv:2502.02083 | NO2 + XCO2 fusion for power-plant emission signal | Closest prior work; this project's citation basis and point of methodological comparison |
+| Varon et al. (2018) | Integrated Mass Enhancement (IME) method and effective-wind-speed scaling (α ≈ 0.5), originally for CH4 plumes | Directly adopted as the core emission-rate formula in Track B (§4.2) |
+| Nassar et al. (2017) | CO2 point-source mass-balance estimation from OCO-2 | Establishes the CO2-specific lineage of the IME approach used here |
+| Reuter et al. (2019) | OCO-2/3 CO2 point-source estimation | Same mass-balance lineage |
+| GMD (2024), SMARTCARB-related | CNN-based emission regression | Demonstrated in **simulation only**; this project's Track A instead trains and evaluates on real satellite tiles |
+| (VIIRS-as-activity-proxy literature) | VIIRS thermal signal as an operational-status proxy for combustion facilities | Motivates Track A's VIIRS fusion (§4.1) |
+| (Wind-error-dominance literature) | Wind-speed measurement error as the dominant uncertainty term in mass-balance plume estimates | Independently reproduced empirically in this project's Track B results (§5.2, §6) |
+| Li et al. (2021), GRL | Cited in the project's literature comparison table | Specific contribution not fully captured in this synthesis pass — **Not documented / needs verification**, consult `RESEARCH_PLAN.md` §3–4 directly |
+| Climate TRACE | Independent, largely satellite-thermal-proxy-based global emissions estimates | Used here as an external benchmark, explicitly not as ground truth (§2.2, §5.2) |
+
+### 2.2 Identified Gaps
+
+`RESEARCH_PLAN.md` §5 identifies and ranks candidate contributions distinguishing this project from the above; the adopted direction (Recommendation #1) is explicitly:
+
+> *"physics-informed, uncertainty-aware, activity-conditioned, facility-validated, benchmarked estimation."*
+
+Concretely, the gaps targeted are: (i) applying per-overpass wind-conditioned IME to **real**, not simulated, OCO-3 data; (ii) producing calibrated per-plant uncertainty rather than point estimates; (iii) an explicit, quantified facility-level generalization test for the detector (as opposed to reporting only tile-level accuracy); (iv) exploring fusion of an independent activity signal with the physics-based estimate; and (v) an India-specific benchmark against Climate TRACE, which — per the literature review performed for this project — had not previously been done at the individual-facility level for Indian coal plants.
+
+Climate TRACE is deliberately treated as a second, independent, imperfect estimator rather than ground truth throughout this work: it is itself built substantially from satellite thermal-proxy methods and has not, to this project's knowledge, been separately validated for the Indian power sector.
+
+---
+
+## 3. Data Sources
+
+| Source | Product | Role | Access |
+|---|---|---|---|
+| Sentinel-5P (Copernicus) | `COPERNICUS/S5P/OFFL/L3_NO2` — tropospheric NO2 column density | Track A primary channel; Track B NO2 co-location sanity check | Google Earth Engine |
+| Sentinel-5P (Copernicus) | `COPERNICUS/S5P/OFFL/L3_SO2` — SO2 column density | Track A second channel | Google Earth Engine |
+| NASA VIIRS | `VNP14A1` — Maximum Fire Radiative Power (MW) | Track A third channel, thermal activity proxy | Google Earth Engine |
+| NASA OCO-3 | `OCO3_L2_Lite_FP`, version `11r` — XCO2 column soundings | Track B primary input | `earthaccess` (NASA Earthdata), parsed with `xarray` |
+| ECMWF ERA5 | Daily mean 10 m (u, v) wind | Track B wind conditioning and uncertainty | Not documented / needs verification — exact access path not independently confirmed in this synthesis pass |
+| WRI | Global Power Plant Database | Facility selection and deduplication | Static CSV (34,937 rows) |
+| Climate TRACE | India power-sector CO2 estimates (2021) | Independent benchmark, not ground truth | REST API (`api.climatetrace.org`) |
+
+All satellite tile exports for Track A use 64×64 pixel tiles over a 60 km box per location, sampled monthly across 2019–2020. Track B's OCO-3 scans cover a ±1° bounding box per plant for calendar year 2020, with a tighter ±0.5° filtering box applied downstream.
+
+---
+
+## 4. Methods
+
+### 4.1 Track A: Satellite-Tile Plant Detector
+
+**Architecture** (constant across all channel-count variants):
+
+```
+Conv(C_in → 16) → BatchNorm → SiLU → MaxPool
+Conv(16 → 32)   → BatchNorm → SiLU → MaxPool
+Conv(32 → 64)   → BatchNorm → SiLU
+GlobalAvgPool
+Dropout(0.3)
+Linear(64 → 2)
+```
+
+Trained with AdamW (learning rate 3×10⁻⁴) for 30 epochs under cross-entropy loss. `C_in` varies with the channel-fusion stage: 1 (NO2 only), 2 (+SO2), or 3 (+VIIRS).
+
+**Channel fusion strategy.** Channels are fused incrementally rather than jointly from the start, so that each addition's marginal effect on accuracy and specific failure modes can be isolated. NO2 was chosen as the base channel for its direct link to combustion; SO2 was added specifically to address confusion with cities (motor-vehicle NO2 sources without matching SO2); VIIRS thermal was added to address confusion with other industrial heat sources not distinguished by the gas channels alone.
+
+**Hard-negative curriculum.** Beyond simple rural "negative" tiles, a curated set of confounding locations — cities, steel manufacturing plants, and highway corridors — was constructed and validated with a minimum-distance-from-any-known-plant check (≥80 km, haversine). This set was expanded over the course of the project (5 → 10 highway locations) specifically to probe and reduce a persistent highway-related confusion mode.
+
+**Train/test split methodology — the central methodological finding of Track A.** Two splitting strategies were implemented and directly compared:
+- *Tile-level split*: individual tiles assigned to train/test at random, regardless of which physical facility or which month they represent.
+- *Facility-level split*: all tiles belonging to a given physical site are kept together on one side of the split, stratified by class (necessary since the positive class spans only 5 distinct facilities).
+
+The facility-level split is the methodologically correct one for measuring genuine generalization to unseen plants; the tile-level split risks (and, as shown in §5.1, did in fact produce) leakage, since the same facility's signature can appear in both train and test simply under a different month's tile.
+
+### 4.2 Track B: Physics-Based CO2 Emission-Rate Estimation
+
+**Pipeline.** For a given plant, `process_plant.py` (i) searches and downloads matching OCO-3 granules for the target year via `earthaccess`, with checkpointing so an interrupted run resumes rather than restarting; (ii) filters soundings to quality flag 0 within a tight radius of the plant; (iii) computes mean XCO2 in a near-plant zone (<0.25°) versus a background ring (0.4°–0.9°), and their difference as the "CO2 enhancement"; (iv) performs an independent NO2 co-location check (distance from the plant coordinate to the peak-NO2 pixel) and a wind-alignment check (does the CO2 enhancement sit downwind of the plant, per ERA5?) as physical plausibility signals; and (v) appends results to a shared results file, using file locking to guard against concurrent-process corruption.
+
+**Emission-rate formula.** Despite the module name (`physics_gaussian.py`), this is explicitly not a ground-level Gaussian plume model — OCO-3 XCO2 is a column-averaged quantity, not a surface concentration, so ground-level dispersion physics does not directly apply. Instead, the Integrated Mass Enhancement (IME) method (Varon et al. 2018; Nassar et al. 2017; Reuter et al. 2019) is used:
+
+```
+Q = U_eff · IME / L_eff
+```
+
+- `IME` (kg): total excess column-mass CO2 over near-plant soundings. Computed by converting the ppm excess to kg/m² (standard surface pressure 101,325 Pa; CO2/air molar-mass ratio 0.04401/0.02897), then scaling by an assumed 2.25 km² footprint area per OCO-3 sounding.
+- `L_eff` (m): effective plume length, taken as the square root of the covered plume area.
+- `U_eff`: effective wind speed, `U_eff = α · wind_speed` with α = 0.5 (the Varon et al. 2018 default, correcting a 10 m surface wind measurement toward the deeper-layer mixing wind relevant to plume transport).
+
+**Uncertainty model.** Three independent relative-uncertainty terms are combined in quadrature into a single `q_rel_std`:
+1. *Wind term*: relative standard deviation of wind speed matched to actual sounding dates where sufficient per-overpass data exists (falling back to an annual-mean estimate otherwise), deduplicated to unique days.
+2. *IME sampling term*: 500-resample bootstrap over the near-plant and background sounding populations.
+3. *Background-definition term*: IME recomputed under 5 alternative definitions of the background annulus, holding the near-plant zone fixed — added specifically in response to a diagnosed failure case (§5.2.3).
+
+Empirically, the wind term dominates the total uncertainty budget in most facilities examined (45–59% relative standard deviation, versus 4–6% for IME sampling), consistent with the wind-error-dominance finding noted in the literature review (§2.1).
+
+---
+
+## 5. Experiments & Results
+
+### 5.1 Track A: Detector Accuracy, the Facility-Split Finding, and Exhaustive LOFO
+
+| Stage | Channels | Split | Facilities | Accuracy | Plant recall | Interpretation |
+|---|---|---|---|---|---|---|
+| Baseline | NO2 | tile-level, easy negatives only | 5 | 91.2% | — | Later shown to be a generic "combustion hotspot" detector, not plant-specific |
+| +Hard negatives | NO2 | tile-level | 5 | 77.1% | — | Confound exposed: cities, steel plants, highways all trigger false positives |
+| +SO2 | NO2+SO2 | tile-level | 5 | 79.2% | — | Resolves city false alarms (no matching SO2), not steel (steel also emits SO2) |
+| +VIIRS | NO2+SO2+VIIRS | tile-level | 5 | 79.2% (tie) | — | Reduces steel-plant false-alarm *confidence* specifically; highways become relatively more confusable |
+| +More highways | NO2+SO2+VIIRS | tile-level | 5 | 81.2% | — | Apparent improvement — later shown to be substantially inflated by leakage |
+| Facility-split correction | NO2+SO2+VIIRS | facility-level, 1 random split | 4 | 67.3% | 8% (collapsed) | True generalization markedly weaker at 4 facilities; too few held-out sites to distinguish memorization from noise |
+| Facility-count expansion | NO2+SO2+VIIRS | facility-level, 1 random split | **20** | 82.8% / 95.0% | 88% | Recall collapse resolved by more facilities to draw a held-out test set from — but see below |
+| **Exhaustive LOFO** | NO2+SO2+VIIRS | **every facility held out once (21 folds)** | **20** | — | **47.2% (true)** | The 88% figure was an artifact of an easy single-split draw; genuine per-facility generalization is closer to a coin flip on average, and highly variable (0–100% by facility) |
+
+The tile-level-vs-facility-level gap (81.2%→67.3%, on an otherwise identical model and dataset) remains the paper's first quantitative demonstration that tile-level evaluation overstates generalization. But the facility-count expansion adds a second, sharper methodological point: even a *facility-level* split can mislead at small facility counts, because a single random draw of held-out sites may happen to be unrepresentative. Expanding the positive class from 4 to 20 facilities and retraining resolved the original recall collapse (8%→88%), which at first reads as confirmation that more data fixed the generalization problem. It was only the subsequent exhaustive leave-one-facility-out evaluation — training 21 fresh models, each with exactly one facility's tiles excluded — that revealed the 88% figure itself depended on which 4 facilities happened to be excluded in that one draw. True recall, averaged honestly across every facility rather than one lucky subset, is 47.2% (tile-weighted: 48.7%), with a wide spread: Anpara, Korba, Rihand, Talcher, Vindhyachal, and Sasan all generalize well (recall ≥0.83), while Kahalgaon, Kudgi, and Mouda generalize essentially not at all (recall = 0.00). A follow-up correlation analysis (`lofo_recall_correlates.py`, N=20) found this per-facility variation is strongly predicted by the standard (non-held-out) model's own confidence on that facility (activity_prob_mean, r=+0.903, leave-one-out R²=0.783) — the facilities the model generalizes to are exactly the ones with a clear, unambiguous NO2+SO2+VIIRS combustion signature even when it hasn't seen them, suggesting the failure mode is intrinsic signal ambiguity per facility rather than memorization of specific training sites. Grad-CAM visualization of the earliest (NO2-only) model's attention supports the leakage conclusion qualitatively: the model attends to any sufficiently compact, sufficiently intense NO2 hotspot, consistent with a generic "concentrated combustion" detector rather than a coal-plant-specific one.
+
+### 5.2 Track B: Emission-Rate Estimates and Benchmarking
+
+**5.2.1 Facility coverage.** All 20 candidate plants now have OCO-3 soundings processed and committed. 17 of those 20 produce a full `physics_gaussian.py` emission-rate estimate; the remaining 3 (Mundra, Sipat, Simhadri) are excluded for a genuine coverage gap — 0 near-plant soundings after the near/background split — not a processing failure. Sounding counts per facility vary widely — from 12 (essentially unusable) to over 7,000 — directly affecting which facilities produce a stable IME estimate at all; facilities below a minimum usable-sounding threshold are recorded with a null enhancement value rather than a forced estimate.
+
+**5.2.2 Example estimates.** For Sasan, the full pipeline (per-overpass wind, three-term uncertainty) produces an estimate of approximately 40.0 million tons CO2/year, with an uncertainty band of roughly ±18.1 million tons (dominated by the wind term at ~44.6% relative contribution, versus ~4.1% for IME sampling and ~6.5% for background definition). An earlier, less-developed version of the pipeline (using a flawed annual-mean wind average, see §6) had produced substantially different point estimates for the same facilities before the wind-averaging methodology was corrected — a roughly threefold change in the resulting estimate for at least two facilities examined.
+
+**5.2.3 Uncertainty case study: Talcher.** One facility produced an internally puzzling result: the *tightest* uncertainty interval of any facility examined, yet the estimate that most disagreed with the Climate TRACE benchmark (roughly half the benchmark value). A targeted diagnosis found the facility's raw CO2 enhancement had an unusually low signal-to-noise ratio (0.18, versus 1.27 for a comparably-sized, well-bracketed facility) and that its IME estimate was highly sensitive to how the background annulus was defined (a ~20% swing across 5 reasonable definitions, versus ~4% for the comparison facility). This directly motivated adding the background-definition uncertainty term described in §4.2, closing a real gap in the uncertainty model that the two originally-implemented terms (wind, IME sampling) did not capture.
+
+**5.2.4 Climate TRACE benchmark.** Across the 17 facilities with both a Track B estimate and a matched Climate TRACE figure, 9 (53%) fall within Track B's own stated uncertainty interval — down from the original 5-of-7 (71%) reported at the smaller facility count. This is a materially more honest number, not a regression in the underlying pipeline: the earlier 71% was computed from too few facilities to be a reliable estimate of the true bracketing rate, and the larger sample surfaced several new misses (Kahalgaon, Talcher, RGundem, Korba, ShriSingajiMalwa, Tamnar, Sasan, Tirora) alongside the original two. Ratios of Track B's estimate to Climate TRACE's now range from roughly 0.09× (ShriSingajiMalwa, a substantial underestimate) to 3.3× (Rihand, an overestimate that nonetheless remains inside its own wide uncertainty band). Both directions of mismatch are reported as findings requiring further investigation rather than treated as proof that Climate TRACE is correct and Track B is wrong (or vice versa) — see §2.2 and §6 on the benchmark-vs-ground-truth distinction. Full facility-level comparison, predicted-vs-actual, and residual-ratio figures are in `data/eval_climate_trace_comparison.png`.
+
+**5.2.5 Root-causing the negative-CO2-enhancement anomaly.** Three facilities (ShriSingajiMalwa, Koradi, Tamnar) produced a *negative* near-minus-background CO2 enhancement — physically implausible for an operating combustion source. A dedicated diagnosis (`diagnose_negative_enhancement.py`, extending the Talcher methodology with a statistical-significance check on the near-minus-background difference) found that **2 of the 3 are not genuinely negative at all**: Koradi (z=−1.58) and Tamnar (z=−1.33) are both statistically consistent with zero given the standard error of the difference — the correct characterization is "no detectable enhancement given available signal-to-noise," not a real negative signal. This resolves the apparent contradiction with the Talcher-derived heuristic that good wind alignment implies a trustworthy signal: Tamnar's good wind/CO2-offset alignment (16°, the best of the three) correctly says its NO2 plume geometry is plausible, but wind alignment and CO2 signal-to-noise are computed from entirely independent data, so a facility can have both a physically sensible wind alignment and a CO2 signal too weak to measure — the two diagnostics are orthogonal, not in tension. **ShriSingajiMalwa is different: its negative enhancement (−1.052 ppm, z=−5.32) is statistically significant**, a genuine anomaly that this diagnosis does not resolve, only correctly isolates from the other two facilities' noise-only cases. All three show elevated background-definition sensitivity relative to the well-bracketed Rihand comparison facility, consistent with the same thin-signal fragility pattern the Talcher case study identified.
+
+### 5.3 Cross-Track Experiment: Activity Signal and Reliability Modeling
+
+As a first, deliberately narrow step toward fusing the two tracks, the already-trained Track A detector was used purely for inference (not retrained) to produce a per-facility "activity probability" and a 64-dimensional embedding for each Track B facility. This activity signal was found to broadly track the physics-based emission estimate, with one facility flagged as a notable outlier.
+
+A follow-up experiment tested whether this activity signal — or the independent wind/CO2-offset alignment metric — could predict Track B's own self-reported relative uncertainty, via single-feature Pearson correlation and leave-one-out cross-validation. At the original N=7 facilities, the best single-feature correlation found was r = −0.62, but this did not survive leave-one-out cross-validation (LOO R² = −1.22), and the result was reported as inconclusive/negative. Re-run after the facility-set expansion at N=17 (re-running `physics_gaussian.py` against the full candidate set surfaced 4 more usable estimates than had previously been computed), the same single-feature-LOO-CV method now finds a real, physically sensible signal: `hit_days` (the number of per-overpass wind-matched days) correlates with the physics estimator's relative uncertainty at r=−0.617, with LOO R²=0.212 (MAE=0.095) — more wind-matched days genuinely predicts a tighter uncertainty interval. This is the first time this specific feasibility check has found anything, and illustrates a general point: a negative result reported honestly at a small sample size should be revisited, not treated as final, once more data becomes available. Consistent with the project's stated methodological discipline, still only a single-feature linear fit was attempted at this sample size, per the same underpowered-multi-feature-model caution that motivated the original scoping decision.
+
+A related consistency check — comparing the activity signal computed from the tile-level-split versus facility-level-split detector checkpoints (§5.1) — originally found (at N=9, 4 training facilities) that facilities *never* included in the detector's training set showed substantially less stable activity-probability outputs (swings of up to 0.22) across the two checkpoints than a facility that had been in training, consistent with the facility-level-split finding that the earlier checkpoint had partly memorized specific training facilities. Re-run after the facility-set expansion at N=20 (20 facilities, 4 held out only in the facility-split checkpoint), this memorization signature disappeared: the held-out group's mean absolute delta (0.036) is now *smaller* than the in-training group's (0.061), the opposite of what a memorizing model would show — consistent with the LOFO finding above that facility-level generalization improved substantially with more training facilities, even though it remains far from perfect.
+
+**A further follow-up (`lofo_recall_correlates.py`, N=20) asked what predicts the exhaustive LOFO recall reported in §5.1.** The strongest predictor by a wide margin is the standard model's own activity-probability confidence for that facility (r=+0.903, LOO R²=0.783, MAE=0.149); the number of OCO-3 soundings collected for that facility (an entirely different data modality, Track B rather than Track A) is a weaker secondary signal (r=+0.596). Because the activity-probability feature and the LOFO-recall target both ultimately derive from the same detector architecture and tile set, this should be read as "facilities with a clearer combustion signature generalize better," not as two fully independent measurements agreeing.
+
+---
+
+## 6. Discussion
+
+Four findings in this work carry implications beyond the specific numbers reported.
+
+**First, evaluation methodology materially changes the apparent quality of a satellite-tile classifier — and this is true at two separate levels, not just one.** The 81.2%→67.3% accuracy drop under a facility-level split (with 4 facilities) — and the more dramatic 53%→8% collapse in plant recall — demonstrated that tile-level evaluation was measuring the wrong thing. But the facility-set expansion revealed a second, subtler version of the same problem: even a methodologically correct facility-level split can mislead when the facility count is too small for one random draw of held-out sites to be representative. The single-split recall of 88% (at 20 training facilities) looked like a clean resolution of the earlier collapse; only the exhaustive 21-fold LOFO evaluation exposed that this figure depended on which facilities happened to be excluded, and that true recall (47.2%) is roughly half of it. Any satellite-imagery classification task with a small-to-moderate number of distinct positive-class sites is at risk of both failure modes unless the split is constructed at the facility level *and*, ideally, evaluated exhaustively rather than on a single held-out draw.
+
+**Second, wind measurement error, not the CO2 signal itself, is generally the dominant source of uncertainty in this class of mass-balance estimate.** This project's empirical finding (wind term contributing 45–59% relative uncertainty, versus single-digit percentages for IME sampling) independently reproduces a pattern already noted in the literature (§2.1), and suggests that further improving the accuracy of per-plant emission estimates from OCO-3-class data may depend more on improving wind data quality or matching methodology than on refining the CO2 mass-balance calculation itself.
+
+**Third, agreement (or disagreement) with Climate TRACE should be interpreted carefully, and larger samples should be expected to look less flattering, not more.** Because Climate TRACE is itself substantially inferred from satellite thermal-proxy methods rather than measured emissions, the 9-of-17 within-interval result (53%) is evidence of rough — but far from complete — mutual consistency between two independent, imperfect estimators, not validation against ground truth. That this figure dropped from 71% at N=7 to 53% at N=17 is itself a useful methodological lesson: a small-sample calibration statistic can look considerably better than the true rate simply because it hasn't had the chance to be wrong yet. The disagreements found (both over- and under-estimates, up to roughly 11× apart at the extremes) are genuinely informative precisely because they cannot be resolved simply by trusting one source over the other; the Talcher case study (§5.2.3) shows that at least one such disagreement had an identifiable, fixable root cause (background-definition sensitivity) rather than being unexplainable noise.
+
+**Fourth, an honestly-reported negative result at a small sample size is a snapshot, not a conclusion.** The activity-signal-predicts-uncertainty feasibility check (§5.3) was correctly reported as inconclusive at N=7 — but re-running the identical method at N=17 (after more facilities became available) found a real, physically sensible effect (`hit_days` predicting `q_rel_std`, LOO R²=0.212) that the smaller sample simply couldn't detect. The lesson generalizes beyond this specific check: in a facility-count-limited project like this one, "no effect found" and "no effect exists" are not the same claim, and results scoped down for sample-size reasons are worth revisiting whenever the facility count grows rather than treating the original negative finding as final.
+
+The negative-CO2-enhancement anomaly (§5.2.5) has since been mostly resolved: 2 of 3 affected facilities turned out to be a signal-to-noise problem, not a real negative signal or a pipeline bug, and the apparent wind-alignment contradiction dissolved once wind alignment and CO2 detectability were recognized as independent diagnostics. One facility, ShriSingajiMalwa, remains a genuine, statistically significant anomaly and is the project's clearest remaining open question at the individual-facility level.
+
+---
+
+## 7. Limitations
+
+- **Climate TRACE is a benchmark, not ground truth**, for the reasons discussed in §2.2 and §6; agreement or disagreement with it should not be read as proof of correctness or error in either direction.
+- **The cross-track reliability experiment (§5.3) is still a single-feature linear fit at N=17**, and while it now shows a real effect (up from an underpowered N=7 negative result), it remains indicative rather than a validated multi-feature model, per `RESEARCH_PLAN.md` §8's caution against fitting one at this facility count.
+- **Track A's exhaustive LOFO recall (47.2%) indicates the detector does not yet reliably generalize to arbitrary unseen facilities**, and is highly variable by facility (0–100%) — a single-split recall figure (however it turns out) should not be quoted as a stand-alone generalization claim without this context, since this project's own experience shows a single split can differ from the true rate by a factor of ~2.
+- **The IME method's 2.25 km² per-sounding footprint-area assumption is fixed, not measured per sounding**, and its sensitivity has not been separately ablated in this work — Not documented / needs verification whether this materially affects the reported estimates.
+- **Three facilities (Mundra, Sipat, Simhadri) have no Track B emission estimate at all**, excluded for a genuine 0-near-sounding OCO-3 coverage gap rather than a processing failure — the 17-facility Climate TRACE comparison and reliability model necessarily omit these three.
+- **One facility (ShriSingajiMalwa) shows a statistically significant, unexplained negative CO2 enhancement** (§5.2.5) — the other two originally-flagged facilities (Koradi, Tamnar) were root-caused as signal-to-noise limitations, not real negative signals, but ShriSingajiMalwa's case remains open.
+- **No formal dependency manifest, automated test suite, or continuous integration exists for this codebase** at the time of this writing — a practical limitation for reproducibility, distinct from the scientific limitations above.
+- **A roughly four-week gap in project activity (mid-July to mid-August, per the git history) is unexplained** in any document found during this synthesis — Not documented / needs verification whether relevant work occurred elsewhere during this period.
+- **The exact ERA5 wind-data access method was not independently re-confirmed** during this synthesis pass — Not documented / needs verification.
+
+---
+
+## 8. Conclusion and Future Work
+
+This project demonstrates a working, checkpointed, uncertainty-aware pipeline for estimating per-plant CO2 emissions from OCO-3 satellite data for Indian coal power plants, cross-checked against an independent benchmark and validated (in part) through a targeted uncertainty-diagnosis case study. It separately demonstrates a satellite-tile power-plant detector fused across three physically distinct channels, along with a methodologically important, quantified finding about the risk of facility-level leakage in tile-level evaluation, and a second-order version of the same lesson: even a facility-level split can mislead at small facility counts, resolved here only by an exhaustive leave-one-facility-out evaluation. Both findings are likely to generalize to other small-N facility-classification problems in remote sensing.
+
+Since the initial version of this paper, the facility-set expansion (4→20 positive-class facilities for Track A, 13→17 usable emission estimates for Track B) has been completed, along with the exhaustive LOFO harness, a feature-importance follow-up explaining the LOFO generalization gap, a re-run reliability model (now a positive result), a recalibrated Climate TRACE comparison, and a full evaluation figure set (`data/eval_climate_trace_comparison.png`, `data/eval_track_a_ablation_and_generalization.png`) — items 2, 4, and 6 below are accordingly marked done; the remaining open items are:
+
+1. ~~Root-cause the negative-CO2-enhancement facilities~~ — **Mostly done** (§5.2.5): 2 of 3 facilities resolved as signal-to-noise limitations, not real anomalies. ShriSingajiMalwa's statistically significant negative enhancement remains open and is the narrower, more specific successor to this item.
+2. ~~Complete and verify the full 20-facility coverage for Track B~~ — **Done**: all 20 facilities processed, 17 produce a usable emission estimate; the remaining 3 are excluded for a genuine coverage gap, not left unverified.
+3. **Build a genuine correction/fusion model** combining the Track A activity signal with the Track B physics-based estimate — still the largest open piece of future work. The cross-track experiments (§5.3) remain exploratory feasibility checks, not a finished model, and per `RESEARCH_PLAN.md` §7 cannot use Climate TRACE as a training label; a genuine Q-correcting A1→A5 ablation ladder (RESEARCH_PLAN.md §9) needs an independent ground-truth source this project does not yet have. *(Still open — the key remaining blocker for full fusion.)*
+4. ~~Run leave-one-facility-out cross-validation more broadly~~ — **Done for Track A** (`lofo_track_a.py`, 21 exhaustive folds); Track B's own correction model (once built per item 3) will need its own LOFO harness, since RESEARCH_PLAN.md §9 specifies LOFO evaluation for the A1→A5 ladder specifically.
+5. **Improve Track A's facility-level generalization** directly. The exhaustive LOFO result (47.2% mean recall) reframes this from "nice to have" to "the primary open weakness of Track A" — worth pursuing via a larger/more diverse training facility set, architectural changes, or a revised training curriculum, informed by the finding that generalization failure correlates with weak intrinsic signal clarity (§5.3) rather than being random. *(Still open.)*
+6. ~~Produce a consolidated evaluation figure set~~ — **Done**: `evaluation_figures.py` produces predicted-vs-actual, residuals, uncertainty calibration, facility-level comparison (vs. Climate TRACE), the full Track A ablation/methodology history table, LOFO recall distribution, and feature-importance panels for both correlation studies.
+7. **Formalize the project's dependency and testing infrastructure**, independent of the scientific work, to support reproducibility. *(Still open.)*
+
+---
+
+## References
+
+*Full bibliographic detail for entries not fully specified here should be verified directly against `RESEARCH_PLAN.md` §3–4 of this repository.*
+
+- Deb, S. & Das, S. (2025). arXiv:2502.02083.
+- Varon, D. J., et al. (2018). Source of the Integrated Mass Enhancement method and the α ≈ 0.5 effective-wind-speed scaling factor adopted in this project's emission-rate calculation.
+- Nassar, R., et al. (2017). CO2 point-source mass-balance estimation from OCO-2.
+- Reuter, M., et al. (2019). OCO-2/3 CO2 point-source estimation.
+- Li, et al. (2021). GRL. (Contribution not fully specified in this synthesis — see `RESEARCH_PLAN.md`.)
+- GMD (2024), SMARTCARB-related literature on CNN-based, simulation-demonstrated emission regression.
+- Climate TRACE (climatetrace.org). India power-sector CO2 estimates, used as an independent benchmark.
+- World Resources Institute. Global Power Plant Database, used for facility selection and deduplication.
+
+---
+
+*This paper was synthesized from the project's git commit history, weekly research logs, source code, and result files, cross-referenced against the previously compiled `PROJECT_RESEARCH_DOCUMENTATION.md`, then updated same-day following a facility-set-expansion and exhaustive-LOFO follow-up session. Claims not independently verifiable from the repository at the time of writing are marked "Not documented / needs verification" and should not be treated as established fact without further checking.*

@@ -1,11 +1,11 @@
 {
-  "n_facilities": 7,
+  "n_facilities": 17,
   "feature_table": [
     {
       "plant": "Sasan",
-      "q_rel_std": 0.4479684707666235,
-      "activity_prob_mean": 0.8201683561007181,
-      "activity_prob_std": 0.2377384608722279,
+      "q_rel_std": 0.45272241782815187,
+      "activity_prob_mean": 0.9343336472908655,
+      "activity_prob_std": 0.048600938955796195,
       "wind_co2_diff_deg": 54.0,
       "hit_days": 19,
       "n_soundings": 7379,
@@ -13,9 +13,9 @@
     },
     {
       "plant": "Tirora",
-      "q_rel_std": 0.5275925101135394,
-      "activity_prob_mean": 0.289015993475914,
-      "activity_prob_std": 0.13467803134965725,
+      "q_rel_std": 0.5381370612927499,
+      "activity_prob_mean": 0.3142467960715294,
+      "activity_prob_std": 0.07697343950648862,
       "wind_co2_diff_deg": 92.0,
       "hit_days": 5,
       "n_soundings": 671,
@@ -23,9 +23,9 @@
     },
     {
       "plant": "Vindhyachal",
-      "q_rel_std": 0.5954457668228308,
-      "activity_prob_mean": 0.8501675700147947,
-      "activity_prob_std": 0.2121208778583912,
+      "q_rel_std": 0.5976851818653336,
+      "activity_prob_mean": 0.963891992966334,
+      "activity_prob_std": 0.029829251534526213,
       "wind_co2_diff_deg": 33.0,
       "hit_days": 17,
       "n_soundings": 7114,
@@ -33,9 +33,9 @@
     },
     {
       "plant": "Talcher",
-      "q_rel_std": 0.2306888278709128,
-      "activity_prob_mean": 0.5916086789220572,
-      "activity_prob_std": 0.31446961272747304,
+      "q_rel_std": 0.24550611042959608,
+      "activity_prob_mean": 0.821315901974837,
+      "activity_prob_std": 0.15141892612954913,
       "wind_co2_diff_deg": 25.0,
       "hit_days": 21,
       "n_soundings": 2165,
@@ -43,9 +43,9 @@
     },
     {
       "plant": "Rihand",
-      "q_rel_std": 0.7404500535279132,
-      "activity_prob_mean": 0.8938823404411474,
-      "activity_prob_std": 0.20537263920426904,
+      "q_rel_std": 0.7406150699669546,
+      "activity_prob_mean": 0.9721457461516062,
+      "activity_prob_std": 0.050108819156970796,
       "wind_co2_diff_deg": 109.0,
       "hit_days": 16,
       "n_soundings": 6072,
@@ -53,9 +53,9 @@
     },
     {
       "plant": "ChandrapurCoal",
-      "q_rel_std": 0.49399112945285567,
-      "activity_prob_mean": 0.34866679925471544,
-      "activity_prob_std": 0.26591843920496294,
+      "q_rel_std": 0.4972363970849994,
+      "activity_prob_mean": 0.5346000716090202,
+      "activity_prob_std": 0.14370898758973397,
       "wind_co2_diff_deg": 177.0,
       "hit_days": 14,
       "n_soundings": 1136,
@@ -63,37 +63,147 @@
     },
     {
       "plant": "Anpara",
-      "q_rel_std": 0.6769219616494417,
-      "activity_prob_mean": 0.8256148733198643,
-      "activity_prob_std": 0.22277025160060487,
+      "q_rel_std": 0.6781744270668287,
+      "activity_prob_mean": 0.964180663228035,
+      "activity_prob_std": 0.044491808809639447,
       "wind_co2_diff_deg": 80.0,
       "hit_days": 16,
       "n_soundings": 5768,
       "capacity_mw": 2630.0
+    },
+    {
+      "plant": "RGundem",
+      "q_rel_std": 0.6742937286356288,
+      "activity_prob_mean": 0.4932669053475062,
+      "activity_prob_std": 0.18058853566677188,
+      "wind_co2_diff_deg": 46.0,
+      "hit_days": 5,
+      "n_soundings": 172,
+      "capacity_mw": 2600.0
+    },
+    {
+      "plant": "Korba",
+      "q_rel_std": 0.6530878283160599,
+      "activity_prob_mean": 0.9093508819739023,
+      "activity_prob_std": 0.060067933435608574,
+      "wind_co2_diff_deg": 86.0,
+      "hit_days": 5,
+      "n_soundings": 384,
+      "capacity_mw": 2600.0
+    },
+    {
+      "plant": "ShriSingajiMalwa",
+      "q_rel_std": 0.8313476123847573,
+      "activity_prob_mean": 0.25072044258316356,
+      "activity_prob_std": 0.053212096937517155,
+      "wind_co2_diff_deg": 71.0,
+      "hit_days": 5,
+      "n_soundings": 228,
+      "capacity_mw": 2520.0
+    },
+    {
+      "plant": "Koradi",
+      "q_rel_std": 0.4093469561347974,
+      "activity_prob_mean": 0.49994858105977374,
+      "activity_prob_std": 0.15106010379079926,
+      "wind_co2_diff_deg": 115.0,
+      "hit_days": 25,
+      "n_soundings": 3672,
+      "capacity_mw": 2400.0
+    },
+    {
+      "plant": "Tamnar",
+      "q_rel_std": 0.5651150377846993,
+      "activity_prob_mean": 0.6236672426263491,
+      "activity_prob_std": 0.195820821906691,
+      "wind_co2_diff_deg": 16.0,
+      "hit_days": 7,
+      "n_soundings": 842,
+      "capacity_mw": 2400.0
+    },
+    {
+      "plant": "Kudgi",
+      "q_rel_std": 0.6323243113431009,
+      "activity_prob_mean": 0.24057448407014212,
+      "activity_prob_std": 0.06811214788948884,
+      "wind_co2_diff_deg": 101.0,
+      "hit_days": 4,
+      "n_soundings": 338,
+      "capacity_mw": 2400.0
+    },
+    {
+      "plant": "Kahalgaon",
+      "q_rel_std": 0.5144477344317883,
+      "activity_prob_mean": 0.3649778539935748,
+      "activity_prob_std": 0.09063782633548532,
+      "wind_co2_diff_deg": 91.0,
+      "hit_days": 14,
+      "n_soundings": 1038,
+      "capacity_mw": 2340.0
+    },
+    {
+      "plant": "Mouda",
+      "q_rel_std": 0.37255694520447946,
+      "activity_prob_mean": 0.41870154937108356,
+      "activity_prob_std": 0.1432963861530767,
+      "wind_co2_diff_deg": 4.0,
+      "hit_days": 19,
+      "n_soundings": 2883,
+      "capacity_mw": 2320.0
+    },
+    {
+      "plant": "Chhabra",
+      "q_rel_std": 0.5131863420531194,
+      "activity_prob_mean": 0.42430850863456726,
+      "activity_prob_std": 0.20441999181000392,
+      "wind_co2_diff_deg": 165.0,
+      "hit_days": 9,
+      "n_soundings": 874,
+      "capacity_mw": 2320.0
+    },
+    {
+      "plant": "Farakka",
+      "q_rel_std": 0.5938872845300058,
+      "activity_prob_mean": 0.36917757615447044,
+      "activity_prob_std": 0.0954639141813908,
+      "wind_co2_diff_deg": 13.0,
+      "hit_days": 12,
+      "n_soundings": 1504,
+      "capacity_mw": 2100.0
     }
   ],
   "correlations_with_q_rel_std": {
-    "activity_prob_mean": 0.4158293926386504,
-    "activity_prob_std": -0.6171153568925866,
-    "wind_co2_diff_deg": 0.3461457803785848,
-    "hit_days": -0.30656282342816044,
-    "n_soundings": 0.44068125697135585,
-    "capacity_mw": -0.02267020484270985
+    "activity_prob_mean": -0.02421081101324013,
+    "activity_prob_std": -0.45661564335815913,
+    "wind_co2_diff_deg": 0.1285513210466665,
+    "hit_days": -0.6167337762511729,
+    "n_soundings": -0.0809806270085031,
+    "capacity_mw": -0.060884606182773846
   },
-  "best_single_feature": "activity_prob_std",
+  "best_single_feature": "hit_days",
   "loo_cv": {
-    "feature": "activity_prob_std",
+    "feature": "hit_days",
     "predictions": {
-      "Sasan": 0.5226500327744693,
-      "Tirora": 0.976529522478,
-      "Vindhyachal": 0.552467058908978,
-      "Talcher": 0.538558478697642,
-      "Rihand": 0.5372579329208665,
-      "ChandrapurCoal": 0.44926641990766014,
-      "Anpara": 0.5162167294636109
+      "Sasan": 0.4760859138354724,
+      "Tirora": 0.6792428695992977,
+      "Vindhyachal": 0.4905741205185793,
+      "Talcher": 0.48532438010255946,
+      "Rihand": 0.49452893378155993,
+      "ChandrapurCoal": 0.5426408393802302,
+      "Anpara": 0.49966297993425823,
+      "RGundem": 0.6571598275633517,
+      "Korba": 0.6605991801658051,
+      "ShriSingajiMalwa": 0.6316874978976538,
+      "Koradi": 0.3873353094511976,
+      "Tamnar": 0.6406814673202876,
+      "Kudgi": 0.680712593386712,
+      "Kahalgaon": 0.541505097055087,
+      "Mouda": 0.48685691139247284,
+      "Chhabra": 0.6140652161357,
+      "Farakka": 0.5647066216866616
     },
-    "mae": 0.1832984279215659,
-    "r2": -1.22240627350426
+    "mae": 0.09547583837387788,
+    "r2": 0.21178978265586168
   },
   "caveat": "N=7 facilities. This is a reliability/uncertainty-prediction exercise, not a Q-correcting model -- no ground-truth emissions are available yet to fit or validate a true correction against. Results are indicative, not a validated predictive model."
 }

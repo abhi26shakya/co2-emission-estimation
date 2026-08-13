@@ -104,14 +104,12 @@ def build_tile(no2_path, so2_path, viirs_path):
 
 
 def monthly_paths(name, year=2020):
-    if name in TRACK_A_ALIAS:
-        alias = TRACK_A_ALIAS[name]
-        no2_dir, so2_dir, viirs_dir = "data/monthly/positive", "data/so2/positive", "data/viirs/positive"
-        prefix = alias
-    else:
-        no2_dir, so2_dir, viirs_dir = ("data/activity_tiles/no2", "data/activity_tiles/so2",
-                                       "data/activity_tiles/viirs")
-        prefix = name
+    # All 20 Track B facilities now have tiles directly in data/{monthly,so2,viirs}/positive
+    # (export_new_positive_tiles.py folded the 16-facility Track A positive-class expansion
+    # in there), so the data/activity_tiles/ fallback that used to be needed for the 5
+    # facilities exported ahead of the others (Week 10) is no longer necessary.
+    no2_dir, so2_dir, viirs_dir = "data/monthly/positive", "data/so2/positive", "data/viirs/positive"
+    prefix = TRACK_A_ALIAS.get(name, name)
     paths = []
     for m in range(1, 13):
         n = f"{no2_dir}/{prefix}_{year}_{m:02d}.npy"

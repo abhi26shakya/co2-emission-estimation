@@ -1,0 +1,114 @@
+{
+  "epochs": 30,
+  "n_facilities": 21,
+  "per_facility": [
+    {
+      "plant": "Anpara",
+      "n_tiles": 12,
+      "recall": 1.0
+    },
+    {
+      "plant": "ChandrapurCoal",
+      "n_tiles": 12,
+      "recall": 0.6666666666666666
+    },
+    {
+      "plant": "Chhabra",
+      "n_tiles": 12,
+      "recall": 0.08333333333333333
+    },
+    {
+      "plant": "Farakka",
+      "n_tiles": 12,
+      "recall": 0.08333333333333333
+    },
+    {
+      "plant": "Kahalgaon",
+      "n_tiles": 12,
+      "recall": 0.0
+    },
+    {
+      "plant": "Koradi",
+      "n_tiles": 12,
+      "recall": 0.5833333333333334
+    },
+    {
+      "plant": "Korba",
+      "n_tiles": 12,
+      "recall": 1.0
+    },
+    {
+      "plant": "Kudgi",
+      "n_tiles": 12,
+      "recall": 0.0
+    },
+    {
+      "plant": "MUNDRA_TPP",
+      "n_tiles": 24,
+      "recall": 0.4583333333333333
+    },
+    {
+      "plant": "MUNDRA_UMPP",
+      "n_tiles": 24,
+      "recall": 0.4583333333333333
+    },
+    {
+      "plant": "Mouda",
+      "n_tiles": 12,
+      "recall": 0.0
+    },
+    {
+      "plant": "RGundem",
+      "n_tiles": 12,
+      "recall": 0.25
+    },
+    {
+      "plant": "Rihand",
+      "n_tiles": 12,
+      "recall": 1.0
+    },
+    {
+      "plant": "SASAN_UMPP",
+      "n_tiles": 24,
+      "recall": 0.8333333333333334
+    },
+    {
+      "plant": "ShriSingajiMalwa",
+      "n_tiles": 12,
+      "recall": 0.08333333333333333
+    },
+    {
+      "plant": "Simhadri",
+      "n_tiles": 12,
+      "recall": 0.4166666666666667
+    },
+    {
+      "plant": "Sipat",
+      "n_tiles": 12,
+      "recall": 0.3333333333333333
+    },
+    {
+      "plant": "TIRORA_TPP",
+      "n_tiles": 24,
+      "recall": 0.041666666666666664
+    },
+    {
+      "plant": "Talcher",
+      "n_tiles": 12,
+      "recall": 1.0
+    },
+    {
+      "plant": "Tamnar",
+      "n_tiles": 12,
+      "recall": 0.6666666666666666
+    },
+    {
+      "plant": "VINDH_CHAL_STPS",
+      "n_tiles": 24,
+      "recall": 0.9583333333333334
+    }
+  ],
+  "mean_recall": 0.4722222222222222,
+  "tile_weighted_mean_recall": 0.48717948717948717,
+  "note": "Each row trains a fresh model with that one facility's tiles fully excluded from training (all other 19 plant facilities + all hard/rural negatives included). recall = fraction of the held-out facility's own tiles classified as 'plant'. This is the true LOFO analogue of the single random facility-split test recall reported in train_3channel.py."
+}

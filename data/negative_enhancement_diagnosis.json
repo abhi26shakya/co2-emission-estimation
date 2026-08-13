@@ -1,0 +1,121 @@
+{
+  "comparison_plant": "Rihand",
+  "comparison_plant_stats": {
+    "near_bg_stats": {
+      "near_n": 1543,
+      "bg_n": 2463,
+      "bg_mean": 413.2850646972656,
+      "bg_std": 1.481845498085022,
+      "near_mean": 415.1727600097656,
+      "n_used": 1166,
+      "frac_near_above_bg": 0.7556707712248866,
+      "excess_used_mean": 2.8950681686401367,
+      "excess_used_median": 1.973968505859375,
+      "signal_to_noise": 1.2738813161849976
+    },
+    "bg_definition_sensitivity": {
+      "definitions_tested": 5,
+      "ime_proxy_min": 3304.4716796875,
+      "ime_proxy_max": 3449.43994140625,
+      "ime_proxy_range_pct_of_default": 4.2945295537750985
+    },
+    "significance": {
+      "near_n": 1543,
+      "bg_n": 2463,
+      "diff_ppm": 1.8876953125,
+      "se_ppm": 0.08006471772530273,
+      "z_score": 23.57711818802097,
+      "consistent_with_zero_at_2sigma": false
+    }
+  },
+  "targets": {
+    "ShriSingajiMalwa": {
+      "near_bg_stats": {
+        "near_n": 59,
+        "bg_n": 120,
+        "bg_mean": 413.3733215332031,
+        "bg_std": 1.894078016281128,
+        "near_mean": 412.32110595703125,
+        "n_used": 4,
+        "frac_near_above_bg": 0.06779661016949153,
+        "excess_used_mean": 0.5232620239257812,
+        "excess_used_median": 0.5036468505859375,
+        "signal_to_noise": -0.5555291771888733
+      },
+      "bg_definition_sensitivity": {
+        "definitions_tested": 5,
+        "ime_proxy_min": 1.179168701171875,
+        "ime_proxy_max": 2.112335205078125,
+        "ime_proxy_range_pct_of_default": 44.58409273164686
+      },
+      "significance": {
+        "near_n": 59,
+        "bg_n": 120,
+        "diff_ppm": -1.052215576171875,
+        "se_ppm": 0.1979308719041773,
+        "z_score": -5.316076092875879,
+        "consistent_with_zero_at_2sigma": false
+      },
+      "wind_co2_diff_deg": 71.0
+    },
+    "Koradi": {
+      "near_bg_stats": {
+        "near_n": 496,
+        "bg_n": 1731,
+        "bg_mean": 412.38165283203125,
+        "bg_std": 1.7132717370986938,
+        "near_mean": 412.2506103515625,
+        "n_used": 252,
+        "frac_near_above_bg": 0.5080645161290323,
+        "excess_used_mean": 1.0432934761047363,
+        "excess_used_median": 0.840606689453125,
+        "signal_to_noise": -0.07648668438196182
+      },
+      "bg_definition_sensitivity": {
+        "definitions_tested": 5,
+        "ime_proxy_min": 232.87149047851562,
+        "ime_proxy_max": 282.0262451171875,
+        "ime_proxy_range_pct_of_default": 18.69642286918692
+      },
+      "significance": {
+        "near_n": 496,
+        "bg_n": 1731,
+        "diff_ppm": -0.13104248046875,
+        "se_ppm": 0.08303823434153397,
+        "z_score": -1.5780981075509855,
+        "consistent_with_zero_at_2sigma": true
+      },
+      "wind_co2_diff_deg": 115.0
+    },
+    "Tamnar": {
+      "near_bg_stats": {
+        "near_n": 221,
+        "bg_n": 314,
+        "bg_mean": 411.49029541015625,
+        "bg_std": 1.1830254793167114,
+        "near_mean": 411.3681335449219,
+        "n_used": 92,
+        "frac_near_above_bg": 0.416289592760181,
+        "excess_used_mean": 0.7464343905448914,
+        "excess_used_median": 0.5498046875,
+        "signal_to_noise": -0.10326224565505981
+      },
+      "bg_definition_sensitivity": {
+        "definitions_tested": 5,
+        "ime_proxy_min": 64.44662475585938,
+        "ime_proxy_max": 89.56521606445312,
+        "ime_proxy_range_pct_of_default": 36.57764961384171
+      },
+      "significance": {
+        "near_n": 221,
+        "bg_n": 314,
+        "diff_ppm": -0.122161865234375,
+        "se_ppm": 0.09213246714698876,
+        "z_score": -1.3259371969218747,
+        "consistent_with_zero_at_2sigma": true
+      },
+      "wind_co2_diff_deg": 16.0
+    }
+  },
+  "conclusion": "2/3 of the flagged facilities have a near-minus-background difference statistically consistent with zero at the 2-sigma level (the standard error of the difference, computed from near/background sample sizes and variance, is larger than the magnitude of the negative value itself). Where that holds, the correct characterization is not 'negative CO2 enhancement' but 'no detectable enhancement given available signal-to-noise' -- the negative sign is sampling noise landing on the wrong side of zero, not a pipeline bug or a real emission-absent facility. This also resolves the apparent contradiction with the Talcher-derived heuristic ('good wind alignment implies trustworthy signal'): Tamnar's good wind alignment (16 deg) says its NO2 plume geometry is plausible, but wind alignment is computed independently of the OCO-3 CO2 signal-to-noise, so it says nothing about whether the CO2 enhancement itself is detectable -- the two diagnostics are orthogonal, not in tension, and this facility illustrates why: it can be true simultaneously that the wind/CO2 offset looks physically sensible AND that the CO2 signal is too weak to measure a reliable enhancement at all. All three facilities also show elevated background-definition sensitivity relative to the well-bracketed comparison facility, consistent with the same thin-signal fragility pattern first identified in the Talcher diagnosis, not a new failure mode."
+}

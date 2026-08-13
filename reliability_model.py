@@ -19,14 +19,16 @@ would validate whether wind/CO2 misalignment (already flagged qualitatively
 for ChandrapurCoal/Rihand) is quantitatively informative beyond what
 wind_rel_std alone already captures.
 
-N=7 (only plants with a physics_gaussian.py estimate: Mundra and Sipat are
-excluded, they were skipped for having 0 near-plant soundings after the
-near/bg split). This is far too small for anything but a single-feature
-linear fit evaluated by leave-one-out CV, reported with explicit sample-
-size caveats -- per the project's priority order (scientific validity >
-novelty > ...), this script deliberately does NOT fit a multi-feature
-gradient-boosted-trees model on 7 points, which per RESEARCH_PLAN.md Sec 8
-would be "underpowered and uninterpretable."
+N=17 as of the 20-facility expansion (only plants with a physics_gaussian.py
+estimate; Mundra, Sipat, and Simhadri are excluded, all three skipped for
+having 0 near-plant soundings after the near/bg split -- a genuine OCO-3
+coverage gap, not something re-running fixes). Originally N=7 when this
+script was first written. Still a single-feature linear fit evaluated by
+leave-one-out CV, reported with explicit sample-size caveats -- per the
+project's priority order (scientific validity > novelty > ...), this script
+deliberately does NOT fit a multi-feature gradient-boosted-trees model,
+which per RESEARCH_PLAN.md Sec 8 would be "underpowered and uninterpretable"
+even at N=17.
 """
 import json
 import numpy as np

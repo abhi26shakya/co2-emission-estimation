@@ -1,73 +1,149 @@
 {
   "per_facility": [
     {
-      "plant": "Vindhyachal",
-      "group": "in_training_both",
-      "orig_activity_prob": 0.8501675700147947,
-      "facility_split_activity_prob": 0.8536404681702455,
-      "delta": 0.003472898155450821
+      "plant": "Anpara",
+      "group": "held_out_in_facility_split",
+      "orig_activity_prob": 0.964180663228035,
+      "facility_split_activity_prob": 0.9537119170029958,
+      "delta": -0.010468746225039127
     },
     {
-      "plant": "Sasan",
+      "plant": "ChandrapurCoal",
+      "group": "held_out_in_facility_split",
+      "orig_activity_prob": 0.5346000716090202,
+      "facility_split_activity_prob": 0.5887955650687218,
+      "delta": 0.05419549345970154
+    },
+    {
+      "plant": "Chhabra",
       "group": "in_training_both",
-      "orig_activity_prob": 0.8201683561007181,
-      "facility_split_activity_prob": 0.7939636384447416,
-      "delta": -0.02620471765597654
+      "orig_activity_prob": 0.42430850863456726,
+      "facility_split_activity_prob": 0.3851502289374669,
+      "delta": -0.03915827969710034
+    },
+    {
+      "plant": "Farakka",
+      "group": "in_training_both",
+      "orig_activity_prob": 0.36917757615447044,
+      "facility_split_activity_prob": 0.3544671442359686,
+      "delta": -0.014710431918501854
+    },
+    {
+      "plant": "Kahalgaon",
+      "group": "in_training_both",
+      "orig_activity_prob": 0.3649778539935748,
+      "facility_split_activity_prob": 0.35706852003932,
+      "delta": -0.007909333954254805
+    },
+    {
+      "plant": "Koradi",
+      "group": "in_training_both",
+      "orig_activity_prob": 0.49994858105977374,
+      "facility_split_activity_prob": 0.6209159220258395,
+      "delta": 0.1209673409660657
+    },
+    {
+      "plant": "Korba",
+      "group": "in_training_both",
+      "orig_activity_prob": 0.9093508819739023,
+      "facility_split_activity_prob": 0.9358934164047241,
+      "delta": 0.026542534430821774
+    },
+    {
+      "plant": "Kudgi",
+      "group": "in_training_both",
+      "orig_activity_prob": 0.24057448407014212,
+      "facility_split_activity_prob": 0.23626887674132982,
+      "delta": -0.0043056073288123
+    },
+    {
+      "plant": "Mouda",
+      "group": "in_training_both",
+      "orig_activity_prob": 0.41870154937108356,
+      "facility_split_activity_prob": 0.5502571885784467,
+      "delta": 0.13155563920736318
     },
     {
       "plant": "Mundra",
       "group": "in_training_both",
-      "orig_activity_prob": 0.34759697938958806,
-      "facility_split_activity_prob": 0.3648529959221681,
-      "delta": 0.01725601653258002
+      "orig_activity_prob": 0.4635506570339203,
+      "facility_split_activity_prob": 0.579959419866403,
+      "delta": 0.11640876283248269
     },
     {
-      "plant": "Tirora",
-      "group": "held_out_in_facility_split",
-      "orig_activity_prob": 0.289015993475914,
-      "facility_split_activity_prob": 0.17179605062119663,
-      "delta": -0.11721994285471737
-    },
-    {
-      "plant": "Talcher",
-      "group": "never_in_training",
-      "orig_activity_prob": 0.5916086789220572,
-      "facility_split_activity_prob": 0.48781489829222363,
-      "delta": -0.10379378062983352
+      "plant": "RGundem",
+      "group": "in_training_both",
+      "orig_activity_prob": 0.4932669053475062,
+      "facility_split_activity_prob": 0.5455857329070568,
+      "delta": 0.052318827559550585
     },
     {
       "plant": "Rihand",
-      "group": "never_in_training",
-      "orig_activity_prob": 0.8938823404411474,
-      "facility_split_activity_prob": 0.8940867607792219,
-      "delta": 0.00020442033807444027
+      "group": "in_training_both",
+      "orig_activity_prob": 0.9721457461516062,
+      "facility_split_activity_prob": 0.9433722297350565,
+      "delta": -0.028773516416549683
+    },
+    {
+      "plant": "Sasan",
+      "group": "held_out_in_facility_split",
+      "orig_activity_prob": 0.9343336472908655,
+      "facility_split_activity_prob": 0.8547692423065504,
+      "delta": -0.07956440498431516
+    },
+    {
+      "plant": "ShriSingajiMalwa",
+      "group": "in_training_both",
+      "orig_activity_prob": 0.25072044258316356,
+      "facility_split_activity_prob": 0.2949836576978366,
+      "delta": 0.044263215114673016
+    },
+    {
+      "plant": "Simhadri",
+      "group": "in_training_both",
+      "orig_activity_prob": 0.34336021294196445,
+      "facility_split_activity_prob": 0.4131718936065833,
+      "delta": 0.06981168066461885
     },
     {
       "plant": "Sipat",
-      "group": "never_in_training",
-      "orig_activity_prob": 0.5777107495814562,
-      "facility_split_activity_prob": 0.35818658249460594,
-      "delta": -0.21952416708685024
+      "group": "in_training_both",
+      "orig_activity_prob": 0.7144295771916708,
+      "facility_split_activity_prob": 0.7313972562551498,
+      "delta": 0.01696767906347907
     },
     {
-      "plant": "ChandrapurCoal",
-      "group": "never_in_training",
-      "orig_activity_prob": 0.34866679925471544,
-      "facility_split_activity_prob": 0.13229736591650484,
-      "delta": -0.2163694333382106
+      "plant": "Talcher",
+      "group": "held_out_in_facility_split",
+      "orig_activity_prob": 0.821315901974837,
+      "facility_split_activity_prob": 0.8230313062667847,
+      "delta": 0.0017154042919477197
     },
     {
-      "plant": "Anpara",
-      "group": "never_in_training",
-      "orig_activity_prob": 0.8256148733198643,
-      "facility_split_activity_prob": 0.8599802056948344,
-      "delta": 0.03436533237497008
+      "plant": "Tamnar",
+      "group": "in_training_both",
+      "orig_activity_prob": 0.6236672426263491,
+      "facility_split_activity_prob": 0.7168165892362595,
+      "delta": 0.09314934660991037
+    },
+    {
+      "plant": "Tirora",
+      "group": "in_training_both",
+      "orig_activity_prob": 0.3142467960715294,
+      "facility_split_activity_prob": 0.48444901530941326,
+      "delta": 0.17020221923788387
+    },
+    {
+      "plant": "Vindhyachal",
+      "group": "in_training_both",
+      "orig_activity_prob": 0.963891992966334,
+      "facility_split_activity_prob": 0.9267446547746658,
+      "delta": -0.037147338191668156
     }
   ],
   "mean_abs_delta_by_group": {
-    "in_training_both": 0.015644544114669128,
-    "held_out_in_facility_split": 0.11721994285471737,
-    "never_in_training": 0.11485142675358777
+    "held_out_in_facility_split": 0.03648601224025089,
+    "in_training_both": 0.06088698457460851
   },
-  "conclusion": "in_training_both facilities show near-zero deltas (stable, as expected if the model reliably recognizes sites it was trained on in both runs). Tirora (held out only in the facility-split run) drops meaningfully, direct evidence the original signal was inflated by having seen this exact facility during training. The 5 never-in-training facilities show the largest and most inconsistent deltas of any group (up to 0.22), meaning the activity signal for genuinely novel facilities is unstable across reasonable training variation, not just weak on average -- confirms WEEK11_LOG.txt's concern about the Week 10 activity signal for the 5 new facilities directly, rather than leaving it inferred."
+  "conclusion": "held_out_in_facility_split facilities (excluded from training only in the facility-split checkpoint) show mean|delta|=0.036; in_training_both facilities (assumed present in both training pools) show mean|delta|=0.061. Unlike the original 4-facility comparison, the held-out group's delta is no longer larger than the in-training group's -- with 20 facilities in the positive class, holding out 4 of them for the facility-split run no longer produces the clear memorization signature seen in WEEK11_LOG.txt's 4-facility comparison."
 }
