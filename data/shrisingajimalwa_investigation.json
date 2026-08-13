@@ -1,0 +1,97 @@
+{
+  "target": "ShriSingajiMalwa",
+  "comparison": "Koradi",
+  "seasonal": {
+    "ShriSingajiMalwa": {
+      "near_month_counts": {
+        "1": 59
+      },
+      "bg_month_counts": {
+        "1": 56,
+        "4": 6,
+        "5": 34,
+        "10": 24
+      },
+      "near_mean_month": 1.0,
+      "bg_mean_month": 4.083333333333333,
+      "month_offset": -3.083333333333333
+    },
+    "Koradi": {
+      "near_month_counts": {
+        "2": 153,
+        "3": 147,
+        "5": 5,
+        "9": 19,
+        "11": 132,
+        "12": 40
+      },
+      "bg_month_counts": {
+        "2": 415,
+        "3": 128,
+        "4": 64,
+        "5": 10,
+        "6": 95,
+        "9": 72,
+        "10": 192,
+        "11": 282,
+        "12": 473
+      },
+      "near_mean_month": 5.796370967741935,
+      "bg_mean_month": 7.761987290583478,
+      "month_offset": -1.9656163228415426
+    }
+  },
+  "directional": {
+    "ShriSingajiMalwa": {
+      "quadrant_stats": {
+        "N": {
+          "n": 23,
+          "mean_xco2": 414.5738220214844
+        },
+        "E": {
+          "n": 41,
+          "mean_xco2": 414.5357666015625
+        },
+        "W": {
+          "n": 55,
+          "mean_xco2": 412.0447692871094
+        }
+      },
+      "quadrant_spread_ppm": 2.529052734375
+    },
+    "Koradi": {
+      "quadrant_stats": {
+        "N": {
+          "n": 445,
+          "mean_xco2": 412.5906982421875
+        },
+        "E": {
+          "n": 255,
+          "mean_xco2": 413.73779296875
+        },
+        "S": {
+          "n": 466,
+          "mean_xco2": 411.9798278808594
+        },
+        "W": {
+          "n": 565,
+          "mean_xco2": 411.93634033203125
+        }
+      },
+      "quadrant_spread_ppm": 1.80145263671875
+    }
+  },
+  "same_month_comparison": {
+    "common_months": [
+      1
+    ],
+    "near_n": 59,
+    "bg_n": 56,
+    "near_mean_xco2": 412.32110595703125,
+    "bg_mean_xco2": 412.0291442871094,
+    "diff_ppm": 0.291961669921875,
+    "se_ppm": 0.13693359863981272,
+    "z_score": 2.1321404886893016
+  },
+  "conclusion": "ShriSingajiMalwa's near-plant soundings are entirely from one month (January), while its background ring also draws from April/May (mean XCO2 ~415.6-416.5 ppm) and October -- months with no near-plant coverage at all, likely due to OCO-3 swath geometry only crossing the tight near-plant circle on some overpasses. This means the original near-minus-background comparison was implicitly comparing January (near) against a January/April/May/October blend (background), and April/May's regional CO2 baseline is genuinely ~3.5-4.5 ppm higher than January's for reasons unrelated to the plant (seasonal atmospheric cycle). Restricting the comparison to the one month both zones actually share (January) flips the sign: near=412.321 vs bg=412.029 ppm, a difference of +0.292 ppm (z=2.13) -- small and only marginally significant, but positive, consistent with a real (weak) plant signal rather than the -1.052 ppm 'negative enhancement' that was actually a seasonal-sampling-imbalance artifact. This resolves the anomaly: it was not a real negative CO2 signal, a pipeline bug, or evidence against the plant emitting -- it was two systematically different seasons being averaged together and compared as if they were the same background. physics_gaussian.py's IME calculation does not currently stratify near/background comparisons by month, so this failure mode could in principle recur for any facility with uneven near/background month coverage, not just this one."
+}
