@@ -193,5 +193,70 @@
     "wind_deg": 53.0,
     "co2_offset_deg": 313.0,
     "wind_co2_diff_deg": 101.0
+  },
+  {
+    "plant": "Kahalgaon",
+    "lat": 25.2349,
+    "lon": 87.2635,
+    "hit_days": 14,
+    "soundings": 1038,
+    "co2_enhancement_ppm": 3.698,
+    "bg_std_ppm": 2.54,
+    "no2_peak_km": 5.4,
+    "wind_deg": 301.0,
+    "co2_offset_deg": 209.0,
+    "wind_co2_diff_deg": 91.0
+  },
+  {
+    "plant": "Mouda",
+    "lat": 21.1797,
+    "lon": 79.3978,
+    "hit_days": 19,
+    "soundings": 2883,
+    "co2_enhancement_ppm": 0.816,
+    "bg_std_ppm": 1.795,
+    "no2_peak_km": 34.9,
+    "wind_deg": 145.0,
+    "co2_offset_deg": 149.0,
+    "wind_co2_diff_deg": 4.0
+  },
+  {
+    "plant": "Chhabra",
+    "lat": 24.6217,
+    "lon": 77.0357,
+    "hit_days": 9,
+    "soundings": 874,
+    "co2_enhancement_ppm": 2.443,
+    "bg_std_ppm": 1.453,
+    "no2_peak_km": 2.8,
+    "wind_deg": 128.0,
+    "co2_offset_deg": 322.0,
+    "wind_co2_diff_deg": 165.0
+  },
+  {
+    "plant": "Farakka",
+    "lat": 24.772,
+    "lon": 87.894,
+    "hit_days": 12,
+    "soundings": 1504,
+    "co2_enhancement_ppm": 0.735,
+    "bg_std_ppm": 2.538,
+    "no2_peak_km": 5.0,
+    "wind_deg": 284.0,
+    "co2_offset_deg": 297.0,
+    "wind_co2_diff_deg": 13.0
+  },
+  {
+    "plant": "Simhadri",
+    "lat": 17.591,
+    "lon": 83.0917,
+    "hit_days": 6,
+    "soundings": 261,
+    "co2_enhancement_ppm": null,
+    "bg_std_ppm": 0.889,
+    "no2_peak_km": 18.6,
+    "wind_deg": 28.0,
+    "co2_offset_deg": 220.0,
+    "wind_co2_diff_deg": 168.0
   }
 ]

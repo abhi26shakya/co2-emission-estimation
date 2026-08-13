@@ -1,7 +1,21 @@
-import sys, os, json, time
+import sys, os, json, time, signal
 import ee, numpy as np, requests, io
 import earthaccess, xarray as xr
 import pandas as pd
+
+# earthaccess.download() has no built-in timeout and has been observed to
+# hang indefinitely on a stalled connection (seen twice this session, on
+# Kahalgaon and Mouda, both stuck in CLOSE_WAIT to urs.earthdata.nasa.gov).
+# A per-granule alarm turns that hang into a normal "skip and move on" case,
+# handled by the existing except block below.
+class _DownloadTimeout(Exception):
+    pass
+
+def _alarm_handler(signum, frame):
+    raise _DownloadTimeout("download stalled")
+
+signal.signal(signal.SIGALRM, _alarm_handler)
+GRANULE_TIMEOUT_S = 90
 
 # ---------- plant registry ----------
 # Loaded from data/candidate_plants.csv (Week 9 facility-set expansion,
@@ -56,7 +70,11 @@ if os.path.exists(CKPT_PATH):
 for i in range(start_i, len(results)):
     g = results[i]
     try:
-        f = earthaccess.download([g], local_path="data/scan_tmp")[0]
+        signal.alarm(GRANULE_TIMEOUT_S)
+        try:
+            f = earthaccess.download([g], local_path="data/scan_tmp")[0]
+        finally:
+            signal.alarm(0)
         ds = xr.open_dataset(f)
         lat, lon = ds["latitude"].values, ds["longitude"].values
         xco2, qf = ds["xco2"].values, ds["xco2_quality_flag"].values
@@ -144,11 +162,18 @@ row = {"plant":NAME,"lat":PLAT,"lon":PLON,"hit_days":hits,"soundings":int(len(kc
        "wind_co2_diff_deg":round(float(wdiff),0) if wdiff==wdiff else None}
 
 RES = "data/plant_results.json"
-allres = []
-if os.path.exists(RES):
-    allres = json.load(open(RES))
-allres = [r for r in allres if r["plant"]!=NAME]  # replace if re-run
-allres.append(row)
-json.dump(allres, open(RES,"w"), indent=2)
+# flock guards this read-modify-write: when plants are processed in parallel
+# (multiple process_plant.py instances), two unsynchronized writers finishing
+# around the same time would otherwise silently drop one plant's result.
+import fcntl
+with open(RES, "a+") as lockf:
+    fcntl.flock(lockf, fcntl.LOCK_EX)
+    lockf.seek(0)
+    contents = lockf.read()
+    allres = json.loads(contents) if contents.strip() else []
+    allres = [r for r in allres if r["plant"]!=NAME]  # replace if re-run
+    allres.append(row)
+    lockf.seek(0); lockf.truncate()
+    json.dump(allres, lockf, indent=2)
 print(f"\n[SAVED] {NAME} -> {RES}")
 print(json.dumps(row, indent=2))

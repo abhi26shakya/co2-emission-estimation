@@ -1,0 +1,15 @@
+=== starting Kahalgaon at Thu Aug 13 11:17:15 IST 2026 ===
+=== finished Kahalgaon at Thu Aug 13 12:37:13 IST 2026 exit=0 ===
+=== starting Mouda at Thu Aug 13 12:37:13 IST 2026 ===
+=== restarted Kahalgaon at Thu Aug 13 12:37:15 IST 2026 (killed hung PID 63021, resuming from checkpoint) ===
+=== restarted single loop: starting Kahalgaon at Thu Aug 13 14:14:50 IST 2026 ===
+=== finished Kahalgaon at Thu Aug 13 15:13:28 IST 2026 exit=0 ===
+=== restarted single loop: starting Mouda at Thu Aug 13 15:13:28 IST 2026 ===
+=== finished Mouda at Thu Aug 13 17:26:59 IST 2026 exit=0 ===
+=== restarted single loop: starting Chhabra at Thu Aug 13 17:26:59 IST 2026 ===
+=== finished Chhabra at Thu Aug 13 19:23:44 IST 2026 exit=0 ===
+=== restarted single loop: starting Farakka at Thu Aug 13 19:23:44 IST 2026 ===
+=== parallel run: starting Simhadri at Thu Aug 13 19:54:17 IST 2026 ===
+=== finished Farakka at Thu Aug 13 21:40:50 IST 2026 exit=0 ===
+=== restarted single loop: starting Simhadri at Thu Aug 13 21:40:50 IST 2026 ===
+=== finished Simhadri at Thu Aug 13 21:54:37 IST 2026 exit=0 ===

@@ -45,7 +45,7 @@ The project has two parallel tracks estimating CO2 emissions from Indian coal po
 | Step | Status |
 |---|---|
 | 1. Per-overpass wind + uncertainty in `physics_gaussian.py` | Done (Week 8), later strengthened with a 3rd uncertainty term (background-sensitivity) |
-| 2. Facility-set expansion (10–20 candidates) | Partial — 9/20 processed; 10 candidates remain |
+| 2. Facility-set expansion (10–20 candidates) | Done — 20/20 processed, all merged into `data/plant_results.json` |
 | 3. Activity signal extraction from Track A CNN | Done (Week 10), but flagged low-confidence for 5/9 facilities after Week 11's leakage fix |
 | 4. Correction model (A1→A5 ablation ladder, §9) | Scoped down to a negative-result feasibility check (Week 10); full correction model not built — blocked on facility count |
 | 5. Leave-one-facility-out CV harness | Not started as a general harness (though Week 11 effectively did one LOFO-style split for Track A) |
@@ -54,7 +54,8 @@ The project has two parallel tracks estimating CO2 emissions from Indian coal po
 
 ## What's needed next
 
-1. **Facility-set expansion (highest-leverage, explicitly named as blocking in Weeks 9–11 logs).** 10 candidates remain (Korba, ShriSingajiMalwa, Koradi, Tamnar, Kudgi, Kahalgaon, Mouda, Chhabra, Farakka, Simhadri) at the measured ~50–65 min/plant cost. This is the shared bottleneck for: Track B's reliability-model retry (needs N>7), Track A's classifier evaluation (only 5 positive-class facilities today), and the correction model in step 4.
+1. **Facility-set expansion — DONE this session.** All 20/20 candidates processed and merged into `data/plant_results.json` (Korba, ShriSingajiMalwa, Koradi, Tamnar, Kudgi, Kahalgaon, Mouda, Chhabra, Farakka, Simhadri were the 10 processed this session). This was the shared bottleneck for: Track B's reliability-model retry (needs N>7 — now satisfied with N=20), Track A's classifier evaluation (was only 5 positive-class facilities), and the correction model in step 4 — all now unblocked.
+   - **Reliability notes (this session):** `earthaccess.download()` has no built-in timeout and hung indefinitely twice (Kahalgaon, then Mouda), each stuck mid-scan for 1.5h+ with a `CLOSE_WAIT` socket to `urs.earthdata.nasa.gov` and no checkpoint progress. Fixed with a 90s per-granule `signal.alarm` timeout in `process_plant.py` (a stalled download now gets skipped like any other granule-level error instead of hanging the whole run). Two separate instances of a duplicate-process bug also occurred: an ad hoc restart of Kahalgaon left two sequential loops running against the same remaining-plant list, and later, when Farakka and Simhadri were deliberately run in parallel to cut wall-clock time, the original sequential loop caught up and launched a *second* concurrent Simhadri process against the same in-progress checkpoint file — a real corruption risk (only the final `plant_results.json` write was flock-protected, not the per-granule checkpoint writes). Both were caught and the redundant process killed within seconds each time; no data was lost or corrupted, confirmed by inspecting the checkpoint/result immediately after. `process_plant.py`'s final results write now uses `fcntl.flock` so parallel runs no longer race on `plant_results.json`.
 2. **More Track A positive-class facilities**, contingent on step 1 — would require exporting NO2/SO2/VIIRS tiles for any newly processed plants, not just OCO-3 soundings.
 3. **Build the actual correction model (roadmap step 4)** once facility count supports it — currently only a negative-result feasibility check exists.
 4. **General leave-one-facility-out CV harness (roadmap step 5)** — currently only exists ad hoc (Week 11's facility split for Track A).

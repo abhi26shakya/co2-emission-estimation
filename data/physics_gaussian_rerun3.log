@@ -1,0 +1,16 @@
+[Mundra] too few soundings (near=0, bg=44), skipping
+[Sasan] IME=93,111,120 kg  L_eff=48.37 km  U_eff=0.66 m/s (per-overpass, n=5)  ->  Q = 39,957,380.6 +/- 18,089,601.9 t/yr (wind 45%, IME 4%, bg 7%)
+[Tirora] IME=730,800 kg  L_eff=5.20 km  U_eff=0.73 m/s (annual-mean (fallback), n=0)  ->  Q = 3,224,383.6 +/- 1,735,160.3 t/yr (wind 52%, IME 6%, bg 11%)
+[Vindhyachal] IME=93,059,648 kg  L_eff=49.84 km  U_eff=0.63 m/s (per-overpass, n=5)  ->  Q = 36,867,163.6 +/- 22,034,957.4 t/yr (wind 59%, IME 4%, bg 5%)
+[Talcher] IME=4,391,071 kg  L_eff=17.10 km  U_eff=0.88 m/s (per-overpass, n=5)  ->  Q = 7,163,462.2 +/- 1,758,673.7 t/yr (wind 20%, IME 11%, bg 8%)
+[Rihand] IME=119,217,128 kg  L_eff=51.22 km  U_eff=0.65 m/s (per-overpass, n=4)  ->  Q = 47,473,002.3 +/- 35,159,220.9 t/yr (wind 74%, IME 3%, bg 2%)
+[Sipat] too few soundings (near=0, bg=63), skipping
+[ChandrapurCoal] IME=3,522,968 kg  L_eff=7.94 km  U_eff=0.84 m/s (annual-mean (fallback), n=0)  ->  Q = 11,775,029.2 +/- 5,854,973.1 t/yr (wind 47%, IME 16%, bg 6%)
+[Anpara] IME=71,166,880 kg  L_eff=43.94 km  U_eff=0.62 m/s (per-overpass, n=5)  ->  Q = 31,660,051.1 +/- 21,471,037.0 t/yr (wind 68%, IME 4%, bg 4%)
+[RGundem] IME=190,008 kg  L_eff=3.35 km  U_eff=0.85 m/s (annual-mean (fallback), n=0)  ->  Q = 1,513,424.5 +/- 1,020,492.6 t/yr (wind 47%, IME 46%, bg 13%)
+[Korba] IME=1,574,464 kg  L_eff=12.00 km  U_eff=0.66 m/s (annual-mean (fallback), n=0)  ->  Q = 2,715,748.4 +/- 1,773,622.2 t/yr (wind 53%, IME 15%, bg 34%)
+[ShriSingajiMalwa] IME=73,920 kg  L_eff=3.00 km  U_eff=1.08 m/s (annual-mean (fallback), n=0)  ->  Q = 840,042.0 +/- 698,366.9 t/yr (wind 45%, IME 67%, bg 21%)
+[Koradi] IME=9,285,138 kg  L_eff=23.81 km  U_eff=0.70 m/s (per-overpass, n=6)  ->  Q = 8,664,282.9 +/- 3,546,697.8 t/yr (wind 40%, IME 8%, bg 7%)
+[Tamnar] IME=2,425,274 kg  L_eff=14.39 km  U_eff=0.61 m/s (annual-mean (fallback), n=0)  ->  Q = 3,258,796.9 +/- 1,841,595.1 t/yr (wind 53%, IME 15%, bg 14%)
+
+[SAVED] 12 plant emission estimates -> data/emission_estimates.json
