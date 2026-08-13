@@ -180,5 +180,18 @@
     "wind_deg": 121.0,
     "co2_offset_deg": 106.0,
     "wind_co2_diff_deg": 16.0
+  },
+  {
+    "plant": "Kudgi",
+    "lat": 16.4994,
+    "lon": 75.8349,
+    "hit_days": 4,
+    "soundings": 338,
+    "co2_enhancement_ppm": 0.335,
+    "bg_std_ppm": 1.352,
+    "no2_peak_km": 3.6,
+    "wind_deg": 53.0,
+    "co2_offset_deg": 313.0,
+    "wind_co2_diff_deg": 101.0
   }
 ]

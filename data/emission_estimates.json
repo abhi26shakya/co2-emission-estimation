@@ -250,5 +250,26 @@
     "q_t_per_year_std": 1841595.138551117,
     "q_t_per_year_low": 1417201.7707831878,
     "q_t_per_year_high": 5100392.047885422
+  },
+  {
+    "plant": "Kudgi",
+    "n_soundings_used": 84,
+    "ime_kg": 1935497.0,
+    "l_eff_m": 13747.72708486752,
+    "wind_speed_ms": 3.2513283652972476,
+    "wind_speed_std_ms": 1.573786800823583,
+    "wind_mode": "annual-mean (fallback)",
+    "n_wind_days_matched": 0,
+    "u_eff_ms": 1.6256641826486238,
+    "wind_rel_std": 0.4840442502274611,
+    "ime_rel_std": 0.21250753564403924,
+    "bg_rel_std": 0.34695208002224043,
+    "n_bg_definitions": 5,
+    "q_rel_std": 0.6323243113431009,
+    "q_kg_s": 228.87188035520887,
+    "q_t_per_year": 7217703.618881867,
+    "q_t_per_year_std": 4563929.470288084,
+    "q_t_per_year_low": 2653774.1485937834,
+    "q_t_per_year_high": 11781633.089169951
   }
 ]
