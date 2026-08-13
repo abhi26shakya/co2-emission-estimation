@@ -167,5 +167,18 @@
     "wind_deg": 143.0,
     "co2_offset_deg": 27.0,
     "wind_co2_diff_deg": 115.0
+  },
+  {
+    "plant": "Tamnar",
+    "lat": 22.0987,
+    "lon": 83.4513,
+    "hit_days": 7,
+    "soundings": 842,
+    "co2_enhancement_ppm": -0.122,
+    "bg_std_ppm": 1.183,
+    "no2_peak_km": 3.2,
+    "wind_deg": 121.0,
+    "co2_offset_deg": 106.0,
+    "wind_co2_diff_deg": 16.0
   }
 ]

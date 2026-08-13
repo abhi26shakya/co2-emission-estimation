@@ -229,5 +229,26 @@
     "q_t_per_year_std": 3546697.8233342757,
     "q_t_per_year_low": 5117585.054993401,
     "q_t_per_year_high": 12210980.701661952
+  },
+  {
+    "plant": "Tamnar",
+    "n_soundings_used": 92,
+    "ime_kg": 2425274.0,
+    "l_eff_m": 14387.494569938159,
+    "wind_speed_ms": 1.2260411484611253,
+    "wind_speed_std_ms": 0.6438801248858662,
+    "wind_mode": "annual-mean (fallback)",
+    "n_wind_days_matched": 0,
+    "u_eff_ms": 0.6130205742305627,
+    "wind_rel_std": 0.5251700774431896,
+    "ime_rel_std": 0.15440413586774188,
+    "bg_rel_std": 0.14039500887015968,
+    "n_bg_definitions": 5,
+    "q_rel_std": 0.5651150377846993,
+    "q_kg_s": 103.33577211232574,
+    "q_t_per_year": 3258796.9093343047,
+    "q_t_per_year_std": 1841595.138551117,
+    "q_t_per_year_low": 1417201.7707831878,
+    "q_t_per_year_high": 5100392.047885422
   }
 ]
