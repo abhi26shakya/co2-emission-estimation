@@ -47,6 +47,21 @@ The three relative stds are combined in quadrature (independent-error
 assumption) into a single sigma, reported as q_t_per_year_std alongside
 the point estimate q_t_per_year.
 
+Month stratification (added after diagnose_shrisingajimalwa.py found a real
+failure case): the background population -- both the main BG_IN/BG_OUT
+annulus and each alternate definition in the sensitivity term -- is
+restricted to only the months the near-plant zone was actually sampled in,
+when per-sounding dates are available. Without this, a near-plant zone
+sampled in one season compared against a background blended across several
+other seasons can produce a spurious near-vs-background difference from
+nothing but XCO2's real seasonal cycle (ShriSingajiMalwa: near=January
+only, background also drew from April/May, ~4ppm seasonally higher on its
+own, which looked like a significant negative "enhancement" until
+restricted to the one shared month). Falls back to the unrestricted
+background when day data isn't available or stratifying would leave too
+few background soundings (results report month_stratified / n_bg_before/
+after_month_filter so this is always visible, never silent).
+
 Caveats (still a coarse, single-scalar estimate, not a fitted plume image):
   - assumes standard surface pressure (no local met pressure)
   - fixed, approximate footprint area per OCO-3 sounding (not per-overpass)
@@ -115,17 +130,59 @@ def _bootstrap_ime_rel_std(near, bg, n_boot=N_BOOT, seed=0):
     return float(boots.std(ddof=1) / mean) if mean > 0 else 0.0
 
 
-def _bg_definition_rel_std(dist, xco2, near):
+def _month_of_day(day_int):
+    """YYYYMMDD int -> month int (1-12), or None for the 0/missing sentinel
+    used by sounding files predating process_plant.py's "day" field."""
+    return int(str(int(day_int))[4:6]) if day_int > 0 else None
+
+
+def _month_stratify_bg(bg_vals, bg_day, near_months_set, min_kept=5):
+    """
+    Restrict a background population to only the months the near-plant zone
+    was actually sampled in, per diagnose_shrisingajimalwa.py's finding:
+    comparing near-plant soundings from one month against a background ring
+    blended across several other months' regional XCO2 baselines can
+    produce a spurious near-vs-background difference that has nothing to do
+    with the plant (ShriSingajiMalwa: near=January only, background also
+    drew from April/May, ~4ppm seasonally higher, which by itself produced
+    a significant "negative enhancement"). Falls back to the unrestricted
+    background (and reports that no stratification was applied) when day
+    data isn't available or restricting would leave too few background
+    soundings to be usable -- same MIN_BG_DEFINITIONS-style graceful
+    degradation as the rest of this module, since an empty/tiny restricted
+    background is worse than an unstratified one, not an improvement.
+    Returns (possibly-restricted bg_vals, stratified: bool).
+    """
+    if bg_day is None or near_months_set is None:
+        return bg_vals, False
+    bg_months = np.array([_month_of_day(x) for x in bg_day])
+    keep = np.isin(bg_months, list(near_months_set))
+    if int(keep.sum()) < min_kept:
+        return bg_vals, False
+    return bg_vals[keep], True
+
+
+def _bg_definition_rel_std(dist, xco2, near, day=None, near_months_set=None):
     """
     Relative std of IME (kg) across several reasonable background-annulus
     definitions, holding the near-plant zone fixed -- see
     diagnose_talcher.py, which found this to be a much larger error source
     than wind or IME-sampling noise for plants with a thin/weak plume
     signal. Returns (rel_std, n_definitions_used).
+
+    When day/near_months_set are supplied, each alternate background
+    definition is also month-stratified against the near-plant zone's
+    months (see _month_stratify_bg) -- otherwise the sensitivity term
+    itself could reintroduce the same seasonal-imbalance artifact this
+    stratification is meant to prevent, just spread across 5 definitions
+    instead of the single main one.
     """
     imes = []
     for bg_in, bg_out in BG_DEFINITIONS:
-        bg = xco2[(dist > bg_in) & (dist < bg_out)]
+        bg_zone_mask = (dist > bg_in) & (dist < bg_out)
+        bg = xco2[bg_zone_mask]
+        bg_day = day[bg_zone_mask] if day is not None else None
+        bg, _ = _month_stratify_bg(bg, bg_day, near_months_set)
         if len(bg) < 5:
             continue
         imes.append(_ime_kg(near, bg.mean()))
@@ -163,9 +220,17 @@ def estimate_emission_rate(plant_row, wind_series):
     bg_mask = (dist > BG_IN) & (dist < BG_OUT)
     near, bg = xco2[near_mask], xco2[bg_mask]
     near_day = day[near_mask] if has_days else None
+    bg_day = day[bg_mask] if has_days else None
     if len(near) < 5 or len(bg) < 5:
         print(f"[{name}] too few soundings (near={len(near)}, bg={len(bg)}), skipping")
         return None
+
+    # month-stratify background against near-plant months, per
+    # diagnose_shrisingajimalwa.py -- see _month_stratify_bg's docstring
+    near_months_set = (set(m for m in (_month_of_day(x) for x in near_day) if m is not None)
+                        if has_days else None)
+    n_bg_before_month_filter = len(bg)
+    bg, month_stratified = _month_stratify_bg(bg, bg_day, near_months_set)
 
     bg_mean = bg.mean()
     excess_ppm = np.clip(near - bg_mean, 0, None)
@@ -217,13 +282,16 @@ def estimate_emission_rate(plant_row, wind_series):
 
     wind_rel_std = wind_speed_std / wind_speed_mean if wind_speed_mean > 0 else 0.0
     ime_rel_std = _bootstrap_ime_rel_std(near, bg)
-    bg_rel_std, n_bg_defs = _bg_definition_rel_std(dist, xco2, near)
+    bg_rel_std, n_bg_defs = _bg_definition_rel_std(dist, xco2, near, day=day, near_months_set=near_months_set)
     q_rel_std = float(np.sqrt(wind_rel_std ** 2 + ime_rel_std ** 2 + bg_rel_std ** 2))
     q_t_yr_std = q_t_yr * q_rel_std
 
     result = {
         "plant": name,
         "n_soundings_used": n_used,
+        "month_stratified": month_stratified,
+        "n_bg_before_month_filter": n_bg_before_month_filter,
+        "n_bg_after_month_filter": len(bg),
         "ime_kg": ime,
         "l_eff_m": l_eff,
         "wind_speed_ms": wind_speed_mean,
@@ -242,8 +310,10 @@ def estimate_emission_rate(plant_row, wind_series):
         "q_t_per_year_low": q_t_yr - q_t_yr_std,
         "q_t_per_year_high": q_t_yr + q_t_yr_std,
     }
+    strat_note = (f"month-stratified bg: {n_bg_before_month_filter}->{len(bg)}"
+                  if month_stratified else "bg not month-stratified")
     print(f"[{name}] IME={ime:,.0f} kg  L_eff={l_eff/1000:.2f} km  "
-          f"U_eff={u_eff:.2f} m/s ({wind_mode}, n={n_wind_matched})  ->  "
+          f"U_eff={u_eff:.2f} m/s ({wind_mode}, n={n_wind_matched})  {strat_note}  ->  "
           f"Q = {q_t_yr:,.1f} +/- {q_t_yr_std:,.1f} t/yr "
           f"(wind {wind_rel_std:.0%}, IME {ime_rel_std:.0%}, bg {bg_rel_std:.0%})")
     return result

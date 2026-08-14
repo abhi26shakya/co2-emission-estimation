@@ -1,0 +1,29 @@
+# Pinned to the versions in the working conda env (/opt/miniconda3/envs/co2,
+# Python 3.11.15) that has every package this codebase imports. Generated
+# by cross-referencing `ast`-parsed third-party imports across every .py
+# file in the repo against that env's `pip freeze` -- not hand-guessed.
+#
+# NOTE (discovered while writing this file): scripts have also been run
+# under a second, separate Python (the macOS python.org 3.14 framework
+# build on PATH via /usr/local/bin/python) that has its own independently
+# pip-installed numpy/pandas/torch/matplotlib/requests/earthengine-api.
+# That environment is MISSING earthaccess, xarray, and geemap, so anything
+# that imports them -- process_plant.py, and any oco_*.py script that
+# touches OCO-3 downloads -- will ImportError under it. Track A/Track B
+# analysis scripts that only need numpy/torch/pandas/ee (e.g.
+# physics_gaussian.py, lofo_track_a.py, track_fusion_model.py) happen to
+# work under either environment, which is how this went unnoticed. Always
+# run this project with /opt/miniconda3/envs/co2/bin/python (or `conda
+# activate co2` from an interactive shell where conda init has actually
+# been sourced) to avoid depending on which script happens to need the
+# packages the framework build is missing.
+
+numpy==2.4.6
+pandas==3.0.3
+torch==2.12.1
+matplotlib==3.11.0
+requests==2.34.2
+earthaccess==0.17.0
+earthengine-api==1.7.33
+geemap==0.37.2
+xarray==2026.7.0

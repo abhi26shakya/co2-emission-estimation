@@ -17,9 +17,9 @@
       "climate_trace_year": 2021,
       "climate_trace_co2_t": 18792000,
       "match_dist_deg": 0.0069641941385816955,
-      "our_q_t_per_year": 39278810.20737811,
+      "our_q_t_per_year": 39957380.558211714,
       "our_q_year": 2020,
-      "ratio_ours_over_ct": 2.0901878569273156,
+      "ratio_ours_over_ct": 2.1262973902837223,
       "bracketed_by_our_interval": false
     },
     {
@@ -29,9 +29,9 @@
       "climate_trace_year": 2021,
       "climate_trace_co2_t": 15659000,
       "match_dist_deg": 0.027414229881574825,
-      "our_q_t_per_year": 337852.0873580591,
+      "our_q_t_per_year": 3224383.554052351,
       "our_q_year": 2020,
-      "ratio_ours_over_ct": 0.02157558511769967,
+      "ratio_ours_over_ct": 0.20591248189873881,
       "bracketed_by_our_interval": false
     },
     {
@@ -41,9 +41,9 @@
       "climate_trace_year": 2021,
       "climate_trace_co2_t": 22589000,
       "match_dist_deg": 0.0025495097567925407,
-      "our_q_t_per_year": 36738050.02086989,
+      "our_q_t_per_year": 36867163.595513575,
       "our_q_year": 2020,
-      "ratio_ours_over_ct": 1.6263690300973876,
+      "ratio_ours_over_ct": 1.63208480213881,
       "bracketed_by_our_interval": true
     },
     {
@@ -53,9 +53,9 @@
       "climate_trace_year": 2021,
       "climate_trace_co2_t": 14235000,
       "match_dist_deg": 0.0011180339887552333,
-      "our_q_t_per_year": 6914642.893860566,
+      "our_q_t_per_year": 7163462.163807527,
       "our_q_year": 2020,
-      "ratio_ours_over_ct": 0.48574941298634117,
+      "ratio_ours_over_ct": 0.5032288137553584,
       "bracketed_by_our_interval": false
     },
     {
@@ -65,9 +65,9 @@
       "climate_trace_year": 2021,
       "climate_trace_co2_t": 14237000,
       "match_dist_deg": 0.0,
-      "our_q_t_per_year": 48347260.30604745,
+      "our_q_t_per_year": 47473002.294419326,
       "our_q_year": 2020,
-      "ratio_ours_over_ct": 3.3958882001859556,
+      "ratio_ours_over_ct": 3.334480739932523,
       "bracketed_by_our_interval": true
     },
     {
@@ -85,10 +85,10 @@
       "climate_trace_year": 2021,
       "climate_trace_co2_t": 14623000,
       "match_dist_deg": 0.0,
-      "our_q_t_per_year": 7106246.984691159,
+      "our_q_t_per_year": 11775029.223358631,
       "our_q_year": 2020,
-      "ratio_ours_over_ct": 0.4859636862949572,
-      "bracketed_by_our_interval": false
+      "ratio_ours_over_ct": 0.8052403216411564,
+      "bracketed_by_our_interval": true
     },
     {
       "plant": "Anpara",
@@ -109,9 +109,9 @@
       "climate_trace_year": 2021,
       "climate_trace_co2_t": 12337700,
       "match_dist_deg": 0.0041593268686114905,
-      "our_q_t_per_year": 1948492.685083411,
+      "our_q_t_per_year": 1513424.4859354428,
       "our_q_year": 2020,
-      "ratio_ours_over_ct": 0.15792997763630262,
+      "ratio_ours_over_ct": 0.12266666282495464,
       "bracketed_by_our_interval": false
     },
     {
@@ -121,9 +121,9 @@
       "climate_trace_year": 2021,
       "climate_trace_co2_t": 12337700,
       "match_dist_deg": 0.0,
-      "our_q_t_per_year": 4202731.445047892,
+      "our_q_t_per_year": 2715748.3622021307,
       "our_q_year": 2020,
-      "ratio_ours_over_ct": 0.34064140358801814,
+      "ratio_ours_over_ct": 0.2201178795239089,
       "bracketed_by_our_interval": false
     },
     {
@@ -133,9 +133,9 @@
       "climate_trace_year": 2021,
       "climate_trace_co2_t": 9867100,
       "match_dist_deg": 0.0019999999999988916,
-      "our_q_t_per_year": 3528645.9180780356,
+      "our_q_t_per_year": 840041.9613186375,
       "our_q_year": 2020,
-      "ratio_ours_over_ct": 0.35761732607129104,
+      "ratio_ours_over_ct": 0.08513564890582212,
       "bracketed_by_our_interval": false
     },
     {
@@ -145,9 +145,9 @@
       "climate_trace_year": 2021,
       "climate_trace_co2_t": 10946800,
       "match_dist_deg": 0.0012206555615783838,
-      "our_q_t_per_year": 10856286.293151114,
+      "our_q_t_per_year": 8664282.878327677,
       "our_q_year": 2020,
-      "ratio_ours_over_ct": 0.9917314916826026,
+      "ratio_ours_over_ct": 0.7914900133671645,
       "bracketed_by_our_interval": true
     },
     {
@@ -157,9 +157,9 @@
       "climate_trace_year": 2021,
       "climate_trace_co2_t": 16134000,
       "match_dist_deg": 0.0,
-      "our_q_t_per_year": 3223070.645572659,
+      "our_q_t_per_year": 3258796.9093343047,
       "our_q_year": 2020,
-      "ratio_ours_over_ct": 0.1997688512193293,
+      "ratio_ours_over_ct": 0.2019831975538803,
       "bracketed_by_our_interval": false
     },
     {
@@ -169,10 +169,10 @@
       "climate_trace_year": 2021,
       "climate_trace_co2_t": 11422100,
       "match_dist_deg": 0.0003162277660262121,
-      "our_q_t_per_year": 4718025.907087494,
+      "our_q_t_per_year": 7217703.618881867,
       "our_q_year": 2020,
-      "ratio_ours_over_ct": 0.4130611627535649,
-      "bracketed_by_our_interval": false
+      "ratio_ours_over_ct": 0.631906883925186,
+      "bracketed_by_our_interval": true
     },
     {
       "plant": "Kahalgaon",
@@ -181,9 +181,9 @@
       "climate_trace_year": 2021,
       "climate_trace_co2_t": 11104600,
       "match_dist_deg": 0.0029000000000085546,
-      "our_q_t_per_year": 29654782.819959152,
+      "our_q_t_per_year": 33000626.768095326,
       "our_q_year": 2020,
-      "ratio_ours_over_ct": 2.6704953640796742,
+      "ratio_ours_over_ct": 2.9717978826878344,
       "bracketed_by_our_interval": false
     },
     {
@@ -193,9 +193,9 @@
       "climate_trace_year": 2021,
       "climate_trace_co2_t": 11009300,
       "match_dist_deg": 0.001640121946686832,
-      "our_q_t_per_year": 10258309.683101472,
+      "our_q_t_per_year": 14164063.952745445,
       "our_q_year": 2020,
-      "ratio_ours_over_ct": 0.9317858249935483,
+      "ratio_ours_over_ct": 1.2865544542110257,
       "bracketed_by_our_interval": true
     },
     {
@@ -205,10 +205,10 @@
       "climate_trace_year": 2021,
       "climate_trace_co2_t": 9498300,
       "match_dist_deg": 0.006008327554318275,
-      "our_q_t_per_year": 1010757.2865149596,
+      "our_q_t_per_year": 15371732.747301359,
       "our_q_year": 2020,
-      "ratio_ours_over_ct": 0.10641454644672832,
-      "bracketed_by_our_interval": false
+      "ratio_ours_over_ct": 1.618366733763027,
+      "bracketed_by_our_interval": true
     },
     {
       "plant": "Farakka",
@@ -217,9 +217,9 @@
       "climate_trace_year": 2021,
       "climate_trace_co2_t": 9965200,
       "match_dist_deg": 0.0007615773105920798,
-      "our_q_t_per_year": 11105118.959295532,
+      "our_q_t_per_year": 19147833.320174024,
       "our_q_year": 2020,
-      "ratio_ours_over_ct": 1.1143899730357174,
+      "ratio_ours_over_ct": 1.9214700477836897,
       "bracketed_by_our_interval": true
     },
     {
@@ -229,18 +229,6 @@
       "climate_trace_year": 2021,
       "climate_trace_co2_t": 8724500,
       "match_dist_deg": 0.0
-    },
-    {
-      "plant": "TalwandiSabo",
-      "climate_trace_name": "Talwandi Sabo Power Project",
-      "climate_trace_id": 25453903,
-      "climate_trace_year": 2021,
-      "climate_trace_co2_t": 8782100,
-      "match_dist_deg": 0.0018027756377323257,
-      "our_q_t_per_year": 1509508.367099197,
-      "our_q_year": 2020,
-      "ratio_ours_over_ct": 0.171884670762027,
-      "bracketed_by_our_interval": false
     }
   ]
 }

@@ -1,4 +1,4 @@
-import sys, os, json, time, signal
+import sys, os, json, time, signal, fcntl
 import ee, numpy as np, requests, io
 import earthaccess, xarray as xr
 import pandas as pd
@@ -34,6 +34,29 @@ if len(sys.argv) < 2 or sys.argv[1] not in PLANTS:
 NAME = sys.argv[1]
 PLAT, PLON = PLANTS[NAME]
 print(f"\n===== Processing {NAME}  ({PLAT}, {PLON}) =====")
+
+# ---------- per-plant process lock ----------
+# Two 2026-08-13 incidents (an ad hoc restart left two sequential loops
+# running against the same remaining-plant list; a deliberate parallel run
+# raced a leftover sequential loop) each ended up with two processes
+# scanning the SAME plant concurrently against the same checkpoint file --
+# only the final data/plant_results.json write was flock-protected, not the
+# per-granule checkpoint. Locking the checkpoint write itself wouldn't
+# really fix this: two independent scan loops each hold their own
+# in-memory klat/klon/kco2/kday, so serializing their writes just makes
+# them cleanly overwrite each other's progress instead of corrupting a
+# file mid-write -- the actual bug is two loops running for one plant at
+# all. Acquiring an exclusive, non-blocking lock on a per-plant lockfile
+# at start prevents that outright: a second process for the same NAME
+# fails fast with a clear error instead of silently racing the first.
+_lock_path = f"data/{NAME}.lock"
+_lockfile = open(_lock_path, "w")
+try:
+    fcntl.flock(_lockfile, fcntl.LOCK_EX | fcntl.LOCK_NB)
+except OSError:
+    print(f"[{NAME}] another process already holds the lock for this plant "
+          f"({_lock_path}) -- refusing to start a duplicate scan.")
+    sys.exit(1)
 
 # ---------- 1. CO2: scan OCO-3 near this plant ----------
 earthaccess.login(persist=True)
