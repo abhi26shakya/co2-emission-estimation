@@ -93,6 +93,39 @@
       }
     },
 
+    "explainability": {
+      "type": "object",
+      "description": "Grad-CAM (Track A detector attention) and SHAP (Track B correction-model attribution) outputs, added to close the explainability gap flagged in RESEARCH_PAPER.md Sec 7-8. Neither sub-block claims coverage beyond what was actually computed for this facility -- absent data is null/available:false, not fabricated.",
+      "properties": {
+        "grad_cam": {
+          "type": "object",
+          "required": ["available"],
+          "properties": {
+            "available": {"type": "boolean"},
+            "prob_plant": {"type": ["number", "null"], "description": "Detector3's predicted P(plant) for the tile Grad-CAM was computed on."},
+            "dominant_channel": {"type": ["string", "null"], "enum": ["NO2", "SO2", "VIIRS", null], "description": "Which input channel the gradient-weighted saliency attributes the prediction to most (see gradcam_3channel.py)."},
+            "channel_shares": {"type": ["object", "null"], "description": "Normalized per-channel saliency shares, keys NO2/SO2/VIIRS, summing to ~1."},
+            "image_reference": {"type": ["string", "null"], "description": "Path to the Grad-CAM overlay figure, relative to this project's data/ directory."}
+          }
+        },
+        "shap": {
+          "type": "object",
+          "required": ["available"],
+          "properties": {
+            "available": {"type": "boolean"},
+            "top_features": {
+              "type": ["array", "null"],
+              "description": "This facility's top-3 SHAP features (by |value|) for the CEA-correction linear model, ranked. See shap_correction_model.py -- attribution on a full-data fit, not a cross-validated claim (the LOO-CV MAE in q_correction_model.py remains the generalization number).",
+              "items": {
+                "type": "object",
+                "properties": {"feature": {"type": "string"}, "shap_value": {"type": "number"}}
+              }
+            }
+          }
+        }
+      }
+    },
+
     "provenance": {
       "type": "object",
       "required": ["exported_at", "source_files"],

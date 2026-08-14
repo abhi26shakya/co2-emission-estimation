@@ -1,0 +1,580 @@
+{
+  "n_facilities": 17,
+  "features": [
+    "activity_prob_mean",
+    "activity_prob_std",
+    "wind_co2_diff_deg",
+    "hit_days",
+    "n_soundings",
+    "bg_std_ppm",
+    "no2_peak_km",
+    "capacity_mw"
+  ],
+  "model": "sklearn LinearRegression on standardized features, full-data fit (not LOO -- attribution only, see module docstring)",
+  "full_data_r2": 0.7203022600422181,
+  "global_shap_ranking": [
+    {
+      "feature": "capacity_mw",
+      "mean_abs_shap": 0.5749635338454185
+    },
+    {
+      "feature": "n_soundings",
+      "mean_abs_shap": 0.5589909646760127
+    },
+    {
+      "feature": "activity_prob_std",
+      "mean_abs_shap": 0.3632027166714377
+    },
+    {
+      "feature": "bg_std_ppm",
+      "mean_abs_shap": 0.2978589948498889
+    },
+    {
+      "feature": "hit_days",
+      "mean_abs_shap": 0.26889310422952584
+    },
+    {
+      "feature": "wind_co2_diff_deg",
+      "mean_abs_shap": 0.17570369726764215
+    },
+    {
+      "feature": "activity_prob_mean",
+      "mean_abs_shap": 0.10717188978968306
+    },
+    {
+      "feature": "no2_peak_km",
+      "mean_abs_shap": 0.08578015863502333
+    }
+  ],
+  "pearson_correlation_ranking": [
+    {
+      "feature": "bg_std_ppm",
+      "abs_corr": 0.5811833990934836
+    },
+    {
+      "feature": "hit_days",
+      "abs_corr": 0.5499282457927606
+    },
+    {
+      "feature": "n_soundings",
+      "abs_corr": 0.5400354911088787
+    },
+    {
+      "feature": "activity_prob_std",
+      "abs_corr": 0.38182178091802405
+    },
+    {
+      "feature": "no2_peak_km",
+      "abs_corr": 0.2829931332296388
+    },
+    {
+      "feature": "activity_prob_mean",
+      "abs_corr": 0.2653419323671289
+    },
+    {
+      "feature": "wind_co2_diff_deg",
+      "abs_corr": 0.19178137842254833
+    },
+    {
+      "feature": "capacity_mw",
+      "abs_corr": 0.010281461898706405
+    }
+  ],
+  "shap_vs_pearson_top_feature_agree": false,
+  "per_facility": {
+    "Anpara": {
+      "log_ratio": 0.8360258210231225,
+      "predicted_log_ratio": 1.2752768075029586,
+      "base_value": -0.529869749302781,
+      "shap_values": {
+        "activity_prob_mean": 0.16605609317815456,
+        "activity_prob_std": 0.43144164462707085,
+        "wind_co2_diff_deg": -0.021224519409973407,
+        "hit_days": 0.1644510875257405,
+        "n_soundings": 0.8676598441287878,
+        "bg_std_ppm": 0.08532799320853161,
+        "no2_peak_km": -0.08665747290073156,
+        "capacity_mw": 0.1980918864481593
+      },
+      "top_3_features": [
+        {
+          "feature": "n_soundings",
+          "shap_value": 0.8676598441287878
+        },
+        {
+          "feature": "activity_prob_std",
+          "shap_value": 0.43144164462707085
+        },
+        {
+          "feature": "capacity_mw",
+          "shap_value": 0.1980918864481593
+        }
+      ]
+    },
+    "ChandrapurCoal": {
+      "log_ratio": -0.7692976109758224,
+      "predicted_log_ratio": -1.3559514815788103,
+      "base_value": -0.529869749302781,
+      "shap_values": {
+        "activity_prob_mean": -0.0266888425644325,
+        "activity_prob_std": -0.2740781138362496,
+        "wind_co2_diff_deg": -0.44804442803248756,
+        "hit_days": 0.06968266420582224,
+        "n_soundings": -0.3564158109894089,
+        "bg_std_ppm": 0.27884385752181146,
+        "no2_peak_km": 0.07399313895307272,
+        "capacity_mw": -0.1433741975341573
+      },
+      "top_3_features": [
+        {
+          "feature": "wind_co2_diff_deg",
+          "shap_value": -0.44804442803248756
+        },
+        {
+          "feature": "n_soundings",
+          "shap_value": -0.3564158109894089
+        },
+        {
+          "feature": "bg_std_ppm",
+          "shap_value": 0.27884385752181146
+        }
+      ]
+    },
+    "Chhabra": {
+      "log_ratio": -2.5575260814348226,
+      "predicted_log_ratio": -1.8083455353677587,
+      "base_value": -0.529869749302781,
+      "shap_values": {
+        "activity_prob_mean": -0.07617464484042032,
+        "activity_prob_std": -0.7057857431015944,
+        "wind_co2_diff_deg": -0.3952419651101146,
+        "hit_days": -0.16723839409397337,
+        "n_soundings": -0.4256532508946264,
+        "bg_std_ppm": -0.13673939206900265,
+        "no2_peak_km": 0.06525024851204937,
+        "capacity_mw": 0.5631073555327047
+      },
+      "top_3_features": [
+        {
+          "feature": "activity_prob_std",
+          "shap_value": -0.7057857431015944
+        },
+        {
+          "feature": "capacity_mw",
+          "shap_value": 0.5631073555327047
+        },
+        {
+          "feature": "n_soundings",
+          "shap_value": -0.4256532508946264
+        }
+      ]
+    },
+    "Farakka": {
+      "log_ratio": 0.012369129052756576,
+      "predicted_log_ratio": 1.01467217039836,
+      "base_value": -0.529869749302781,
+      "shap_values": {
+        "activity_prob_mean": -0.10091088350114946,
+        "activity_prob_std": 0.06898599014861688,
+        "wind_co2_diff_deg": 0.27358923190660844,
+        "hit_days": -0.02508575911409601,
+        "n_soundings": -0.259166277076737,
+        "bg_std_ppm": 0.7237717258814425,
+        "no2_peak_km": 0.04120729979923511,
+        "capacity_mw": 0.8221505916572207
+      },
+      "top_3_features": [
+        {
+          "feature": "capacity_mw",
+          "shap_value": 0.8221505916572207
+        },
+        {
+          "feature": "bg_std_ppm",
+          "shap_value": 0.7237717258814425
+        },
+        {
+          "feature": "wind_co2_diff_deg",
+          "shap_value": 0.27358923190660844
+        }
+      ]
+    },
+    "Kahalgaon": {
+      "log_ratio": 0.9049201799208236,
+      "predicted_log_ratio": 0.3901325170824752,
+      "base_value": -0.529869749302781,
+      "shap_values": {
+        "activity_prob_mean": -0.10279522183912645,
+        "activity_prob_std": 0.10330363930202242,
+        "wind_co2_diff_deg": -0.0696267770888152,
+        "hit_days": 0.06968266420582224,
+        "n_soundings": -0.38231378469441396,
+        "bg_std_ppm": 0.7253579214905678,
+        "no2_peak_km": 0.036835854578723425,
+        "capacity_mw": 0.5395579704304759
+      },
+      "top_3_features": [
+        {
+          "feature": "bg_std_ppm",
+          "shap_value": 0.7253579214905678
+        },
+        {
+          "feature": "capacity_mw",
+          "shap_value": 0.5395579704304759
+        },
+        {
+          "feature": "n_soundings",
+          "shap_value": -0.38231378469441396
+        }
+      ]
+    },
+    "Koradi": {
+      "log_ratio": 0.32368734954593953,
+      "predicted_log_ratio": 0.4433496317056156,
+      "base_value": -0.529869749302781,
+      "shap_values": {
+        "activity_prob_mean": -0.042236331090689624,
+        "activity_prob_std": -0.3263508935139147,
+        "wind_co2_diff_deg": -0.17523170293356097,
+        "hit_days": 0.5909089924653727,
+        "n_soundings": 0.3137603248870477,
+        "bg_std_ppm": 0.06946603711727915,
+        "no2_peak_km": 0.07399313895307272,
+        "capacity_mw": 0.46890981512378976
+      },
+      "top_3_features": [
+        {
+          "feature": "hit_days",
+          "shap_value": 0.5909089924653727
+        },
+        {
+          "feature": "capacity_mw",
+          "shap_value": 0.46890981512378976
+        },
+        {
+          "feature": "activity_prob_std",
+          "shap_value": -0.3263508935139147
+        }
+      ]
+    },
+    "Korba": {
+      "log_ratio": -1.507412423414135,
+      "predicted_log_ratio": -1.2840371840714013,
+      "base_value": -0.529869749302781,
+      "shap_values": {
+        "activity_prob_mean": 0.1414549755513588,
+        "activity_prob_std": 0.32068195745369354,
+        "wind_co2_diff_deg": -0.04762575087115985,
+        "hit_days": -0.3567752407338099,
+        "n_soundings": -0.5551431194196516,
+        "bg_std_ppm": -0.5412192723959401,
+        "no2_peak_km": 0.051043051545386395,
+        "capacity_mw": 0.2334159641015024
+      },
+      "top_3_features": [
+        {
+          "feature": "n_soundings",
+          "shap_value": -0.5551431194196516
+        },
+        {
+          "feature": "bg_std_ppm",
+          "shap_value": -0.5412192723959401
+        },
+        {
+          "feature": "hit_days",
+          "shap_value": -0.3567752407338099
+        }
+      ]
+    },
+    "Kudgi": {
+      "log_ratio": 0.24055052160592555,
+      "predicted_log_ratio": -1.201514521584457,
+      "base_value": -0.529869749302781,
+      "shap_values": {
+        "activity_prob_mean": -0.15861273317427302,
+        "activity_prob_std": 0.2634806511042393,
+        "wind_co2_diff_deg": -0.11362882952412592,
+        "hit_days": -0.40415945239376905,
+        "n_soundings": -0.5672993111587356,
+        "bg_std_ppm": -0.2168422703298275,
+        "no2_peak_km": 0.05650735807102599,
+        "capacity_mw": 0.46890981512378976
+      },
+      "top_3_features": [
+        {
+          "feature": "n_soundings",
+          "shap_value": -0.5672993111587356
+        },
+        {
+          "feature": "capacity_mw",
+          "shap_value": 0.46890981512378976
+        },
+        {
+          "feature": "hit_days",
+          "shap_value": -0.40415945239376905
+        }
+      ]
+    },
+    "Mouda": {
+      "log_ratio": 0.509576991527296,
+      "predicted_log_ratio": 0.2573948983065095,
+      "base_value": -0.529869749302781,
+      "shap_values": {
+        "activity_prob_mean": -0.07869038466674359,
+        "activity_prob_std": -0.27114416157605425,
+        "wind_co2_diff_deg": 0.3131910790983881,
+        "hit_days": 0.3066037225056179,
+        "n_soundings": 0.10525521005797657,
+        "bg_std_ppm": 0.13450005709141408,
+        "no2_peak_km": -0.285558230434013,
+        "capacity_mw": 0.5631073555327047
+      },
+      "top_3_features": [
+        {
+          "feature": "capacity_mw",
+          "shap_value": 0.5631073555327047
+        },
+        {
+          "feature": "wind_co2_diff_deg",
+          "shap_value": 0.3131910790983881
+        },
+        {
+          "feature": "hit_days",
+          "shap_value": 0.3066037225056179
+        }
+      ]
+    },
+    "RGundem": {
+      "log_ratio": -2.034257927595688,
+      "predicted_log_ratio": -2.2761788132431673,
+      "base_value": -0.529869749302781,
+      "shap_values": {
+        "activity_prob_mean": -0.045234276484265465,
+        "activity_prob_std": -0.5363235250791696,
+        "wind_co2_diff_deg": 0.12838245887008307,
+        "hit_days": -0.3567752407338099,
+        "n_soundings": -0.6111673074345604,
+        "bg_std_ppm": -0.6435288891845184,
+        "no2_peak_km": 0.08492175200435194,
+        "capacity_mw": 0.2334159641015024
+      },
+      "top_3_features": [
+        {
+          "feature": "bg_std_ppm",
+          "shap_value": -0.6435288891845184
+        },
+        {
+          "feature": "n_soundings",
+          "shap_value": -0.6111673074345604
+        },
+        {
+          "feature": "activity_prob_std",
+          "shap_value": -0.5363235250791696
+        }
+      ]
+    },
+    "Rihand": {
+      "log_ratio": 0.8524637675518628,
+      "predicted_log_ratio": 0.6508943218699685,
+      "base_value": -0.529869749302781,
+      "shap_values": {
+        "activity_prob_mean": 0.16962987985809302,
+        "activity_prob_std": 0.39149985397891496,
+        "wind_co2_diff_deg": -0.14883047147237452,
+        "hit_days": 0.1644510875257405,
+        "n_soundings": 0.9479964156218647,
+        "bg_std_ppm": -0.11373955573668669,
+        "no2_peak_km": 0.007328599340269584,
+        "capacity_mw": -0.23757173794307224
+      },
+      "top_3_features": [
+        {
+          "feature": "n_soundings",
+          "shap_value": 0.9479964156218647
+        },
+        {
+          "feature": "activity_prob_std",
+          "shap_value": 0.39149985397891496
+        },
+        {
+          "feature": "capacity_mw",
+          "shap_value": -0.23757173794307224
+        }
+      ]
+    },
+    "Sasan": {
+      "log_ratio": 0.3212221520389835,
+      "predicted_log_ratio": 0.4429306870735169,
+      "base_value": -0.529869749302781,
+      "shap_values": {
+        "activity_prob_mean": 0.15266428432748896,
+        "activity_prob_std": 0.4022221834021516,
+        "wind_co2_diff_deg": 0.0931808169218345,
+        "hit_days": 0.3066037225056179,
+        "n_soundings": 1.2933908200345337,
+        "bg_std_ppm": 0.166223969273919,
+        "no2_peak_km": -0.07354313723919652,
+        "capacity_mw": -1.3679422228500513
+      },
+      "top_3_features": [
+        {
+          "feature": "capacity_mw",
+          "shap_value": -1.3679422228500513
+        },
+        {
+          "feature": "n_soundings",
+          "shap_value": 1.2933908200345337
+        },
+        {
+          "feature": "activity_prob_std",
+          "shap_value": 0.4022221834021516
+        }
+      ]
+    },
+    "ShriSingajiMalwa": {
+      "log_ratio": -0.453137070438226,
+      "predicted_log_ratio": -0.6237116878625374,
+      "base_value": -0.529869749302781,
+      "shap_values": {
+        "activity_prob_mean": -0.1540604276004364,
+        "activity_prob_std": 0.3694328710522153,
+        "wind_co2_diff_deg": 0.018377327781806247,
+        "hit_days": -0.3567752407338099,
+        "n_soundings": -0.5963684653174146,
+        "bg_std_ppm": 0.2130167397431137,
+        "no2_peak_km": 0.08492175200435194,
+        "capacity_mw": 0.3276135045104173
+      },
+      "top_3_features": [
+        {
+          "feature": "n_soundings",
+          "shap_value": -0.5963684653174146
+        },
+        {
+          "feature": "activity_prob_std",
+          "shap_value": 0.3694328710522153
+        },
+        {
+          "feature": "hit_days",
+          "shap_value": -0.3567752407338099
+        }
+      ]
+    },
+    "Talcher": {
+      "log_ratio": -1.0527232396881643,
+      "predicted_log_ratio": -0.9291731504819927,
+      "base_value": -0.529869749302781,
+      "shap_values": {
+        "activity_prob_mean": 0.10195529401530702,
+        "activity_prob_std": -0.32890242998046904,
+        "wind_co2_diff_deg": 0.22078676898423558,
+        "hit_days": 0.40137214582553615,
+        "n_soundings": -0.08448708708685615,
+        "bg_std_ppm": -0.1890838471701358,
+        "no2_peak_km": -0.2833725078237573,
+        "capacity_mw": -0.23757173794307224
+      },
+      "top_3_features": [
+        {
+          "feature": "hit_days",
+          "shap_value": 0.40137214582553615
+        },
+        {
+          "feature": "activity_prob_std",
+          "shap_value": -0.32890242998046904
+        },
+        {
+          "feature": "no2_peak_km",
+          "shap_value": -0.2833725078237573
+        }
+      ]
+    },
+    "Tamnar": {
+      "log_ratio": -0.8563425290684734,
+      "predicted_log_ratio": -1.4180491239925965,
+      "base_value": -0.529869749302781,
+      "shap_values": {
+        "activity_prob_mean": 0.013273964157837449,
+        "activity_prob_std": -0.6446382246197692,
+        "wind_co2_diff_deg": 0.2603886161760153,
+        "hit_days": -0.26200681741389165,
+        "n_soundings": -0.434109732104424,
+        "bg_std_ppm": -0.3508757993009107,
+        "no2_peak_km": 0.06087880329153768,
+        "capacity_mw": 0.46890981512378976
+      },
+      "top_3_features": [
+        {
+          "feature": "activity_prob_std",
+          "shap_value": -0.6446382246197692
+        },
+        {
+          "feature": "capacity_mw",
+          "shap_value": 0.46890981512378976
+        },
+        {
+          "feature": "n_soundings",
+          "shap_value": -0.434109732104424
+        }
+      ]
+    },
+    "Tirora": {
+      "log_ratio": -3.8787833993583147,
+      "predicted_log_ratio": -2.2216509279036623,
+      "base_value": -0.529869749302781,
+      "shap_values": {
+        "activity_prob_mean": -0.1255573174507693,
+        "activity_prob_std": 0.20046922104578851,
+        "wind_co2_diff_deg": -0.07402698233234628,
+        "hit_days": -0.3567752407338099,
+        "n_soundings": -0.4792990535692797,
+        "bg_std_ppm": -0.339772430037034,
+        "no2_peak_km": 0.07399313895307272,
+        "capacity_mw": -0.5908125144765032
+      },
+      "top_3_features": [
+        {
+          "feature": "capacity_mw",
+          "shap_value": -0.5908125144765032
+        },
+        {
+          "feature": "n_soundings",
+          "shap_value": -0.4792990535692797
+        },
+        {
+          "feature": "hit_days",
+          "shap_value": -0.3567752407338099
+        }
+      ]
+    },
+    "Vindhyachal": {
+      "log_ratio": 0.10087863155965873,
+      "predicted_log_ratio": -0.36382434600029767,
+      "base_value": -0.529869749302781,
+      "shap_values": {
+        "activity_prob_mean": 0.1659265721240663,
+        "activity_prob_std": 0.5357050795925076,
+        "wind_co2_diff_deg": 0.185585127035987,
+        "hit_days": 0.21183529918569965,
+        "n_soundings": 1.2233605850158977,
+        "bg_std_ppm": 0.1352931548959768,
+        "no2_peak_km": 0.01825721239154879,
+        "capacity_mw": -2.3099176269392006
+      },
+      "top_3_features": [
+        {
+          "feature": "capacity_mw",
+          "shap_value": -2.3099176269392006
+        },
+        {
+          "feature": "n_soundings",
+          "shap_value": 1.2233605850158977
+        },
+        {
+          "feature": "activity_prob_std",
+          "shap_value": 0.5357050795925076
+        }
+      ]
+    }
+  },
+  "caveat": "SHAP explains a full-data linear fit's own predictions, not a cross-validated generalization estimate -- the project's LOO-CV MAE figures in q_correction_model.py / strengthen_q_correction_model.py remain the generalization claim. N=17-18, deliberately a linear (not tree-ensemble) model per RESEARCH_PLAN.md Sec 8's caution against complex multi-feature models at this facility count."
+}

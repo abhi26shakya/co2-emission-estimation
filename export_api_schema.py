@@ -23,6 +23,7 @@ SOURCE_FILES = [
     "data/q_correction_model_strengthened_results.json", "data/activity_signals.json",
     "data/lofo_track_a_results.json", "data/climate_trace_comparison.json",
     "data/temporal_q_model_results.json", "data/plume_maps/prototype_summary.json",
+    "data/gradcam_3channel_summary.json", "data/shap_correction_model_results.json",
 ]
 
 
@@ -47,6 +48,9 @@ def build_records():
     ct_by_plant = {f["plant"]: f for f in ct.get("facilities", []) if "our_q_t_per_year" in f}
     temporal = load_or_empty("data/temporal_q_model_results.json", {"results": {}})["results"]
     plume_summary = load_or_empty("data/plume_maps/prototype_summary.json", {"facilities": {}})["facilities"]
+    gradcam = load_or_empty("data/gradcam_3channel_summary.json", {"facilities": {}})["facilities"]
+    shap_result = load_or_empty("data/shap_correction_model_results.json", {"per_facility": {}})
+    shap_per_facility = shap_result.get("per_facility", {})
     candidates_names = set(plant_results)
 
     import csv
@@ -65,6 +69,8 @@ def build_records():
         ct_row = ct_by_plant.get(name)
         temp_row = temporal.get(name)
         plume_row = plume_summary.get(name)
+        gradcam_row = gradcam.get(name)
+        shap_row = shap_per_facility.get(name)
 
         act_prob_mean = act["activity_prob_mean"] if act else None
         track_a = {
@@ -133,6 +139,20 @@ def build_records():
                                                  "retrieval gap, not a genuine emissions pattern."),
             }
 
+        explainability = {
+            "grad_cam": {
+                "available": gradcam_row is not None,
+                "prob_plant": gradcam_row["prob_plant"] if gradcam_row else None,
+                "dominant_channel": gradcam_row["dominant_channel"] if gradcam_row else None,
+                "channel_shares": gradcam_row["channel_shares"] if gradcam_row else None,
+                "image_reference": "gradcam_3channel.png" if gradcam_row else None,
+            },
+            "shap": {
+                "available": shap_row is not None,
+                "top_features": shap_row["top_3_features"] if shap_row else None,
+            },
+        }
+
         records.append({
             "facility_id": name, "name": name, "lat": pr["lat"], "lon": pr["lon"],
             "capacity_mw": capacity.get(name),
@@ -141,6 +161,7 @@ def build_records():
                         "climate_trace_comparison": climate_trace_comparison},
             "plume": plume,
             "temporal": temporal_out,
+            "explainability": explainability,
             "provenance": {"exported_at": datetime.datetime.utcnow().isoformat() + "Z",
                            "source_files": SOURCE_FILES, "methodology_reference": "NOVEL_METHODOLOGY_PROPOSAL.md"},
         })

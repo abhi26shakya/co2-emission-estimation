@@ -1,0 +1,39 @@
+{
+  "checkpoint": "detector3_2ch_mixed_facility_split.pt",
+  "caveat": "Diagnostic scope: 1 tile per facility (the temporal-midpoint tile, preferring 2020 if available), not an exhaustive per-tile study. Complements diagnose_lofo_weak_facilities.py's raw-intensity finding (Kudgi/ShriSingajiMalwa sit at or below the rural-negative noise floor) by showing where/what the trained detector attends to on these specific tiles, not a claim about every tile from either facility.",
+  "facilities": {
+    "Rihand": {
+      "tile_used": "data/threech/positive/Rihand_2020_07.npy",
+      "prob_plant": 0.9969910383224487,
+      "channel_shares": {
+        "NO2": 0.6676391959190369,
+        "SO2": 0.31927305459976196,
+        "VIIRS": 0.013087727129459381
+      },
+      "dominant_channel": "NO2",
+      "note": "well-generalizing (100% LOFO recall)"
+    },
+    "Kudgi": {
+      "tile_used": "data/threech/positive/Kudgi_2020_07.npy",
+      "prob_plant": 0.1826828271150589,
+      "channel_shares": {
+        "NO2": 0.49321943521499634,
+        "SO2": 0.4954802095890045,
+        "VIIRS": 0.011300336569547653
+      },
+      "dominant_channel": "SO2",
+      "note": "0% LOFO recall even after 2019-data-year fix"
+    },
+    "ShriSingajiMalwa": {
+      "tile_used": "data/threech/positive/ShriSingajiMalwa_2020_07.npy",
+      "prob_plant": 0.152739018201828,
+      "channel_shares": {
+        "NO2": 0.48527902364730835,
+        "SO2": 0.5027877688407898,
+        "VIIRS": 0.01193319447338581
+      },
+      "dominant_channel": "SO2",
+      "note": "0% LOFO recall even after 2019-data-year fix"
+    }
+  }
+}
