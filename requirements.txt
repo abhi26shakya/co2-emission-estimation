@@ -27,3 +27,4 @@ earthaccess==0.17.0
 earthengine-api==1.7.33
 geemap==0.37.2
 xarray==2026.7.0
+openpyxl==3.1.5
