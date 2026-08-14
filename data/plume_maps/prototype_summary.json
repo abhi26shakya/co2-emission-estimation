@@ -1,0 +1,202 @@
+{
+  "prototype_facilities": [
+    "Rihand",
+    "Talcher",
+    "Anpara"
+  ],
+  "facilities": {
+    "Rihand": {
+      "inputs": {
+        "lat": 24.027,
+        "lon": 82.7915,
+        "Q_t_per_year": 48347260.30604745,
+        "Q_t_per_year_std": 35804919.021015026,
+        "wind_speed_ms": 1.2935164795429537,
+        "wind_deg_toward": 108.0,
+        "wind_from_deg": 288.0
+      },
+      "default_result": {
+        "peak_conc_kg_m3": 0.004312972040270629,
+        "peak_downwind_dist_km": 1.5811388300841898,
+        "stability_class": "B",
+        "stack_height_m": 220.0
+      },
+      "ablation": [
+        {
+          "stability_class": "A",
+          "stack_height_m": 150.0,
+          "peak_conc_kg_m3": 0.004527268774365725
+        },
+        {
+          "stability_class": "A",
+          "stack_height_m": 220.0,
+          "peak_conc_kg_m3": 0.0034737812404577574
+        },
+        {
+          "stability_class": "A",
+          "stack_height_m": 275.0,
+          "peak_conc_kg_m3": 0.0026295638350100586
+        },
+        {
+          "stability_class": "B",
+          "stack_height_m": 150.0,
+          "peak_conc_kg_m3": 0.006180320852194289
+        },
+        {
+          "stability_class": "B",
+          "stack_height_m": 220.0,
+          "peak_conc_kg_m3": 0.004312972040270629
+        },
+        {
+          "stability_class": "B",
+          "stack_height_m": 275.0,
+          "peak_conc_kg_m3": 0.0029549461982821077
+        },
+        {
+          "stability_class": "C",
+          "stack_height_m": 150.0,
+          "peak_conc_kg_m3": 0.00836832957021258
+        },
+        {
+          "stability_class": "C",
+          "stack_height_m": 220.0,
+          "peak_conc_kg_m3": 0.0033792194510597964
+        },
+        {
+          "stability_class": "C",
+          "stack_height_m": 275.0,
+          "peak_conc_kg_m3": 0.0023878967985602505
+        }
+      ]
+    },
+    "Talcher": {
+      "inputs": {
+        "lat": 21.0966,
+        "lon": 85.074,
+        "Q_t_per_year": 6914642.893860566,
+        "Q_t_per_year_std": 1697787.2740303124,
+        "wind_speed_ms": 1.7694522034965623,
+        "wind_deg_toward": 318.0,
+        "wind_from_deg": 138.0
+      },
+      "default_result": {
+        "peak_conc_kg_m3": 0.00044565900279855636,
+        "peak_downwind_dist_km": 1.4142135623730951,
+        "stability_class": "B",
+        "stack_height_m": 220.0
+      },
+      "ablation": [
+        {
+          "stability_class": "A",
+          "stack_height_m": 150.0,
+          "peak_conc_kg_m3": 0.0010266089896083432
+        },
+        {
+          "stability_class": "A",
+          "stack_height_m": 220.0,
+          "peak_conc_kg_m3": 0.000536323754998128
+        },
+        {
+          "stability_class": "A",
+          "stack_height_m": 275.0,
+          "peak_conc_kg_m3": 0.00028938129256288864
+        },
+        {
+          "stability_class": "B",
+          "stack_height_m": 150.0,
+          "peak_conc_kg_m3": 0.0008400777231986567
+        },
+        {
+          "stability_class": "B",
+          "stack_height_m": 220.0,
+          "peak_conc_kg_m3": 0.00044565900279855636
+        },
+        {
+          "stability_class": "B",
+          "stack_height_m": 275.0,
+          "peak_conc_kg_m3": 0.0002774386023399145
+        },
+        {
+          "stability_class": "C",
+          "stack_height_m": 150.0,
+          "peak_conc_kg_m3": 0.0007713401505032306
+        },
+        {
+          "stability_class": "C",
+          "stack_height_m": 220.0,
+          "peak_conc_kg_m3": 0.0003445080782716369
+        },
+        {
+          "stability_class": "C",
+          "stack_height_m": 275.0,
+          "peak_conc_kg_m3": 0.00021594460185047804
+        }
+      ]
+    },
+    "Anpara": {
+      "inputs": {
+        "lat": 24.201,
+        "lon": 82.7891,
+        "Q_t_per_year": 31660051.120184448,
+        "Q_t_per_year_std": 21471037.029337596,
+        "wind_speed_ms": 1.2396297117448924,
+        "wind_deg_toward": 108.0,
+        "wind_from_deg": 288.0
+      },
+      "default_result": {
+        "peak_conc_kg_m3": 0.0029471101939365476,
+        "peak_downwind_dist_km": 1.5811388300841898,
+        "stability_class": "B",
+        "stack_height_m": 220.0
+      },
+      "ablation": [
+        {
+          "stability_class": "A",
+          "stack_height_m": 150.0,
+          "peak_conc_kg_m3": 0.0030935419546069326
+        },
+        {
+          "stability_class": "A",
+          "stack_height_m": 220.0,
+          "peak_conc_kg_m3": 0.0023736801466990773
+        },
+        {
+          "stability_class": "A",
+          "stack_height_m": 275.0,
+          "peak_conc_kg_m3": 0.0017968153541006397
+        },
+        {
+          "stability_class": "B",
+          "stack_height_m": 150.0,
+          "peak_conc_kg_m3": 0.0042230940556149555
+        },
+        {
+          "stability_class": "B",
+          "stack_height_m": 220.0,
+          "peak_conc_kg_m3": 0.0029471101939365476
+        },
+        {
+          "stability_class": "B",
+          "stack_height_m": 275.0,
+          "peak_conc_kg_m3": 0.002019153377805066
+        },
+        {
+          "stability_class": "C",
+          "stack_height_m": 150.0,
+          "peak_conc_kg_m3": 0.005718189024254986
+        },
+        {
+          "stability_class": "C",
+          "stack_height_m": 220.0,
+          "peak_conc_kg_m3": 0.0023090648394609335
+        },
+        {
+          "stability_class": "C",
+          "stack_height_m": 275.0,
+          "peak_conc_kg_m3": 0.0016316811079219943
+        }
+      ]
+    }
+  },
+  "note": "Peak ground-level concentration varies substantially across the stability-class x stack-height sensitivity grid for every prototype facility -- this range should be reported alongside any single default-assumption number in the paper, not hidden. See NOVEL_METHODOLOGY_PROPOSAL.md Sec 6 for why these specific defaults were chosen (documented literature/regulatory defaults, not fitted or invented)."
+}
