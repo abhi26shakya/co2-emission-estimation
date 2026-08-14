@@ -38,7 +38,7 @@ As of the latest committed and uncommitted state, Track A (detector) and Track B
 
 ## 2. Timeline Summary — Full Commit History
 
-All 26 commits, chronological (oldest → newest). Dates as recorded in git (local/IST as committed).
+All 29 commits, chronological (oldest → newest). Dates as recorded in git (local/IST as committed).
 
 | # | Hash | Date | Author | Message |
 |---|---|---|---|---|
@@ -68,12 +68,16 @@ All 26 commits, chronological (oldest → newest). Dates as recorded in git (loc
 | 24 | `03e1f52` | 2026-08-13 04:44 | Abhishek Shakya (co-authored: Claude Sonnet 5) | Process ShriSingajiMalwa and Koradi; Tamnar incomplete (resource pressure) |
 | 25 | `f88cff6` | 2026-08-13 09:16 | Abhishek Shakya (co-authored: Claude Sonnet 5) | Process Tamnar, completing the ShriSingajiMalwa/Koradi/Tamnar round |
 | 26 | `0d2a823` | 2026-08-13 10:49 | Abhishek Shakya (co-authored: Claude Sonnet 5) | Process Kudgi, final plant of this session's facility-set expansion |
+| 27 | `5ca1c0f` | 2026-08-14 00:05 | Abhishek Shakya (co-authored: Claude Sonnet 5) | Complete facility-set expansion to 20/20 plants; add reliability fixes and master research documentation |
+| 28 | `5bcbb34` | 2026-08-14 03:02 | Abhishek Shakya (co-authored: Claude Sonnet 5) | Expand Track A positive class to 20 facilities; add exhaustive LOFO harness and root-cause negative-enhancement anomaly |
+| 29 | `cadb194` | 2026-08-14 03:06 | Abhishek Shakya (co-authored: Claude Sonnet 5) | Fully resolve the negative-CO2-enhancement anomaly: ShriSingajiMalwa was a seasonal sampling artifact |
 
 **Timeline gaps and pacing:**
 - ~1 week gap: Jul 3 → Jul 10 (Week 3 → Week 4 handoff).
 - **~4 week gap: Jul 10 → Aug 10** — unexplained in the repo (no commits, no log entries); marked **Not documented / needs verification**.
 - From Aug 10 onward, authorship switches to the current user (Abhishek Shakya), starting with a catch-up README commit.
-- 16 of the 26 commits (Week 5 through the post-Week-11 facility-processing round) land within a single ~33-hour span (Aug 11 02:27 → Aug 13 10:49), consistent with an intensive, session-based working style. This pattern is also reflected in the language of the logs themselves ("continues the same session").
+- 16 of the first 26 commits (Week 5 through the post-Week-11 facility-processing round) land within a single ~33-hour span (Aug 11 02:27 → Aug 13 10:49), consistent with an intensive, session-based working style. This pattern is also reflected in the language of the logs themselves ("continues the same session").
+- Commits 27–29 (Aug 14, 00:05 → 03:06) form a same-day follow-up session, covered narratively in §12 below.
 
 **No branches or tags exist** other than `main`.
 
@@ -191,6 +195,10 @@ Same day, `5baa198` directly follow-up-confirms this concern from the activity-s
 | 5 | NO2+SO2+VIIRS | tile-level | 79.2% (tie) | Reduces steel false-alarm confidence specifically |
 | 7 | NO2+SO2+VIIRS, +5 highways | tile-level | 81.2% | First improvement since Week 4 |
 | 11 | NO2+SO2+VIIRS | **facility-level** (leakage-corrected) | **67.3%** | True generalization is substantially weaker than tile-level numbers suggested |
+| 12.1 | NO2+SO2+VIIRS, 20 facilities (4→20 positive class) | facility-level, single random split | 82.8% (95.0% mixed, 88% recall) | Superseded as a generalization estimate by the row below — single split, not representative |
+| 12.4 | NO2+SO2+VIIRS, 20 facilities | **exhaustive LOFO** (21 folds) | — (mean recall **47.2%**, tile-weighted 48.7%) | The trustworthy generalization number; recall ranges 0% (Kahalgaon, Kudgi, Mouda) to 100% (Anpara, Korba, Rihand, Talcher), predicted by detector confidence (r=+0.90) |
+
+Full detail on rows 12.1/12.4 is in §12.1 and §12.4.
 
 ### 5.4 Explainability / Failure-Analysis Tooling
 
@@ -396,20 +404,22 @@ A consolidated table of every explicitly documented bug-find-and-fix cycle in th
 
 ## 9. Current Implementation State
 
-### 9.1 Committed State (as of `0d2a823`, 2026-08-13 10:49)
+### 9.1 Committed State (as of `cadb194`, 2026-08-14 03:06 — see §12 for the narrative of commits 27–29)
 
-- **Track A:** 3-channel (NO2+SO2+VIIRS) detector, most recent honestly-reported number is the facility-level-split hard-only accuracy of **67.3%** (Week 11). Both tile-level and facility-level checkpoints are retained for different downstream uses.
-- **Track B:** 13 of 20 candidate plants processed and committed to `data/plant_results.json`; `data/emission_estimates.json` holds 13 entries with full uncertainty bands. Three consecutive plants (ShriSingajiMalwa, Koradi, Tamnar) show negative CO2 enhancement; Kudgi (the 4th plant in that run) does not, bounding the issue to those specific 3 rather than indicating a systemic pipeline fault (root cause of the negative-enhancement cases themselves is **not yet diagnosed — see §11**).
-- `NEXT_STEPS.md` (committed version, `43c5399`) still describes roadmap step 2 (facility-set expansion) as **"Partial — 9/20 processed"** — this is stale relative to the 4 subsequent commits (13/20) already in git history.
+- **Track A:** 3-channel (NO2+SO2+VIIRS) detector, retrained on the expanded 20-facility positive class (§12.1). Single-split facility-level accuracy reached **82.8%** hard-only / **95.0%** mixed (88% recall, 4 held-out), but the more rigorous **exhaustive LOFO evaluation (§12.4, 21 folds) is the trustworthy generalization number: true mean recall is 47.2%** (tile-weighted 48.7%), ranging 0% (Kahalgaon, Kudgi, Mouda) to 100% (Anpara, Korba, Rihand, Talcher). Recall is predicted by the detector's own confidence per facility (r=+0.90) — a signal-clarity issue, not memorization. Tile-level, facility-level, and 20-facility checkpoints are all retained for different downstream uses.
+- **Track B:** all 20/20 candidate plants processed. 17/20 produce a `physics_gaussian.py` estimate (Mundra, Sipat, Simhadri excluded for a genuine 0-near-sounding coverage gap, not left unverified). The three previously-flagged negative-CO2-enhancement facilities (ShriSingajiMalwa, Koradi, Tamnar) are now fully root-caused (§12.6–§12.7): Koradi and Tamnar are statistically consistent with zero signal; ShriSingajiMalwa was a seasonal near/background sampling artifact whose sign flips positive under a same-month comparison. None represent a pipeline bug or genuine negative signal.
+- Climate TRACE uncertainty-interval calibration, re-run at the full N=17: **53% (9/17)**, down from an earlier small-sample 71% (5/7) — a more honest number, not a regression (§12.5).
+- `reliability_model.py`, re-run at N=17 (up from N=7): now a **positive result** — `hit_days` predicts `q_rel_std` at r=−0.617, LOO R²=0.212 (§12.3).
+- `NEXT_STEPS.md`, `RESEARCH_PAPER.md`, and this document were all updated in commits 27–29 and are current as of `cadb194`.
 
-### 9.2 Uncommitted Working-Tree State (as of 2026-08-13, this session)
+### 9.2 Uncommitted Working-Tree State (as of 2026-08-14, this session)
 
-Per `git status`, the working tree is **ahead of the last commit**:
+Per `git status`, the working tree is again ahead of the last commit (`cadb194`) — this is separate, newer work not covered by §12:
 
-- **Modified (uncommitted):** `NEXT_STEPS.md` (updates roadmap step 2 to **"Done — 20/20 processed"** and adds a paragraph on reliability fixes), `data/plant_results.json` (+65 lines — presumably results for the remaining plants), `process_plant.py` (the two reliability fixes described in Bug/Fix Log entries #7 and #8 above).
-- **New/untracked:** per-plant process logs and `.npz` sounding archives for **Chhabra, Farakka, Kahalgaon, Koradi, Korba, Kudgi, Mouda, RGundem, ShriSingajiMalwa, Simhadri, Tamnar**, plus several `physics_gaussian_rerun*.log` files and a `remaining5_process.log`.
+- **Modified (uncommitted):** `data/candidate_plants.csv`, `data/plant_results.json`, `pick_plants.py`.
+- **New/untracked:** `data/TalwandiSabo_soundings.npz`, and a `logs/` directory.
 
-**This means:** the actual facility count in the live working directory is ahead of both the last git commit (13/20) and possibly complete (approaching or at 20/20, per the uncommitted `NEXT_STEPS.md` claim) — but this has **not yet been independently verified in this documentation pass** (i.e., this document reports what git/file state shows, not a fresh re-count of `data/plant_results.json`'s current entries). **Recommendation:** before treating "20/20 complete" as fact, re-check `data/plant_results.json`'s current entry count and commit the pending work, since the committed history, the committed `NEXT_STEPS.md`, and the uncommitted working tree currently disagree with each other on completion status — a "documentation lags reality, then working tree jumps ahead of the last commit" pattern worth being deliberate about before it compounds further.
+This reflects a paused facility-set-expansion batch (a further 10 candidate coal plants — TalwandiSabo, Lalitpur, Pryagraj(Bara), Dadri(Nctpp), Akaltara, KGudemNew, Raichur, Bellary, RayalSeema, Sagardighi — queued via `run_queue.sh`, then explicitly stopped mid-run per user instruction). Only TalwandiSabo appears to have produced a soundings artifact before the stop. **Not yet documented in prose** (no week/session log exists for this batch) and **not committed** — flagged here for completeness, not analyzed further in this pass since the work was intentionally halted rather than completed.
 
 ### 9.3 What Is Fused vs. Not
 
@@ -426,8 +436,8 @@ Compiled from `README.md`, `RESEARCH_PLAN.md`, and script docstrings:
 - **Activity-signal instability on non-training facilities.** `compare_activity_signal_checkpoints.py` quantifies that facilities never included in Track A's training set show activity-probability swings of up to 0.22 across reasonable training variation (i.e., between the tile-level and facility-level split checkpoints) — a reliability caveat for anyone using this signal downstream.
 - **IME footprint-area assumption.** The 2.25 km² per-OCO-3-sounding footprint area used in `column_mass_enhancement()` is a fixed assumption, not measured per-sounding — **the sensitivity of results to this specific assumed value has not been separately tested in this project** (Not documented / needs verification: no ablation of this constant was found in the exploration pass).
 - **Wind uncertainty dominates and is not fully resolved by per-overpass matching.** Even with per-overpass wind conditioning (Week 8) and the added background-definition term (Week 10), the wind relative-std term remains the largest single uncertainty contributor observed (45–59% in cases reviewed).
-- **Track A's honestly-reported accuracy (67.3%, facility-split) is modest** and the mixed-model plant recall (8%, post-leakage-fix) indicates the current 3-channel detector does not yet generalize well to unseen facilities — this is reported directly rather than the pre-fix, leakage-inflated 81.2% figure.
-- **Negative CO2 enhancement cases (ShriSingajiMalwa, Koradi, Tamnar) are not yet root-caused.** Unlike the Talcher case (which received a dedicated diagnosis script), these three cases from the 2026-08-13 session have not yet had an equivalent targeted investigation as of this document's compilation — flagged here as open, not resolved.
+- **Track A's true generalization accuracy is modest.** The single-split facility-level number (82.8% hard-only / 95.0% mixed, §12.1) is not representative — exhaustive LOFO (§12.4, 21 folds) shows true mean recall of only 47.2%, with a bimodal spread by facility (0% to 100%) predicted by the detector's own confidence (r=+0.90), not by memorization.
+- **Negative CO2 enhancement cases (ShriSingajiMalwa, Koradi, Tamnar) are now fully root-caused (§12.6–§12.7).** Koradi and Tamnar are statistically consistent with zero signal (not a real anomaly); ShriSingajiMalwa was a seasonal near/background sampling artifact that flips positive under a same-month comparison. A general follow-up remains open: `physics_gaussian.py` does not yet month-stratify its near/background comparison, so this exact failure mode could recur elsewhere.
 - **No formal test suite, `requirements.txt`/`pyproject.toml`/environment file, `CLAUDE.md`, or `docs/` folder exists anywhere in this repository** (confirmed in both research passes). Dependencies are documented only prose-style in `README.md`. This is stated here as a factual gap, not a criticism.
 - **The ~4-week gap in the commit history (2026-07-10 → 2026-08-10) is unexplained** in any file found during this pass — marked **Not documented / needs verification**.
 - **ERA5 wind-data access method is not confirmed** in this pass (likely Earth Engine's ERA5 collection or the CDS API, based on the pattern used for other Earth Engine data, but not directly verified against `process_plant.py`'s import statements during this documentation pass) — **Not documented / needs verification**.
@@ -450,9 +460,9 @@ Directly from the unfinished portions of `RESEARCH_PLAN.md` §14's roadmap and `
 
 ---
 
-## 12. Same-Day Follow-Up Session (2026-08-14, uncommitted)
+## 12. Same-Day Follow-Up Session (2026-08-14, commits 27–29)
 
-This section covers a follow-up session run after §§1–11 above were compiled (which describe state as of `5ca1c0f`, 2026-08-13). All work below is **uncommitted working-tree state** as of this writing, not yet reflected in the timeline table (§2) or committed to git.
+This section covers a follow-up session run after §§1–11 above were originally compiled (which described state as of `5ca1c0f`, 2026-08-14 00:05). The work below is now committed — split across `5ca1c0f` (master documentation + reliability fixes), `5bcbb34` (Track A expansion, LOFO harness, negative-enhancement root-cause), and `cadb194` (ShriSingajiMalwa full resolution) — and is reflected in the timeline table (§2, rows 27–29).
 
 **12.1 Track A positive-class expansion (4→20 facilities).** Wrote `export_new_positive_tiles.py`, exporting NO2/SO2/VIIRS 2020 tiles directly into `data/{monthly,so2,viirs}/positive` for the 16 Track B facilities Track A had never trained on (it had only ever used the original `top5_plants.csv` 4-site set). Reused the 5 facilities' tiles already downloaded to `data/activity_tiles/` (Week 10) where present; fetched the remaining 11 fresh (one transient `HTTP 503` on Koradi SO2 2020-01, backfilled manually). Rebuilt `data/threech/positive` (312 tiles, up from ~120) and reran `train_3channel.py`. **Result: the Week 11 leakage-driven recall collapse (53%→8%) is resolved** — hard_only facility-split accuracy rose 67.3%→82.8%, mixed facility-split accuracy reached 95.0% with 88% plant recall (single random split, 4 held-out facilities).
 
