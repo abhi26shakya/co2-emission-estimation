@@ -1,0 +1,65 @@
+{
+  "weak_facilities": {
+    "Kudgi": {
+      "n_tiles": 24,
+      "no2_mean": 2.657578261278104e-05,
+      "so2_mean": 7.513588207075372e-05,
+      "viirs_mean": 0.00697428360581398,
+      "no2_peak_km": 3.6
+    },
+    "ShriSingajiMalwa": {
+      "n_tiles": 24,
+      "no2_mean": 2.817615859385114e-05,
+      "so2_mean": 0.00011875254131155089,
+      "viirs_mean": 0.01797790639102459,
+      "no2_peak_km": 1.0
+    },
+    "Talcher": {
+      "n_tiles": 24,
+      "no2_mean": 9.179985499940813e-05,
+      "so2_mean": 0.0004124899860471487,
+      "viirs_mean": 0.028458064422011375,
+      "no2_peak_km": 34.7
+    },
+    "Rihand": {
+      "n_tiles": 24,
+      "no2_mean": 0.00017889216542243958,
+      "so2_mean": 0.0005546603933908045,
+      "viirs_mean": 0.009633890353143215,
+      "no2_peak_km": 8.1
+    },
+    "Anpara": {
+      "n_tiles": 24,
+      "no2_mean": 0.00015921580779831856,
+      "so2_mean": 0.0004806561628356576,
+      "viirs_mean": 0.009771558456122875,
+      "no2_peak_km": 16.7
+    },
+    "Korba": {
+      "n_tiles": 24,
+      "no2_mean": 0.00011082645505666733,
+      "so2_mean": 0.0004471889405976981,
+      "viirs_mean": 0.007506341207772493,
+      "no2_peak_km": 4.1
+    }
+  },
+  "hard_negative": {
+    "n_tiles": 480,
+    "no2_mean": 4.1593659261707217e-05,
+    "so2_mean": 0.00012261958909220994,
+    "viirs_mean": 0.02417026273906231
+  },
+  "rural_negative": {
+    "n_tiles": 120,
+    "no2_mean": 2.4910068532335572e-05,
+    "so2_mean": 0.00011883393017342314,
+    "viirs_mean": 0.0213444996625185
+  },
+  "positive_rest": {
+    "n_tiles": 468,
+    "no2_mean": 8.127108594635502e-05,
+    "so2_mean": 0.00029497226933017373,
+    "viirs_mean": 0.029375942423939705
+  },
+  "finding": "Kudgi's and ShriSingajiMalwa's raw NO2/SO2 tile intensity sits at or below rural_negative levels and well below the rest-of-positive-class average (~3x lower NO2, ~3-4x lower SO2) -- checked every month individually, not just on average, with no month showing a strong signal spike. no2_peak_km for both (3.6km, 1.0km) is smaller than several 100%-LOFO-recall facilities (Talcher 34.7km, Anpara 16.7km, Rihand 8.1km), ruling out bad lat/lon tile placement as the explanation. Conclusion: these two facilities' satellite-observable NO2/SO2 signature is genuinely at or near the noise floor established by the negative classes -- a real observability limit, not a detector/training artifact. No architecture or training-regime change can be expected to fix this; the signal is not there to learn from a satellite-tile classifier input. Plausible physical explanation, NOT verified from available data (capacity_mw is the only per-plant attribute in candidate_plants.csv, and both are large plants at 2400-2520 MW, so capacity alone does not explain it): modern flue-gas desulfurization (FGD) / selective catalytic reduction (SCR) emissions-control equipment suppressing stack NO2/SO2 well below older, less-controlled plants of similar capacity. Not documented / needs verification against each plant's actual emissions-control equipment."
+}
