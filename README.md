@@ -5,65 +5,69 @@ Research and implementation work on detecting and estimating CO2 emissions from 
 1. **Plant detector (Track A)** — a small CNN that classifies satellite tiles as "power plant" vs. "not a power plant," built up incrementally by fusing more pollutant/thermal channels (Weeks 2–5, described below). Since expanded to 20 positive-class facilities; exhaustive leave-one-facility-out recall is currently **69.1%**.
 2. **CO2 enhancement estimation (Track B)** — a physics-driven track that estimates near-plant XCO2 enhancement and a per-plant emission rate directly from OCO-3 soundings, cross-checked against NO2 co-location and wind direction. Now benchmarked against **two** independent references: Climate TRACE (satellite-inferred) and, more importantly, India's Central Electricity Authority CO2 Baseline Database — a real, non-satellite ground-truth source computed from each plant's reported fuel consumption. A working, cross-validated correction model exists against this real ground truth (MAE 1.01→0.902 in log-ratio space).
 
-**This README describes the project's original Week 2–7 state and has not been kept current since.** For up-to-date status, results, and the full same-day findings referenced above, see `NEXT_STEPS.md` (running status + roadmap), `RESEARCH_PAPER.md` (full write-up), and `PROJECT_RESEARCH_DOCUMENTATION.md` (exhaustive research log). The sections below are accurate as historical record through Week 7 but should not be read as the current state of the project.
+For the full week-by-week narrative through Week 7 (superseded by everything below, kept only as historical record), see the "Original Week 2–7 walkthrough" section near the bottom of this file, or `PROJECT_RESEARCH_DOCUMENTATION.md` §5.2/§6.3 for the exhaustive version. Everything from here on describes the current state.
 
-## Weekly progress (plant detector track)
+## Track A: plant detector — current state
 
-Full details and numbers are in `WEEK2_LOG.txt` through `WEEK7_LOG.txt` (`WEEK6_LOG.txt` covers the CO2-enhancement track, not the detector).
+Expanded from the original 4-facility positive class to 20 (`data/candidate_plants.csv`), each with 24 months of NO2+SO2+VIIRS tile depth (2019+2020). Tile-level accuracy numbers (Week 2–7, up to 81.2%) turned out to substantially overstate real generalization — a facility-level split dropped this to 67.3%, and even that was an artifact of an easy single random split. The number that matters is **exhaustive leave-one-facility-out (LOFO) recall**, which holds out each of the 20 facilities in turn and trains a fresh model each time:
 
-| Week | Input channels | Hard-negative test accuracy | Key finding |
-|---|---|---|---|
-| 2 | NO2 (Sentinel-5P) | 91.2% (easy negatives) | Baseline plant-vs-forest detector |
-| 3 | NO2 | 77.1% | Adding hard negatives (cities/steel/highways) reveals the detector is really a "concentrated combustion detector," not plant-specific |
-| 4 | NO2 + SO2 | 79.2% | SO2 fixes city false alarms (Delhi 0.43→0.11), but steel plants (Bhilai, Jamshedpur) remain confused since they also emit SO2 |
-| 5 | NO2 + SO2 + VIIRS (MaxFRP) | 79.2% (tied) | VIIRS thermal data measurably reduces false-alarm confidence on the two steel plants specifically (Bhilai 0.59→0.52, Jamshedpur 0.54→0.50), but highways become relatively more confusable, so overall accuracy doesn't move |
-| 7 | NO2 + SO2 + VIIRS, +5 more highway hard negatives | 81.2% | Expanding the highway hard-negative set from 5 to 10 (geographically spread, not clustered) drops both of Week 5's worst false alarms (hwy_AhmedabadVadodara 0.46→0.38, hwy_GTRoad_UP 0.44→0.34) — first accuracy improvement since Week 4 |
+| Stage | LOFO mean recall | Note |
+|---|---|---|
+| Original (12-tile depth per facility) | 47.2% | Roughly a coin flip on average, 0–100% by facility |
+| Light data augmentation (no new data) | 46.8% | No improvement — rules out training-diversity as the driver |
+| 24-tile depth (2nd data year exported) | **69.1%** | Real additional satellite observations closed most of the gap |
 
-## Data sources actually used
+Two facilities (Kudgi, ShriSingajiMalwa) still show 0% LOFO recall after the fix — diagnosed as a genuine satellite-observability limit (their raw NO2/SO2 signal sits at or below background-noise levels in every month checked), not a fixable modeling gap.
 
-* **Sentinel-5P NO2** — `COPERNICUS/S5P/OFFL/L3_NO2` (via Google Earth Engine)
-* **Sentinel-5P SO2** — `COPERNICUS/S5P/OFFL/L3_SO2` (via Earth Engine)
-* **NASA VIIRS active-fire/thermal** — `NASA/VIIRS/002/VNP14A1`, `MaxFRP` band (via Earth Engine)
-* **OCO-3 XCO2 soundings** — `OCO3_L2_Lite_FP` v11r (via NASA `earthaccess`, CO2-enhancement track only)
-* **ERA5 wind** — `ECMWF/ERA5/DAILY` (wind-alignment sanity check, CO2-enhancement track only)
-
-All tiles cover the 2019–2020 window, for 5 Indian coal plants (`data/top5_plants.csv`), 5 rural/background points, and 20 hard-negative locations (cities, steel mills, highway corridors — `data/hard_negatives.csv`).
-
-## Plant detector: run order
-
+**Run order:**
 ```
-export_monthly.py            # NO2 tiles: data/monthly/{positive,negative}
-export_hard_negatives.py     # NO2 tiles: data/monthly/hard_negative
-export_so2.py                # SO2 tiles: data/so2/*
-export_viirs.py              # VIIRS MaxFRP tiles: data/viirs/*
+export_monthly.py                 # NO2 tiles: data/monthly/{positive,negative}
+export_hard_negatives.py          # NO2 tiles: data/monthly/hard_negative
+export_so2.py / export_viirs.py   # SO2 / VIIRS MaxFRP tiles
+export_new_positive_tiles.py      # 2020 tiles for the 16 facility-expansion plants
+export_new_positive_tiles_2019.py # 2019 tiles for the same, closing a data-quantity LOFO gap
 
-build_2channel.py            # NO2+SO2 -> data/twoch/*
-build_3channel.py            # NO2+SO2+VIIRS -> data/threech/*
+build_2channel.py / build_3channel.py   # channel-stack tiles -> data/{twoch,threech}/*
 
-train_detector.py            # Week 2/3: 1-channel (NO2) detector
-train_2channel.py            # Week 4: 2-channel (NO2+SO2) detector
-train_3channel.py            # Week 5: 3-channel (NO2+SO2+VIIRS) detector
+train_detector.py / train_2channel.py / train_3channel.py   # 1/2/3-channel detectors
 
-gradcam.py                   # Grad-CAM explainability (1-channel model)
-analyze_failures.py          # Per-source false-alarm ranking (1-channel model)
-analyze_failures_3ch.py      # Per-source false-alarm ranking (3-channel model)
-summary_figure.py            # Week 2-5 accuracy comparison chart
+lofo_track_a.py                # exhaustive leave-one-facility-out harness (21+ folds)
+lofo_track_a_aug.py            # same, with light spatial augmentation
+lofo_recall_correlates.py      # what predicts per-facility LOFO recall
+diagnose_lofo_weak_facilities.py   # why Kudgi/ShriSingajiMalwa still fail (signal-strength diagnosis)
+
+gradcam.py / analyze_failures.py / analyze_failures_3ch.py   # explainability, false-alarm ranking
+extract_activity_signal.py / compare_activity_signal_checkpoints.py   # Track A -> Track B activity signal
+summary_figure.py / evaluation_figures.py   # summary figures
 ```
 
-## CO2 enhancement track: run order
+## Track B: CO2 emission estimation — current state
 
+All 20 committed candidate plants processed; 17–18 produce a usable `physics_gaussian.py` estimate (a few excluded for a genuine 0-near-sounding OCO-3 coverage gap). The IME (Integrated Mass Enhancement) pipeline now uses per-overpass wind conditioning, a three-term uncertainty budget (wind, IME-sampling, background-definition sensitivity), and month-stratifies its near/background comparison (fixing a real seasonal-sampling-bias bug found via a facility with spuriously negative CO2 enhancement).
+
+**Benchmarked against two independent references**, which measure different things:
+- **Climate TRACE** (satellite-thermal-proxy inferred, itself unvalidated for India) — 35.3% of estimates fall within their own stated uncertainty interval.
+- **CEA's CO2 Baseline Database** (Government of India, bottom-up from each plant's reported fuel consumption — genuine ground truth, not another satellite proxy) — 47.1% bracketing, MAE 1.01 in log-ratio space. A single-feature, leave-one-out-cross-validated correction (using background XCO2 noise) reduces this to **MAE 0.902**, a real ~11% improvement — the project's first correction model validated against actual reported emissions.
+
+**Run order:**
 ```
 process_plant.py <PlantName>   # end-to-end: OCO-3 scan, NO2 co-location, wind check for one plant
 co2_enhancement.py             # near-plant vs background XCO2 enhancement (single plant, from saved soundings)
 co2_no2_colocation.py          # NO2 heatmap + CO2 soundings overlay
 wind_check.py                  # wind-direction vs high-CO2-offset alignment check
-physics_gaussian.py            # Week 6: IME mass-balance emission-rate estimate (t CO2/yr) from saved soundings
+physics_gaussian.py            # IME mass-balance emission-rate estimate (t CO2/yr), per-overpass wind + 3-term uncertainty + month-stratified background
+reliability_model.py           # does activity signal / wind alignment predict physics's own uncertainty?
+track_fusion_model.py          # self-consistency Track A/B fusion attempt (tested negative, kept for the record)
+
+pull_climate_trace.py          # benchmark vs. Climate TRACE (independent, not ground truth)
+pull_cea_ground_truth.py       # pull real ground-truth emissions (CEA CO2 Baseline Database)
+q_correction_model.py          # the actual Q-correcting model, validated against CEA ground truth
+
+diagnose_talcher.py / diagnose_negative_enhancement.py / diagnose_shrisingajimalwa.py   # targeted uncertainty/anomaly diagnoses
 summary_co2_figure.py          # cross-plant summary figure
 ```
 
-Results across the 4 processed plants (Vindhyachal, Sasan, Mundra, Tirora) are in `data/plant_results.json`. Note: 3 of 4 plants show a large mismatch between wind direction and the CO2-enhancement offset, so the enhancement signal should be treated as preliminary, not validated against ground truth.
-
-Emission-rate estimates (Week 6, `physics_gaussian.py`) are in `data/emission_estimates.json`: Vindhyachal 44.6 Mt/yr and Sasan 37.2 Mt/yr land in the physically expected range for large baseload coal plants, a sanity check on the method's magnitude. Tirora's estimate (3.2 Mt/yr) looks too low relative to its capacity, most likely due to thin OCO-3 coverage (5 hit-days / 671 soundings). Mundra is skipped entirely (only 57 soundings total). See `WEEK6_LOG.txt` for the full writeup, including a wind-speed bug found and fixed during this work.
+Full facility-level results are in `data/plant_results.json`, `data/emission_estimates.json`, `data/climate_trace_comparison.json`, `data/cea_ground_truth_2020_21.json`, and `data/q_correction_model_results.json`.
 
 ## Requirements
 
@@ -87,11 +91,58 @@ Every script that pulls satellite tiles calls `ee.Initialize(project="<your-proj
 
 OCO-3 sounding download additionally requires a NASA Earthdata login (`earthaccess.login(persist=True)`, used only by `process_plant.py`).
 
+## Testing
+
+A basic test suite exists (`tests/`, 22 stdlib-`unittest` tests, no extra dependency) covering the pipeline's most bug-prone deterministic logic — `physics_gaussian.py`'s IME math and month-stratification, `build_3channel.py`'s tile pairing, and `lofo_track_a.py`'s facility fold-splitting. Run with:
+
+```
+python -m unittest discover -s tests -v
+```
+
+Doesn't cover Earth Engine, OCO-3 downloads, or model training end-to-end — no CI configured to run these automatically. See `tests/README.md`.
+
 ## Known limitations
 
-* `physics_gaussian.py`'s emission-rate estimate described here (Week 6) used a single annual-mean wind speed — since replaced with per-overpass wind conditioning and a three-term uncertainty budget (see `NEXT_STEPS.md`). It is also now benchmarked against real reported plant-level emissions (India's CEA CO2 Baseline Database, not just Climate TRACE), not merely "order-of-magnitude" as originally caveated here — see `PROJECT_RESEARCH_DOCUMENTATION.md` §12.15 for the current accuracy numbers.
-* The plant detector's "mixed" accuracy (plants vs. all negatives including rural) is not directly comparable across weeks — only the "hard-only" number (plants vs. hard negatives, balanced) is tracked consistently and shown in `summary_figure.py`.
-* Dataset is small (600 tiles total per detector variant, ~240 in the balanced hard-only split), so accuracy differences within a few points should be treated as noisy.
+* Track A's exhaustive LOFO recall (69.1%) is still meaningfully below tile-level or single-split numbers you might see quoted elsewhere for similar work — treat any single-split facility-level recall figure with suspicion unless it comes from a full leave-one-facility-out evaluation, since this project's own experience shows a single split can differ from the true rate by up to 2×. Two facilities (Kudgi, ShriSingajiMalwa) are diagnosed as a genuine satellite-observability limit, not a training gap.
+* Track B's Q-correcting model (against real CEA ground truth) is still indicative, not production-validated: N=17, a single-feature linear correction, one fiscal year (FY2020-21) of ground-truth data compared against 2020-calendar-year Track B estimates (not an exact year match), and one CEA database version.
+* Climate TRACE and CEA ground-truth bracketing rates (35.3% and 47.1% respectively) measure different things and should not be conflated — Climate TRACE is itself a satellite-inferred estimator (independent benchmark, not ground truth); CEA is bottom-up from reported fuel consumption (genuine ground truth). Neither number supersedes the other.
+* No CI is configured; the test suite (above) must be run manually.
+* Scripts have historically been run under two different Python installations (a conda env at `/opt/miniconda3/envs/co2` with everything needed, and a separate macOS framework Python missing `earthaccess`/`xarray`/`geemap`) — use `requirements.txt` and the conda env to avoid import errors on `process_plant.py` or other OCO-3-touching scripts.
+
+## Original Week 2–7 walkthrough (historical record, superseded)
+
+<details>
+<summary>Expand for the project's original state as of Week 7 — kept for the record, not current. See the sections above for current numbers.</summary>
+
+### Weekly progress (plant detector track)
+
+Full details and numbers are in `WEEK2_LOG.txt` through `WEEK7_LOG.txt` (`WEEK6_LOG.txt` covers the CO2-enhancement track, not the detector).
+
+| Week | Input channels | Hard-negative test accuracy | Key finding |
+|---|---|---|---|
+| 2 | NO2 (Sentinel-5P) | 91.2% (easy negatives) | Baseline plant-vs-forest detector |
+| 3 | NO2 | 77.1% | Adding hard negatives (cities/steel/highways) reveals the detector is really a "concentrated combustion detector," not plant-specific |
+| 4 | NO2 + SO2 | 79.2% | SO2 fixes city false alarms (Delhi 0.43→0.11), but steel plants (Bhilai, Jamshedpur) remain confused since they also emit SO2 |
+| 5 | NO2 + SO2 + VIIRS (MaxFRP) | 79.2% (tied) | VIIRS thermal data measurably reduces false-alarm confidence on the two steel plants specifically (Bhilai 0.59→0.52, Jamshedpur 0.54→0.50), but highways become relatively more confusable, so overall accuracy doesn't move |
+| 7 | NO2 + SO2 + VIIRS, +5 more highway hard negatives | 81.2% | Expanding the highway hard-negative set from 5 to 10 (geographically spread, not clustered) drops both of Week 5's worst false alarms (hwy_AhmedabadVadodara 0.46→0.38, hwy_GTRoad_UP 0.44→0.34) — first accuracy improvement since Week 4 |
+
+This tile-level accuracy turned out to substantially overstate real generalization — see the current-state Track A section above.
+
+### Data sources originally used
+
+* **Sentinel-5P NO2** — `COPERNICUS/S5P/OFFL/L3_NO2` (via Google Earth Engine)
+* **Sentinel-5P SO2** — `COPERNICUS/S5P/OFFL/L3_SO2` (via Earth Engine)
+* **NASA VIIRS active-fire/thermal** — `NASA/VIIRS/002/VNP14A1`, `MaxFRP` band (via Earth Engine)
+* **OCO-3 XCO2 soundings** — `OCO3_L2_Lite_FP` v11r (via NASA `earthaccess`, CO2-enhancement track only)
+* **ERA5 wind** — `ECMWF/ERA5/DAILY` (wind-alignment sanity check, CO2-enhancement track only)
+
+All tiles originally covered the 2019–2020 window, for 5 Indian coal plants (`data/top5_plants.csv`), 5 rural/background points, and 20 hard-negative locations (cities, steel mills, highway corridors — `data/hard_negatives.csv`). Since expanded to 20 positive-class facilities at full 24-month depth — see the current-state sections above.
+
+### Original results (4 plants, Week 6)
+
+Results across the 4 originally-processed plants (Vindhyachal, Sasan, Mundra, Tirora) are in `data/plant_results.json` (now holds 20). Emission-rate estimates (Week 6, `physics_gaussian.py`) originally in `data/emission_estimates.json`: Vindhyachal 44.6 Mt/yr and Sasan 37.2 Mt/yr landed in the physically expected range for large baseload coal plants, a sanity check on the method's magnitude. Tirora's estimate (3.2 Mt/yr) looked too low relative to its capacity, most likely due to thin OCO-3 coverage (5 hit-days / 671 soundings). Mundra was skipped entirely (only 57 soundings total). See `WEEK6_LOG.txt` for the full original writeup, including a wind-speed bug found and fixed during that work — since further corrected (per-overpass wind, month-stratified background) and validated against real ground truth, per the current-state Track B section above.
+
+</details>
 
 ## Citation
 
