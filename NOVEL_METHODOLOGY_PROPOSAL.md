@@ -148,6 +148,20 @@ Full results: `data/plume_maps/spatial_consistency_results.json` (18 facilities)
 
 Full results: `data/plume_maps/day_matched_results.json`; per-day wind cache: `data/daily_wind/`.
 
+## 12.5 Strengthening the CEA correction model (Phase 5, DONE)
+
+`strengthen_q_correction_model.py` adds the statistical rigor `q_correction_model.py`'s original single-feature result (MAE 1.012→0.902, N=17) didn't yet have — a paper cannot claim this improvement is meaningful without answering: is it distinguishable from noise, is it driven by one facility, and does a second feature add anything.
+
+**1. Bootstrap CI on the improvement (1000 resamples, resampling facilities with replacement)**: mean improvement +0.111, **95% CI = [−0.287, +0.509] — includes zero.** At N=17, the improvement is **not statistically distinguishable from noise**, and this must be stated plainly rather than only quoting the point estimate.
+
+**2. Leave-one-facility-out sensitivity**: the improvement stays **positive in all 17/17** leave-one-out re-fits — no single facility is driving the result; it is a small but directionally consistent effect across every subset, just underpowered at this N rather than an outlier artifact. Reporting both facts together (not statistically significant, but not an artifact either) is the honest characterization.
+
+**3. Does a second feature help?** Yes, and by more than the first: `bg_std_ppm` + `n_soundings` reduces LOO MAE further to **0.846** (from 0.902); `+hit_days` (0.859) and `+activity_prob_mean` (0.894) also help; `+wind_co2_diff_deg` and `+capacity_mw` do not. This is a real lead — but per this project's own established caution against multi-feature models at small N (`reliability_model.py`'s docstring, `RESEARCH_PLAN.md` §8), it is reported here as an **indicative direction for more data to confirm, not a new recommended production model.**
+
+**Revised honest framing for the paper**: the CEA-ground-truth correction is a real, directionally consistent, physically interpretable effect (background noise predicts estimation error, which makes physical sense) — but at N=17 it should be presented with its confidence interval, not just its point estimate, and the 2-feature lead should be flagged as needing more facilities/years before being adopted, not claimed as a finished model. This is more defensible for a paper than the original unqualified "11% improvement" framing, and is consistent with how this project has handled every other small-N result (§7.4's original N=7 reliability-model caution, LOFO's exhaustive-vs-single-split lesson).
+
+Full results: `data/q_correction_model_strengthened_results.json`.
+
 ## 13. Next steps (not started)
 
 - **True per-overpass-time wind matching** (not daily-mean) — the one remaining untested hypothesis before concluding the plume-direction claim is unsupported by available data, not just by the two matching approaches tried so far. Requires sub-daily ERA5/reanalysis wind and extracting each sounding's exact overpass time from its `sounding_id`.

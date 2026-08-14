@@ -1,0 +1,52 @@
+{
+  "n_facilities": 17,
+  "baseline_mae": 1.0124220485764714,
+  "one_feature_corrected_mae": 0.9018608889250149,
+  "best_feature": "bg_std_ppm",
+  "bootstrap": {
+    "n_resamples": 1000,
+    "mean_improvement": 0.11071130332061237,
+    "ci_95_low": -0.28698668839166824,
+    "ci_95_high": 0.5092330773674668,
+    "distinguishable_from_noise": false
+  },
+  "lofo_sensitivity": {
+    "per_facility_improvement": {
+      "Anpara": 0.13972336570128163,
+      "ChandrapurCoal": 0.11381892909821478,
+      "Chhabra": 0.08724545486059654,
+      "Farakka": 0.17296546246764488,
+      "Kahalgaon": 0.04119341396268672,
+      "Koradi": 0.14365876465411231,
+      "Korba": 0.018303223382017952,
+      "Kudgi": 0.17210634456102714,
+      "Mouda": 0.1351613341309914,
+      "RGundem": 0.002017955374489455,
+      "Rihand": 0.16440196178654687,
+      "Sasan": 0.13201182688560786,
+      "ShriSingajiMalwa": 0.10696609487305186,
+      "Talcher": 0.058048498838519036,
+      "Tamnar": 0.07991749238239354,
+      "Tirora": 0.0701884769109129,
+      "Vindhyachal": 0.1344943716804723
+    },
+    "n_still_positive": 17,
+    "n_total": 17,
+    "robust_to_single_facility_removal": true
+  },
+  "two_feature_test": {
+    "results_by_second_feature": {
+      "activity_prob_mean": 0.8944399316114415,
+      "activity_prob_std": 0.8978612458499804,
+      "wind_co2_diff_deg": 0.9256432185027663,
+      "hit_days": 0.858830439079568,
+      "n_soundings": 0.8456694700538678,
+      "no2_peak_km": 0.9006678732031772,
+      "capacity_mw": 0.9487946745483963
+    },
+    "best_second_feature": "n_soundings",
+    "best_two_feature_mae": 0.8456694700538678,
+    "two_feature_helps": true
+  },
+  "caveat": "N=17, same facility set and ground-truth source as q_correction_model.py. Bootstrap CI resamples facilities, not the underlying physics -- it quantifies sampling uncertainty in the improvement estimate given this specific facility set, not a claim the model would generalize to unseen facilities (that would need its own LOFO-style test, not attempted here)."
+}
