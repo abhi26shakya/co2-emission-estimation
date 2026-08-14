@@ -1,10 +1,665 @@
 {
-  "prototype_facilities": [
+  "facility_list": [
+    "Anpara",
+    "ChandrapurCoal",
+    "Chhabra",
+    "Farakka",
+    "Kahalgaon",
+    "Koradi",
+    "Korba",
+    "Kudgi",
+    "Mouda",
+    "RGundem",
     "Rihand",
+    "Sasan",
+    "ShriSingajiMalwa",
     "Talcher",
-    "Anpara"
+    "TalwandiSabo",
+    "Tamnar",
+    "Tirora",
+    "Vindhyachal"
   ],
   "facilities": {
+    "Anpara": {
+      "inputs": {
+        "lat": 24.201,
+        "lon": 82.7891,
+        "Q_t_per_year": 31660051.120184448,
+        "Q_t_per_year_std": 21471037.029337596,
+        "wind_speed_ms": 1.2396297117448924,
+        "wind_deg_toward": 108.0,
+        "wind_from_deg": 288.0
+      },
+      "default_result": {
+        "peak_conc_kg_m3": 0.0029471101939365476,
+        "peak_downwind_dist_km": 1.5811388300841898,
+        "stability_class": "B",
+        "stack_height_m": 220.0
+      },
+      "ablation": [
+        {
+          "stability_class": "A",
+          "stack_height_m": 150.0,
+          "peak_conc_kg_m3": 0.0030935419546069326
+        },
+        {
+          "stability_class": "A",
+          "stack_height_m": 220.0,
+          "peak_conc_kg_m3": 0.0023736801466990773
+        },
+        {
+          "stability_class": "A",
+          "stack_height_m": 275.0,
+          "peak_conc_kg_m3": 0.0017968153541006397
+        },
+        {
+          "stability_class": "B",
+          "stack_height_m": 150.0,
+          "peak_conc_kg_m3": 0.0042230940556149555
+        },
+        {
+          "stability_class": "B",
+          "stack_height_m": 220.0,
+          "peak_conc_kg_m3": 0.0029471101939365476
+        },
+        {
+          "stability_class": "B",
+          "stack_height_m": 275.0,
+          "peak_conc_kg_m3": 0.002019153377805066
+        },
+        {
+          "stability_class": "C",
+          "stack_height_m": 150.0,
+          "peak_conc_kg_m3": 0.005718189024254986
+        },
+        {
+          "stability_class": "C",
+          "stack_height_m": 220.0,
+          "peak_conc_kg_m3": 0.0023090648394609335
+        },
+        {
+          "stability_class": "C",
+          "stack_height_m": 275.0,
+          "peak_conc_kg_m3": 0.0016316811079219943
+        }
+      ]
+    },
+    "ChandrapurCoal": {
+      "inputs": {
+        "lat": 20.0063,
+        "lon": 79.29,
+        "Q_t_per_year": 7106246.984691159,
+        "Q_t_per_year_std": 4108938.033814528,
+        "wind_speed_ms": 1.682468565089224,
+        "wind_deg_toward": 63.0,
+        "wind_from_deg": 243.0
+      },
+      "default_result": {
+        "peak_conc_kg_m3": 0.0004876430911562366,
+        "peak_downwind_dist_km": 1.118033988749895,
+        "stability_class": "B",
+        "stack_height_m": 220.0
+      },
+      "ablation": [
+        {
+          "stability_class": "A",
+          "stack_height_m": 150.0,
+          "peak_conc_kg_m3": 0.0006522336682054377
+        },
+        {
+          "stability_class": "A",
+          "stack_height_m": 220.0,
+          "peak_conc_kg_m3": 0.0005034014476287594
+        },
+        {
+          "stability_class": "A",
+          "stack_height_m": 275.0,
+          "peak_conc_kg_m3": 0.000383416654511065
+        },
+        {
+          "stability_class": "B",
+          "stack_height_m": 150.0,
+          "peak_conc_kg_m3": 0.0010013152588466403
+        },
+        {
+          "stability_class": "B",
+          "stack_height_m": 220.0,
+          "peak_conc_kg_m3": 0.0004876430911562366
+        },
+        {
+          "stability_class": "B",
+          "stack_height_m": 275.0,
+          "peak_conc_kg_m3": 0.0002901477233117628
+        },
+        {
+          "stability_class": "C",
+          "stack_height_m": 150.0,
+          "peak_conc_kg_m3": 0.0008067224512299189
+        },
+        {
+          "stability_class": "C",
+          "stack_height_m": 220.0,
+          "peak_conc_kg_m3": 0.00043031735191194825
+        },
+        {
+          "stability_class": "C",
+          "stack_height_m": 275.0,
+          "peak_conc_kg_m3": 0.0002666339560109559
+        }
+      ]
+    },
+    "Chhabra": {
+      "inputs": {
+        "lat": 24.6217,
+        "lon": 77.0357,
+        "Q_t_per_year": 1010757.2865149596,
+        "Q_t_per_year_std": 624682.8562314494,
+        "wind_speed_ms": 1.7668023133069262,
+        "wind_deg_toward": 128.0,
+        "wind_from_deg": 308.0
+      },
+      "default_result": {
+        "peak_conc_kg_m3": 5.272179391002789e-05,
+        "peak_downwind_dist_km": 1.8027756377319946,
+        "stability_class": "B",
+        "stack_height_m": 220.0
+      },
+      "ablation": [
+        {
+          "stability_class": "A",
+          "stack_height_m": 150.0,
+          "peak_conc_kg_m3": 0.00013180985231235433
+        },
+        {
+          "stability_class": "A",
+          "stack_height_m": 220.0,
+          "peak_conc_kg_m3": 6.831290058512257e-05
+        },
+        {
+          "stability_class": "A",
+          "stack_height_m": 275.0,
+          "peak_conc_kg_m3": 3.6858770754232815e-05
+        },
+        {
+          "stability_class": "B",
+          "stack_height_m": 150.0,
+          "peak_conc_kg_m3": 9.436014173687014e-05
+        },
+        {
+          "stability_class": "B",
+          "stack_height_m": 220.0,
+          "peak_conc_kg_m3": 5.272179391002789e-05
+        },
+        {
+          "stability_class": "B",
+          "stack_height_m": 275.0,
+          "peak_conc_kg_m3": 3.935060947180222e-05
+        },
+        {
+          "stability_class": "C",
+          "stack_height_m": 150.0,
+          "peak_conc_kg_m3": 9.306221520840887e-05
+        },
+        {
+          "stability_class": "C",
+          "stack_height_m": 220.0,
+          "peak_conc_kg_m3": 5.686012000122768e-05
+        },
+        {
+          "stability_class": "C",
+          "stack_height_m": 275.0,
+          "peak_conc_kg_m3": 3.633391735976434e-05
+        }
+      ]
+    },
+    "Farakka": {
+      "inputs": {
+        "lat": 24.772,
+        "lon": 87.894,
+        "Q_t_per_year": 11105118.959295532,
+        "Q_t_per_year_std": 6054577.747940437,
+        "wind_speed_ms": 2.4972351725371125,
+        "wind_deg_toward": 284.0,
+        "wind_from_deg": 104.0
+      },
+      "default_result": {
+        "peak_conc_kg_m3": 0.0004492523169123342,
+        "peak_downwind_dist_km": 1.5811388300841898,
+        "stability_class": "B",
+        "stack_height_m": 220.0
+      },
+      "ablation": [
+        {
+          "stability_class": "A",
+          "stack_height_m": 150.0,
+          "peak_conc_kg_m3": 0.0006851844113079095
+        },
+        {
+          "stability_class": "A",
+          "stack_height_m": 220.0,
+          "peak_conc_kg_m3": 0.00032220457042124066
+        },
+        {
+          "stability_class": "A",
+          "stack_height_m": 275.0,
+          "peak_conc_kg_m3": 0.0002809685666790509
+        },
+        {
+          "stability_class": "B",
+          "stack_height_m": 150.0,
+          "peak_conc_kg_m3": 0.0006451422280174361
+        },
+        {
+          "stability_class": "B",
+          "stack_height_m": 220.0,
+          "peak_conc_kg_m3": 0.0004492523169123342
+        },
+        {
+          "stability_class": "B",
+          "stack_height_m": 275.0,
+          "peak_conc_kg_m3": 0.0003256756561086301
+        },
+        {
+          "stability_class": "C",
+          "stack_height_m": 150.0,
+          "peak_conc_kg_m3": 0.0008733872647663959
+        },
+        {
+          "stability_class": "C",
+          "stack_height_m": 220.0,
+          "peak_conc_kg_m3": 0.0004458460072863379
+        },
+        {
+          "stability_class": "C",
+          "stack_height_m": 275.0,
+          "peak_conc_kg_m3": 0.00025634712845616446
+        }
+      ]
+    },
+    "Kahalgaon": {
+      "inputs": {
+        "lat": 25.2349,
+        "lon": 87.2635,
+        "Q_t_per_year": 29654782.819959152,
+        "Q_t_per_year_std": 15267092.104217306,
+        "wind_speed_ms": 2.0379361341750117,
+        "wind_deg_toward": 301.0,
+        "wind_from_deg": 121.0
+      },
+      "default_result": {
+        "peak_conc_kg_m3": 0.001472922289620374,
+        "peak_downwind_dist_km": 1.118033988749895,
+        "stability_class": "B",
+        "stack_height_m": 220.0
+      },
+      "ablation": [
+        {
+          "stability_class": "A",
+          "stack_height_m": 150.0,
+          "peak_conc_kg_m3": 0.0021078387344520004
+        },
+        {
+          "stability_class": "A",
+          "stack_height_m": 220.0,
+          "peak_conc_kg_m3": 0.0016243457527788001
+        },
+        {
+          "stability_class": "A",
+          "stack_height_m": 275.0,
+          "peak_conc_kg_m3": 0.0012351808679183127
+        },
+        {
+          "stability_class": "B",
+          "stack_height_m": 150.0,
+          "peak_conc_kg_m3": 0.003037456889335336
+        },
+        {
+          "stability_class": "B",
+          "stack_height_m": 220.0,
+          "peak_conc_kg_m3": 0.001472922289620374
+        },
+        {
+          "stability_class": "B",
+          "stack_height_m": 275.0,
+          "peak_conc_kg_m3": 0.0010837067704310044
+        },
+        {
+          "stability_class": "C",
+          "stack_height_m": 150.0,
+          "peak_conc_kg_m3": 0.0028011618731304698
+        },
+        {
+          "stability_class": "C",
+          "stack_height_m": 220.0,
+          "peak_conc_kg_m3": 0.0013883407583209755
+        },
+        {
+          "stability_class": "C",
+          "stack_height_m": 275.0,
+          "peak_conc_kg_m3": 0.0009342339836461551
+        }
+      ]
+    },
+    "Koradi": {
+      "inputs": {
+        "lat": 21.2414,
+        "lon": 79.096,
+        "Q_t_per_year": 10856286.293151114,
+        "Q_t_per_year_std": 4471038.315862282,
+        "wind_speed_ms": 1.409156338265129,
+        "wind_deg_toward": 143.0,
+        "wind_from_deg": 323.0
+      },
+      "default_result": {
+        "peak_conc_kg_m3": 0.0007484600839807373,
+        "peak_downwind_dist_km": 1.8027756377319946,
+        "stability_class": "B",
+        "stack_height_m": 220.0
+      },
+      "ablation": [
+        {
+          "stability_class": "A",
+          "stack_height_m": 150.0,
+          "peak_conc_kg_m3": 0.0016888711857449635
+        },
+        {
+          "stability_class": "A",
+          "stack_height_m": 220.0,
+          "peak_conc_kg_m3": 0.0008726428840228886
+        },
+        {
+          "stability_class": "A",
+          "stack_height_m": 275.0,
+          "peak_conc_kg_m3": 0.0004776030238773303
+        },
+        {
+          "stability_class": "B",
+          "stack_height_m": 150.0,
+          "peak_conc_kg_m3": 0.0011492777698895009
+        },
+        {
+          "stability_class": "B",
+          "stack_height_m": 220.0,
+          "peak_conc_kg_m3": 0.0007484600839807373
+        },
+        {
+          "stability_class": "B",
+          "stack_height_m": 275.0,
+          "peak_conc_kg_m3": 0.0005590168557057019
+        },
+        {
+          "stability_class": "C",
+          "stack_height_m": 150.0,
+          "peak_conc_kg_m3": 0.0014034805761537104
+        },
+        {
+          "stability_class": "C",
+          "stack_height_m": 220.0,
+          "peak_conc_kg_m3": 0.000781026761841759
+        },
+        {
+          "stability_class": "C",
+          "stack_height_m": 275.0,
+          "peak_conc_kg_m3": 0.0004708156336518501
+        }
+      ]
+    },
+    "Korba": {
+      "inputs": {
+        "lat": 22.3881,
+        "lon": 82.6858,
+        "Q_t_per_year": 4202731.445047892,
+        "Q_t_per_year_std": 2341166.985563346,
+        "wind_speed_ms": 1.3126873140018682,
+        "wind_deg_toward": 133.0,
+        "wind_from_deg": 313.0
+      },
+      "default_result": {
+        "peak_conc_kg_m3": 0.00037769368697014653,
+        "peak_downwind_dist_km": 1.4142135623730951,
+        "stability_class": "B",
+        "stack_height_m": 220.0
+      },
+      "ablation": [
+        {
+          "stability_class": "A",
+          "stack_height_m": 150.0,
+          "peak_conc_kg_m3": 0.0008548728012804659
+        },
+        {
+          "stability_class": "A",
+          "stack_height_m": 220.0,
+          "peak_conc_kg_m3": 0.0004470467105350213
+        },
+        {
+          "stability_class": "A",
+          "stack_height_m": 275.0,
+          "peak_conc_kg_m3": 0.0002412128165730558
+        },
+        {
+          "stability_class": "B",
+          "stack_height_m": 150.0,
+          "peak_conc_kg_m3": 0.0007112328338487621
+        },
+        {
+          "stability_class": "B",
+          "stack_height_m": 220.0,
+          "peak_conc_kg_m3": 0.00037769368697014653
+        },
+        {
+          "stability_class": "B",
+          "stack_height_m": 275.0,
+          "peak_conc_kg_m3": 0.0002352975491244669
+        },
+        {
+          "stability_class": "C",
+          "stack_height_m": 150.0,
+          "peak_conc_kg_m3": 0.0006792340317327309
+        },
+        {
+          "stability_class": "C",
+          "stack_height_m": 220.0,
+          "peak_conc_kg_m3": 0.0003047462232101512
+        },
+        {
+          "stability_class": "C",
+          "stack_height_m": 275.0,
+          "peak_conc_kg_m3": 0.0001918607514023285
+        }
+      ]
+    },
+    "Kudgi": {
+      "inputs": {
+        "lat": 16.4994,
+        "lon": 75.8349,
+        "Q_t_per_year": 4718025.907087494,
+        "Q_t_per_year_std": 2528359.4793015416,
+        "wind_speed_ms": 3.2513283652972476,
+        "wind_deg_toward": 53.0,
+        "wind_from_deg": 233.0
+      },
+      "default_result": {
+        "peak_conc_kg_m3": 0.00014097627241603614,
+        "peak_downwind_dist_km": 1.8027756377319946,
+        "stability_class": "B",
+        "stack_height_m": 220.0
+      },
+      "ablation": [
+        {
+          "stability_class": "A",
+          "stack_height_m": 150.0,
+          "peak_conc_kg_m3": 0.00031810749758473734
+        },
+        {
+          "stability_class": "A",
+          "stack_height_m": 220.0,
+          "peak_conc_kg_m3": 0.00016436673587938685
+        },
+        {
+          "stability_class": "A",
+          "stack_height_m": 275.0,
+          "peak_conc_kg_m3": 8.99589643348116e-05
+        },
+        {
+          "stability_class": "B",
+          "stack_height_m": 150.0,
+          "peak_conc_kg_m3": 0.00021647232689807046
+        },
+        {
+          "stability_class": "B",
+          "stack_height_m": 220.0,
+          "peak_conc_kg_m3": 0.00014097627241603614
+        },
+        {
+          "stability_class": "B",
+          "stack_height_m": 275.0,
+          "peak_conc_kg_m3": 0.00010529367460182587
+        },
+        {
+          "stability_class": "C",
+          "stack_height_m": 150.0,
+          "peak_conc_kg_m3": 0.00026435272136643906
+        },
+        {
+          "stability_class": "C",
+          "stack_height_m": 220.0,
+          "peak_conc_kg_m3": 0.0001471103722138533
+        },
+        {
+          "stability_class": "C",
+          "stack_height_m": 275.0,
+          "peak_conc_kg_m3": 8.868052478419109e-05
+        }
+      ]
+    },
+    "Mouda": {
+      "inputs": {
+        "lat": 21.1797,
+        "lon": 79.3978,
+        "Q_t_per_year": 10258309.683101472,
+        "Q_t_per_year_std": 4327398.939937261,
+        "wind_speed_ms": 1.5407140742620786,
+        "wind_deg_toward": 145.0,
+        "wind_from_deg": 325.0
+      },
+      "default_result": {
+        "peak_conc_kg_m3": 0.0006894455904283975,
+        "peak_downwind_dist_km": 1.8027756377319946,
+        "stability_class": "B",
+        "stack_height_m": 220.0
+      },
+      "ablation": [
+        {
+          "stability_class": "A",
+          "stack_height_m": 150.0,
+          "peak_conc_kg_m3": 0.0012935972163256497
+        },
+        {
+          "stability_class": "A",
+          "stack_height_m": 220.0,
+          "peak_conc_kg_m3": 0.000663514429911813
+        },
+        {
+          "stability_class": "A",
+          "stack_height_m": 275.0,
+          "peak_conc_kg_m3": 0.0004720974141209291
+        },
+        {
+          "stability_class": "B",
+          "stack_height_m": 150.0,
+          "peak_conc_kg_m3": 0.0009882164590810216
+        },
+        {
+          "stability_class": "B",
+          "stack_height_m": 220.0,
+          "peak_conc_kg_m3": 0.0006894455904283975
+        },
+        {
+          "stability_class": "B",
+          "stack_height_m": 275.0,
+          "peak_conc_kg_m3": 0.0005153623829979855
+        },
+        {
+          "stability_class": "C",
+          "stack_height_m": 150.0,
+          "peak_conc_kg_m3": 0.0013908409066862
+        },
+        {
+          "stability_class": "C",
+          "stack_height_m": 220.0,
+          "peak_conc_kg_m3": 0.0006390819501732271
+        },
+        {
+          "stability_class": "C",
+          "stack_height_m": 275.0,
+          "peak_conc_kg_m3": 0.0003993078962880547
+        }
+      ]
+    },
+    "RGundem": {
+      "inputs": {
+        "lat": 18.7572,
+        "lon": 79.456,
+        "Q_t_per_year": 1948492.685083411,
+        "Q_t_per_year_std": 1199189.9963528092,
+        "wind_speed_ms": 1.6942949621317267,
+        "wind_deg_toward": 14.0,
+        "wind_from_deg": 194.0
+      },
+      "default_result": {
+        "peak_conc_kg_m3": 0.00011618132198034669,
+        "peak_downwind_dist_km": 1.5811388300841898,
+        "stability_class": "B",
+        "stack_height_m": 220.0
+      },
+      "ablation": [
+        {
+          "stability_class": "A",
+          "stack_height_m": 150.0,
+          "peak_conc_kg_m3": 0.00017719581560135308
+        },
+        {
+          "stability_class": "A",
+          "stack_height_m": 220.0,
+          "peak_conc_kg_m3": 8.332545327073794e-05
+        },
+        {
+          "stability_class": "A",
+          "stack_height_m": 275.0,
+          "peak_conc_kg_m3": 7.266139379324613e-05
+        },
+        {
+          "stability_class": "B",
+          "stack_height_m": 150.0,
+          "peak_conc_kg_m3": 0.00016684049051000931
+        },
+        {
+          "stability_class": "B",
+          "stack_height_m": 220.0,
+          "peak_conc_kg_m3": 0.00011618132198034669
+        },
+        {
+          "stability_class": "B",
+          "stack_height_m": 275.0,
+          "peak_conc_kg_m3": 8.422311213344485e-05
+        },
+        {
+          "stability_class": "C",
+          "stack_height_m": 150.0,
+          "peak_conc_kg_m3": 0.0002258670310678883
+        },
+        {
+          "stability_class": "C",
+          "stack_height_m": 220.0,
+          "peak_conc_kg_m3": 0.00011530041488087404
+        },
+        {
+          "stability_class": "C",
+          "stack_height_m": 275.0,
+          "peak_conc_kg_m3": 6.629403377281782e-05
+        }
+      ]
+    },
     "Rihand": {
       "inputs": {
         "lat": 24.027,
@@ -66,6 +721,134 @@
           "stability_class": "C",
           "stack_height_m": 275.0,
           "peak_conc_kg_m3": 0.0023878967985602505
+        }
+      ]
+    },
+    "Sasan": {
+      "inputs": {
+        "lat": 23.98,
+        "lon": 82.62,
+        "Q_t_per_year": 39278810.20737811,
+        "Q_t_per_year_std": 17689788.237759978,
+        "wind_speed_ms": 1.3165179253167092,
+        "wind_deg_toward": 106.0,
+        "wind_from_deg": 286.0
+      },
+      "default_result": {
+        "peak_conc_kg_m3": 0.003310822525864895,
+        "peak_downwind_dist_km": 1.5811388300841898,
+        "stability_class": "B",
+        "stack_height_m": 220.0
+      },
+      "ablation": [
+        {
+          "stability_class": "A",
+          "stack_height_m": 150.0,
+          "peak_conc_kg_m3": 0.0036856539293728488
+        },
+        {
+          "stability_class": "A",
+          "stack_height_m": 220.0,
+          "peak_conc_kg_m3": 0.002427552131256136
+        },
+        {
+          "stability_class": "A",
+          "stack_height_m": 275.0,
+          "peak_conc_kg_m3": 0.0019774568100449745
+        },
+        {
+          "stability_class": "B",
+          "stack_height_m": 150.0,
+          "peak_conc_kg_m3": 0.004747268235504572
+        },
+        {
+          "stability_class": "B",
+          "stack_height_m": 220.0,
+          "peak_conc_kg_m3": 0.003310822525864895
+        },
+        {
+          "stability_class": "B",
+          "stack_height_m": 275.0,
+          "peak_conc_kg_m3": 0.0022668425422995332
+        },
+        {
+          "stability_class": "C",
+          "stack_height_m": 150.0,
+          "peak_conc_kg_m3": 0.006144124149052288
+        },
+        {
+          "stability_class": "C",
+          "stack_height_m": 220.0,
+          "peak_conc_kg_m3": 0.0028204598770536766
+        },
+        {
+          "stability_class": "C",
+          "stack_height_m": 275.0,
+          "peak_conc_kg_m3": 0.0018348537790531065
+        }
+      ]
+    },
+    "ShriSingajiMalwa": {
+      "inputs": {
+        "lat": 22.0971,
+        "lon": 76.5317,
+        "Q_t_per_year": 3528645.9180780356,
+        "Q_t_per_year_std": 1825512.0158410985,
+        "wind_speed_ms": 2.162146357563672,
+        "wind_deg_toward": 121.0,
+        "wind_from_deg": 301.0
+      },
+      "default_result": {
+        "peak_conc_kg_m3": 0.00016519566602064744,
+        "peak_downwind_dist_km": 1.118033988749895,
+        "stability_class": "B",
+        "stack_height_m": 220.0
+      },
+      "ablation": [
+        {
+          "stability_class": "A",
+          "stack_height_m": 150.0,
+          "peak_conc_kg_m3": 0.00023640474861145734
+        },
+        {
+          "stability_class": "A",
+          "stack_height_m": 220.0,
+          "peak_conc_kg_m3": 0.00018217857138088623
+        },
+        {
+          "stability_class": "A",
+          "stack_height_m": 275.0,
+          "peak_conc_kg_m3": 0.00013853176611531705
+        },
+        {
+          "stability_class": "B",
+          "stack_height_m": 150.0,
+          "peak_conc_kg_m3": 0.0003406661148240757
+        },
+        {
+          "stability_class": "B",
+          "stack_height_m": 220.0,
+          "peak_conc_kg_m3": 0.00016519566602064744
+        },
+        {
+          "stability_class": "B",
+          "stack_height_m": 275.0,
+          "peak_conc_kg_m3": 0.00012154318185963184
+        },
+        {
+          "stability_class": "C",
+          "stack_height_m": 150.0,
+          "peak_conc_kg_m3": 0.0003141644365927116
+        },
+        {
+          "stability_class": "C",
+          "stack_height_m": 220.0,
+          "peak_conc_kg_m3": 0.00015570942055168126
+        },
+        {
+          "stability_class": "C",
+          "stack_height_m": 275.0,
+          "peak_conc_kg_m3": 0.00010477905469631126
         }
       ]
     },
@@ -133,18 +916,210 @@
         }
       ]
     },
-    "Anpara": {
+    "TalwandiSabo": {
       "inputs": {
-        "lat": 24.201,
-        "lon": 82.7891,
-        "Q_t_per_year": 31660051.120184448,
-        "Q_t_per_year_std": 21471037.029337596,
-        "wind_speed_ms": 1.2396297117448924,
-        "wind_deg_toward": 108.0,
-        "wind_from_deg": 288.0
+        "lat": 29.924,
+        "lon": 75.2372,
+        "Q_t_per_year": 1509508.367099197,
+        "Q_t_per_year_std": 960821.6847505871,
+        "wind_speed_ms": 1.9411532317702138,
+        "wind_deg_toward": 215.0,
+        "wind_from_deg": 35.0
       },
       "default_result": {
-        "peak_conc_kg_m3": 0.0029471101939365476,
+        "peak_conc_kg_m3": 8.052337100866673e-05,
+        "peak_downwind_dist_km": 1.8027756377319946,
+        "stability_class": "B",
+        "stack_height_m": 220.0
+      },
+      "ablation": [
+        {
+          "stability_class": "A",
+          "stack_height_m": 150.0,
+          "peak_conc_kg_m3": 0.0001510848862217606
+        },
+        {
+          "stability_class": "A",
+          "stack_height_m": 220.0,
+          "peak_conc_kg_m3": 7.749475716596351e-05
+        },
+        {
+          "stability_class": "A",
+          "stack_height_m": 275.0,
+          "peak_conc_kg_m3": 5.513832528230485e-05
+        },
+        {
+          "stability_class": "B",
+          "stack_height_m": 150.0,
+          "peak_conc_kg_m3": 0.00011541812969172372
+        },
+        {
+          "stability_class": "B",
+          "stack_height_m": 220.0,
+          "peak_conc_kg_m3": 8.052337100866673e-05
+        },
+        {
+          "stability_class": "B",
+          "stack_height_m": 275.0,
+          "peak_conc_kg_m3": 6.019143054388313e-05
+        },
+        {
+          "stability_class": "C",
+          "stack_height_m": 150.0,
+          "peak_conc_kg_m3": 0.00016244240284941602
+        },
+        {
+          "stability_class": "C",
+          "stack_height_m": 220.0,
+          "peak_conc_kg_m3": 7.464118081713308e-05
+        },
+        {
+          "stability_class": "C",
+          "stack_height_m": 275.0,
+          "peak_conc_kg_m3": 4.66369185993547e-05
+        }
+      ]
+    },
+    "Tamnar": {
+      "inputs": {
+        "lat": 22.0987,
+        "lon": 83.4513,
+        "Q_t_per_year": 3223070.645572659,
+        "Q_t_per_year_std": 1815185.1901807499,
+        "wind_speed_ms": 1.2260411484611253,
+        "wind_deg_toward": 121.0,
+        "wind_from_deg": 301.0
+      },
+      "default_result": {
+        "peak_conc_kg_m3": 0.00026609727975573065,
+        "peak_downwind_dist_km": 1.118033988749895,
+        "stability_class": "B",
+        "stack_height_m": 220.0
+      },
+      "ablation": [
+        {
+          "stability_class": "A",
+          "stack_height_m": 150.0,
+          "peak_conc_kg_m3": 0.000380800913499653
+        },
+        {
+          "stability_class": "A",
+          "stack_height_m": 220.0,
+          "peak_conc_kg_m3": 0.00029345335408605675
+        },
+        {
+          "stability_class": "A",
+          "stack_height_m": 275.0,
+          "peak_conc_kg_m3": 0.0002231470534973693
+        },
+        {
+          "stability_class": "B",
+          "stack_height_m": 150.0,
+          "peak_conc_kg_m3": 0.0005487451858955534
+        },
+        {
+          "stability_class": "B",
+          "stack_height_m": 220.0,
+          "peak_conc_kg_m3": 0.00026609727975573065
+        },
+        {
+          "stability_class": "B",
+          "stack_height_m": 275.0,
+          "peak_conc_kg_m3": 0.00019578183159878844
+        },
+        {
+          "stability_class": "C",
+          "stack_height_m": 150.0,
+          "peak_conc_kg_m3": 0.0005060562664087293
+        },
+        {
+          "stability_class": "C",
+          "stack_height_m": 220.0,
+          "peak_conc_kg_m3": 0.00025081682975850415
+        },
+        {
+          "stability_class": "C",
+          "stack_height_m": 275.0,
+          "peak_conc_kg_m3": 0.0001687781653217252
+        }
+      ]
+    },
+    "Tirora": {
+      "inputs": {
+        "lat": 21.41,
+        "lon": 79.94,
+        "Q_t_per_year": 337852.0873580591,
+        "Q_t_per_year_std": 271053.7303612373,
+        "wind_speed_ms": 1.453962255062782,
+        "wind_deg_toward": 132.0,
+        "wind_from_deg": 312.0
+      },
+      "default_result": {
+        "peak_conc_kg_m3": 2.649996121563003e-05,
+        "peak_downwind_dist_km": 1.4142135623730951,
+        "stability_class": "B",
+        "stack_height_m": 220.0
+      },
+      "ablation": [
+        {
+          "stability_class": "A",
+          "stack_height_m": 150.0,
+          "peak_conc_kg_m3": 6.104465126341289e-05
+        },
+        {
+          "stability_class": "A",
+          "stack_height_m": 220.0,
+          "peak_conc_kg_m3": 3.18911064675512e-05
+        },
+        {
+          "stability_class": "A",
+          "stack_height_m": 275.0,
+          "peak_conc_kg_m3": 1.7207310928960943e-05
+        },
+        {
+          "stability_class": "B",
+          "stack_height_m": 150.0,
+          "peak_conc_kg_m3": 4.9953051420666384e-05
+        },
+        {
+          "stability_class": "B",
+          "stack_height_m": 220.0,
+          "peak_conc_kg_m3": 2.649996121563003e-05
+        },
+        {
+          "stability_class": "B",
+          "stack_height_m": 275.0,
+          "peak_conc_kg_m3": 1.6497169709482088e-05
+        },
+        {
+          "stability_class": "C",
+          "stack_height_m": 150.0,
+          "peak_conc_kg_m3": 4.5865749247823955e-05
+        },
+        {
+          "stability_class": "C",
+          "stack_height_m": 220.0,
+          "peak_conc_kg_m3": 2.0485282817895308e-05
+        },
+        {
+          "stability_class": "C",
+          "stack_height_m": 275.0,
+          "peak_conc_kg_m3": 1.2840587843681458e-05
+        }
+      ]
+    },
+    "Vindhyachal": {
+      "inputs": {
+        "lat": 24.1,
+        "lon": 82.67,
+        "Q_t_per_year": 36738050.02086989,
+        "Q_t_per_year_std": 21935562.6491217,
+        "wind_speed_ms": 1.2522109728959634,
+        "wind_deg_toward": 110.0,
+        "wind_from_deg": 290.0
+      },
+      "default_result": {
+        "peak_conc_kg_m3": 0.003333775648300316,
         "peak_downwind_dist_km": 1.5811388300841898,
         "stability_class": "B",
         "stack_height_m": 220.0
@@ -153,47 +1128,47 @@
         {
           "stability_class": "A",
           "stack_height_m": 150.0,
-          "peak_conc_kg_m3": 0.0030935419546069326
+          "peak_conc_kg_m3": 0.0039325223811757055
         },
         {
           "stability_class": "A",
           "stack_height_m": 220.0,
-          "peak_conc_kg_m3": 0.0023736801466990773
+          "peak_conc_kg_m3": 0.003024817188437332
         },
         {
           "stability_class": "A",
           "stack_height_m": 275.0,
-          "peak_conc_kg_m3": 0.0017968153541006397
+          "peak_conc_kg_m3": 0.0022956012044041967
         },
         {
           "stability_class": "B",
           "stack_height_m": 150.0,
-          "peak_conc_kg_m3": 0.0042230940556149555
+          "peak_conc_kg_m3": 0.005248103541125985
         },
         {
           "stability_class": "B",
           "stack_height_m": 220.0,
-          "peak_conc_kg_m3": 0.0029471101939365476
+          "peak_conc_kg_m3": 0.003333775648300316
         },
         {
           "stability_class": "B",
           "stack_height_m": 275.0,
-          "peak_conc_kg_m3": 0.002019153377805066
+          "peak_conc_kg_m3": 0.0022834745786434367
         },
         {
           "stability_class": "C",
           "stack_height_m": 150.0,
-          "peak_conc_kg_m3": 0.005718189024254986
+          "peak_conc_kg_m3": 0.006356066304358691
         },
         {
           "stability_class": "C",
           "stack_height_m": 220.0,
-          "peak_conc_kg_m3": 0.0023090648394609335
+          "peak_conc_kg_m3": 0.0027609498227059983
         },
         {
           "stability_class": "C",
           "stack_height_m": 275.0,
-          "peak_conc_kg_m3": 0.0016316811079219943
+          "peak_conc_kg_m3": 0.0018055250577859653
         }
       ]
     }

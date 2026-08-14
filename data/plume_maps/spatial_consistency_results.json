@@ -1,12 +1,191 @@
 {
-  "prototype_facilities": [
+  "facility_list": [
+    "Anpara",
+    "ChandrapurCoal",
+    "Chhabra",
+    "Farakka",
+    "Kahalgaon",
+    "Koradi",
+    "Korba",
+    "Kudgi",
+    "Mouda",
+    "RGundem",
     "Rihand",
+    "Sasan",
+    "ShriSingajiMalwa",
     "Talcher",
-    "Anpara"
+    "TalwandiSabo",
+    "Tamnar",
+    "Tirora",
+    "Vindhyachal"
   ],
   "extent_km": 30.0,
   "sector_half_width_deg": 45.0,
   "results": {
+    "Anpara": {
+      "n_within_extent": 1710,
+      "bg_mean_ppm": 413.3420715332031,
+      "wind_from_deg": 288.0,
+      "plume_travel_deg": 108.0,
+      "pearson_r_predicted_vs_observed": 0.07834124444238293,
+      "sector_test": {
+        "n_in_sector": 272,
+        "n_out_sector": 1438,
+        "mean_excess_in_sector_ppm": 2.880908966064453,
+        "mean_excess_out_sector_ppm": 1.029917597770691,
+        "diff_ppm": 1.8509913682937622,
+        "se_ppm": 0.17458427706697277,
+        "z_score": 10.602279881043916,
+        "in_sector_significantly_higher": true
+      }
+    },
+    "ChandrapurCoal": {
+      "n_within_extent": 122,
+      "bg_mean_ppm": 413.0535888671875,
+      "wind_from_deg": 243.0,
+      "plume_travel_deg": 63.0,
+      "pearson_r_predicted_vs_observed": -0.20281481920262595,
+      "sector_test": {
+        "n_in_sector": 78,
+        "n_out_sector": 44,
+        "mean_excess_in_sector_ppm": -0.7363003492355347,
+        "mean_excess_out_sector_ppm": 2.3498029708862305,
+        "diff_ppm": -3.0861034393310547,
+        "se_ppm": 0.36041933088479766,
+        "z_score": -8.562535843332663,
+        "in_sector_significantly_higher": false
+      }
+    },
+    "Chhabra": {
+      "n_within_extent": 118,
+      "bg_mean_ppm": 413.4858703613281,
+      "wind_from_deg": 308.0,
+      "plume_travel_deg": 128.0,
+      "pearson_r_predicted_vs_observed": NaN,
+      "sector_test": {
+        "skipped": true,
+        "reason": "too few soundings in one of the two sectors"
+      }
+    },
+    "Farakka": {
+      "n_within_extent": 492,
+      "bg_mean_ppm": 412.75531005859375,
+      "wind_from_deg": 104.0,
+      "plume_travel_deg": 284.0,
+      "pearson_r_predicted_vs_observed": 0.07771313867628694,
+      "sector_test": {
+        "n_in_sector": 291,
+        "n_out_sector": 201,
+        "mean_excess_in_sector_ppm": 0.8567219376564026,
+        "mean_excess_out_sector_ppm": 0.4815922975540161,
+        "diff_ppm": 0.3751296401023865,
+        "se_ppm": 0.12010378790286601,
+        "z_score": 3.123378926281432,
+        "in_sector_significantly_higher": true
+      }
+    },
+    "Kahalgaon": {
+      "n_within_extent": 117,
+      "bg_mean_ppm": 413.30255126953125,
+      "wind_from_deg": 121.0,
+      "plume_travel_deg": 301.0,
+      "pearson_r_predicted_vs_observed": -0.15061866026973325,
+      "sector_test": {
+        "n_in_sector": 5,
+        "n_out_sector": 112,
+        "mean_excess_in_sector_ppm": -4.416979789733887,
+        "mean_excess_out_sector_ppm": 2.292681932449341,
+        "diff_ppm": -6.709661483764648,
+        "se_ppm": 0.5379095085338805,
+        "z_score": -12.473587801138557,
+        "in_sector_significantly_higher": false
+      }
+    },
+    "Koradi": {
+      "n_within_extent": 700,
+      "bg_mean_ppm": 412.38165283203125,
+      "wind_from_deg": 323.0,
+      "plume_travel_deg": 143.0,
+      "pearson_r_predicted_vs_observed": 0.010773946550769643,
+      "sector_test": {
+        "n_in_sector": 257,
+        "n_out_sector": 443,
+        "mean_excess_in_sector_ppm": -0.204338937997818,
+        "mean_excess_out_sector_ppm": -0.19055306911468506,
+        "diff_ppm": -0.013785868883132935,
+        "se_ppm": 0.11882306981622352,
+        "z_score": -0.11602013737277371,
+        "in_sector_significantly_higher": false
+      }
+    },
+    "Korba": {
+      "n_within_extent": 96,
+      "bg_mean_ppm": 410.849609375,
+      "wind_from_deg": 313.0,
+      "plume_travel_deg": 133.0,
+      "pearson_r_predicted_vs_observed": 0.16714834123503333,
+      "sector_test": {
+        "n_in_sector": 62,
+        "n_out_sector": 34,
+        "mean_excess_in_sector_ppm": 0.31255659461021423,
+        "mean_excess_out_sector_ppm": 0.48955491185188293,
+        "diff_ppm": -0.1769983172416687,
+        "se_ppm": 0.17688059530709369,
+        "z_score": -1.000665544653842,
+        "in_sector_significantly_higher": false
+      }
+    },
+    "Kudgi": {
+      "n_within_extent": 141,
+      "bg_mean_ppm": 415.39447021484375,
+      "wind_from_deg": 233.0,
+      "plume_travel_deg": 53.0,
+      "pearson_r_predicted_vs_observed": 0.045169045826277336,
+      "sector_test": {
+        "n_in_sector": 37,
+        "n_out_sector": 104,
+        "mean_excess_in_sector_ppm": 0.3251887261867523,
+        "mean_excess_out_sector_ppm": 0.3651246428489685,
+        "diff_ppm": -0.039935916662216187,
+        "se_ppm": 0.10428699235361936,
+        "z_score": -0.3829424529456207,
+        "in_sector_significantly_higher": false
+      }
+    },
+    "Mouda": {
+      "n_within_extent": 803,
+      "bg_mean_ppm": 412.25555419921875,
+      "wind_from_deg": 325.0,
+      "plume_travel_deg": 145.0,
+      "pearson_r_predicted_vs_observed": 0.2860096791239091,
+      "sector_test": {
+        "n_in_sector": 185,
+        "n_out_sector": 618,
+        "mean_excess_in_sector_ppm": 1.684183120727539,
+        "mean_excess_out_sector_ppm": 0.5247485637664795,
+        "diff_ppm": 1.1594345569610596,
+        "se_ppm": 0.11186949727997215,
+        "z_score": 10.364170619801575,
+        "in_sector_significantly_higher": true
+      }
+    },
+    "RGundem": {
+      "n_within_extent": 20,
+      "bg_mean_ppm": 416.2101135253906,
+      "wind_from_deg": 194.0,
+      "plume_travel_deg": 14.0,
+      "pearson_r_predicted_vs_observed": 0.4389747209650938,
+      "sector_test": {
+        "n_in_sector": 7,
+        "n_out_sector": 13,
+        "mean_excess_in_sector_ppm": 0.367584228515625,
+        "mean_excess_out_sector_ppm": 0.05738008767366409,
+        "diff_ppm": 0.3102041482925415,
+        "se_ppm": 0.44682965921747453,
+        "z_score": 0.6942335672967568,
+        "in_sector_significantly_higher": false
+      }
+    },
     "Rihand": {
       "n_within_extent": 2028,
       "bg_mean_ppm": 413.2850646972656,
@@ -22,6 +201,34 @@
         "se_ppm": 0.13078479947766092,
         "z_score": 11.426730838051133,
         "in_sector_significantly_higher": true
+      }
+    },
+    "Sasan": {
+      "n_within_extent": 2440,
+      "bg_mean_ppm": 413.3589782714844,
+      "wind_from_deg": 286.0,
+      "plume_travel_deg": 106.0,
+      "pearson_r_predicted_vs_observed": 0.17443128182736728,
+      "sector_test": {
+        "n_in_sector": 552,
+        "n_out_sector": 1888,
+        "mean_excess_in_sector_ppm": 2.3271007537841797,
+        "mean_excess_out_sector_ppm": 0.2293073982000351,
+        "diff_ppm": 2.0977933406829834,
+        "se_ppm": 0.14050592048225227,
+        "z_score": 14.930284314588452,
+        "in_sector_significantly_higher": true
+      }
+    },
+    "ShriSingajiMalwa": {
+      "n_within_extent": 77,
+      "bg_mean_ppm": 413.3733215332031,
+      "wind_from_deg": 301.0,
+      "plume_travel_deg": 121.0,
+      "pearson_r_predicted_vs_observed": 0.054918377081367604,
+      "sector_test": {
+        "skipped": true,
+        "reason": "too few soundings in one of the two sectors"
       }
     },
     "Talcher": {
@@ -41,20 +248,59 @@
         "in_sector_significantly_higher": false
       }
     },
-    "Anpara": {
-      "n_within_extent": 1710,
-      "bg_mean_ppm": 413.3420715332031,
-      "wind_from_deg": 288.0,
-      "plume_travel_deg": 108.0,
-      "pearson_r_predicted_vs_observed": 0.07834124444238293,
+    "TalwandiSabo": {
+      "n_within_extent": 83,
+      "bg_mean_ppm": 413.1238098144531,
+      "wind_from_deg": 35.0,
+      "plume_travel_deg": 215.0,
+      "pearson_r_predicted_vs_observed": 0.2446189290314931,
       "sector_test": {
-        "n_in_sector": 272,
-        "n_out_sector": 1438,
-        "mean_excess_in_sector_ppm": 2.880908966064453,
-        "mean_excess_out_sector_ppm": 1.029917597770691,
-        "diff_ppm": 1.8509913682937622,
-        "se_ppm": 0.17458427706697277,
-        "z_score": 10.602279881043916,
+        "skipped": true,
+        "reason": "too few soundings in one of the two sectors"
+      }
+    },
+    "Tamnar": {
+      "n_within_extent": 291,
+      "bg_mean_ppm": 411.49029541015625,
+      "wind_from_deg": 301.0,
+      "plume_travel_deg": 121.0,
+      "pearson_r_predicted_vs_observed": -0.03762551387248768,
+      "sector_test": {
+        "n_in_sector": 68,
+        "n_out_sector": 223,
+        "mean_excess_in_sector_ppm": -0.20148468017578125,
+        "mean_excess_out_sector_ppm": -0.06108469516038895,
+        "diff_ppm": -0.1403999924659729,
+        "se_ppm": 0.11291369200762,
+        "z_score": -1.2434275238869879,
+        "in_sector_significantly_higher": false
+      }
+    },
+    "Tirora": {
+      "n_within_extent": 18,
+      "bg_mean_ppm": 413.9202880859375,
+      "wind_from_deg": 312.0,
+      "plume_travel_deg": 132.0,
+      "pearson_r_predicted_vs_observed": -0.07362391094974458,
+      "sector_test": {
+        "skipped": true,
+        "reason": "too few soundings in one of the two sectors"
+      }
+    },
+    "Vindhyachal": {
+      "n_within_extent": 2416,
+      "bg_mean_ppm": 413.373046875,
+      "wind_from_deg": 290.0,
+      "plume_travel_deg": 110.0,
+      "pearson_r_predicted_vs_observed": 0.05657581796781635,
+      "sector_test": {
+        "n_in_sector": 320,
+        "n_out_sector": 2096,
+        "mean_excess_in_sector_ppm": 2.890855073928833,
+        "mean_excess_out_sector_ppm": 0.5755382776260376,
+        "diff_ppm": 2.315316677093506,
+        "se_ppm": 0.1549656828488463,
+        "z_score": 14.94083486439942,
         "in_sector_significantly_higher": true
       }
     }

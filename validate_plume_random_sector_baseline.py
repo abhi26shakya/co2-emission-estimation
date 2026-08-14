@@ -4,7 +4,7 @@ requested explicitly before the spatial-consistency finding is trusted.
 
 Phase 2 found that soundings in the plume model's predicted downwind
 sector show significantly higher XCO2 excess than soundings outside it,
-for all three prototype facilities. Two confounds could produce that
+across every eligible facility (scaled up from the original 3-facility prototype). Two confounds could produce that
 result WITHOUT the plume model's wind-direction reasoning being correct:
 
   1. A pure distance-from-source effect: near-source soundings read
@@ -38,7 +38,7 @@ import json
 import numpy as np
 
 from validate_plume_spatial_consistency import (
-    PROTOTYPE_FACILITIES, PLUME_SECTOR_HALF_WIDTH_DEG,
+    ALL_FACILITIES, PLUME_SECTOR_HALF_WIDTH_DEG,
     load_and_project_soundings, sector_significance_check,
 )
 
@@ -61,7 +61,7 @@ def main():
     extent_km = 30.0
 
     results = {}
-    for name in PROTOTYPE_FACILITIES:
+    for name in ALL_FACILITIES:
         pr = plant_results[name]
         wind_from_deg = (pr["wind_deg"] + 180.0) % 360.0
         plume_travel_deg = (wind_from_deg + 180.0) % 360.0
@@ -78,6 +78,15 @@ def main():
         excess_ppm = proj["excess_ppm"]
 
         true_z = random_sector_z(bearing_deg, excess_ppm, plume_travel_deg, PLUME_SECTOR_HALF_WIDTH_DEG)
+        if true_z is None:
+            # the wind-predicted sector itself has too few soundings on one
+            # side (same skip condition Phase 2 already uses) -- nothing to
+            # compare against a null distribution, so skip honestly rather
+            # than crash or silently treat this as some default value.
+            print("  true (wind-predicted) sector has too few soundings on one side, skipping")
+            results[name] = {"n_soundings": n, "skipped": True,
+                              "reason": "wind-predicted sector too small to test"}
+            continue
 
         null_z = []
         random_centers = rng.uniform(0, 360, size=N_RANDOM_TRIALS)

@@ -1,8 +1,10 @@
 """
 Phase 2 of NOVEL_METHODOLOGY_PROPOSAL.md: does the plume model's predicted
 spatial pattern agree with WHERE the real OCO-3 soundings actually
-observed elevated CO2, for the same prototype facilities Phase 1 used
-(Rihand, Talcher, Anpara)?
+observed elevated CO2, across every eligible processed facility (scaled
+up from the original 3-facility prototype after the random-sector
+robustness check showed N=3 wasn't enough statistical power to draw a
+confident conclusion either way, see Sec 10)?
 
 This is explicitly a SPATIAL CONSISTENCY check, not a pixel-accuracy
 benchmark (see NOVEL_METHODOLOGY_PROPOSAL.md Sec 4.2's honesty
@@ -15,7 +17,7 @@ more than chance would produce?
 
 Method (deliberately simple, consistent with this project's established
 small-N statistical discipline -- no new dependency, no scipy):
-  1. For each prototype facility, load its real soundings (lat, lon,
+  1. For each eligible facility, load its real soundings (lat, lon,
      xco2), restricted to the plume grid's spatial extent (30km).
   2. Compute each sounding's excess over the SAME background definition
      physics_gaussian.py already uses (NEAR/BG_IN/BG_OUT, imported
@@ -41,8 +43,18 @@ import numpy as np
 
 import plume_model as pm
 from physics_gaussian import NEAR, BG_IN, BG_OUT
+from build_plume_maps import eligible_facilities
 
-PROTOTYPE_FACILITIES = ["Rihand", "Talcher", "Anpara"]
+# Same facility list build_plume_maps.py used (every facility with a wind
+# direction, a Track B estimate, and a soundings file) -- computed once
+# here, at module level, so this script and validate_plume_random_sector_
+# baseline.py (which imports ALL_FACILITIES from here) can't disagree on
+# scope. Matches this project's existing convention of module-level data
+# loading (e.g. reliability_model.py, lofo_recall_correlates.py).
+ALL_FACILITIES = eligible_facilities(
+    {r["plant"]: r for r in json.load(open("data/plant_results.json"))},
+    {r["plant"]: r for r in json.load(open("data/emission_estimates.json"))},
+)
 PLUME_SECTOR_HALF_WIDTH_DEG = 45.0
 KM_PER_DEG_LAT = 111.0
 
@@ -91,7 +103,7 @@ def main():
     extent_km = 30.0  # matches plume_model.plume_grid()'s default
 
     results = {}
-    for name in PROTOTYPE_FACILITIES:
+    for name in ALL_FACILITIES:
         pr, est = plant_results[name], emission_estimates[name]
         wind_from_deg = (pr["wind_deg"] + 180.0) % 360.0
 
@@ -144,7 +156,7 @@ def main():
     )
     print(f"\n{honesty_note}")
 
-    json.dump({"prototype_facilities": PROTOTYPE_FACILITIES, "extent_km": extent_km,
+    json.dump({"facility_list": ALL_FACILITIES, "extent_km": extent_km,
                "sector_half_width_deg": PLUME_SECTOR_HALF_WIDTH_DEG,
                "results": results, "note": honesty_note},
               open("data/plume_maps/spatial_consistency_results.json", "w"), indent=2)

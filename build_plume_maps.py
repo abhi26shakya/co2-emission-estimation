@@ -1,14 +1,16 @@
 """
-Phase 1 prototype (NOVEL_METHODOLOGY_PROPOSAL.md): builds plume_model.py's
-Gaussian plume hotspot map for a small set of well-bracketed, strong-signal
-facilities before scaling to all 21 processed plants, per the confirmed
-plan (prototype first, catch methodology issues cheaply).
+Phase 1 (NOVEL_METHODOLOGY_PROPOSAL.md): builds plume_model.py's Gaussian
+plume hotspot map for every eligible processed facility.
 
-Prototype facilities: Rihand, Talcher, Anpara -- all previously confirmed
-100% exhaustive-LOFO recall (Track A) and among the strongest raw
-NO2/SO2/VIIRS tile signal (see PROJECT_RESEARCH_DOCUMENTATION.md Sec
-12.10's comparison table), so any methodology problem surfaced here is a
-plume-modeling issue, not a signal-quality issue muddying the picture.
+Originally prototyped on 3 facilities (Rihand, Talcher, Anpara) to catch
+methodology issues cheaply -- it found one real bug (see module docstring
+history in NOVEL_METHODOLOGY_PROPOSAL.md Sec 8) and, in the Phase 2
+robustness follow-up, found the spatial-consistency claim needed more
+statistical power than 3 facilities could provide (Sec 10). Scaled up
+here to every facility with the inputs the plume model needs: a wind
+direction (plant_results.json's wind_deg), a Track B emission estimate
+(emission_estimates.json), and a saved soundings file (for the spatial
+validation scripts downstream, which import ALL_FACILITIES from here).
 
 IMPORTANT WIND-CONVENTION NOTE (caught during verification, before this
 script was first run): data/plant_results.json's "wind_deg" field is
@@ -35,9 +37,24 @@ import numpy as np
 
 import plume_model as pm
 
-PROTOTYPE_FACILITIES = ["Rihand", "Talcher", "Anpara"]
 ABLATION_STABILITY_CLASSES = ["A", "B", "C"]
 ABLATION_STACK_HEIGHTS_M = [150.0, 220.0, 275.0]
+
+
+def eligible_facilities(plant_results, emission_estimates):
+    """Every facility with everything the plume model needs: a wind
+    direction, a Track B emission estimate, and a saved soundings file
+    (needed by the downstream spatial-validation scripts, not this script
+    itself, but computed here once so all three scripts agree on scope)."""
+    names = []
+    for name, est in emission_estimates.items():
+        pr = plant_results.get(name)
+        if pr is None or pr.get("wind_deg") is None:
+            continue
+        if not os.path.exists(f"data/{name}_soundings.npz"):
+            continue
+        names.append(name)
+    return sorted(names)
 
 
 def load_facility_inputs(name, plant_results, emission_estimates):
@@ -62,9 +79,11 @@ def main():
     os.makedirs("data/plume_maps", exist_ok=True)
     plant_results = {r["plant"]: r for r in json.load(open("data/plant_results.json"))}
     emission_estimates = {r["plant"]: r for r in json.load(open("data/emission_estimates.json"))}
+    facilities = eligible_facilities(plant_results, emission_estimates)
+    print(f"Building plume maps for {len(facilities)} facilities: {facilities}")
 
     summary = {}
-    for name in PROTOTYPE_FACILITIES:
+    for name in facilities:
         inputs = load_facility_inputs(name, plant_results, emission_estimates)
         print(f"\n=== {name} ===")
         print(f"  Q = {inputs['Q_t_per_year']:,.0f} +/- {inputs['Q_t_per_year_std']:,.0f} t/yr  "
@@ -112,7 +131,7 @@ def main():
     )
     print(f"\n{ablation_range_note}")
 
-    json.dump({"prototype_facilities": PROTOTYPE_FACILITIES, "facilities": summary,
+    json.dump({"facility_list": facilities, "facilities": summary,
                "note": ablation_range_note},
               open("data/plume_maps/prototype_summary.json", "w"), indent=2)
     print("\n[SAVED] data/plume_maps/prototype_summary.json (+ per-facility .npz grids)")
