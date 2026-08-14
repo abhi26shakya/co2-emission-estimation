@@ -1,10 +1,10 @@
-# CO2 Emission Estimation — Master Research Documentation
+# CO2 Emission Estimation — Master Research Documentation (Track B Now Validated Against Real Ground Truth)
 
 **Repository:** `co2-emission-estimation`
-**Author (commits):** `devashishpandey044-code` (2026-07-01 – 2026-07-10), then `Abhishek Shakya` (2026-08-10 onward; several commits from 2026-08-12/13 co-authored with Claude Sonnet 5)
+**Author (commits):** `devashishpandey044-code` (2026-07-01 – 2026-07-10), then `Abhishek Shakya` (2026-08-10 onward; several commits from 2026-08-12/13/14 co-authored with Claude Sonnet 5)
 **Branch:** `main` (single branch, no tags)
-**Timeline:** 2026-07-01 (initial commit) → 2026-08-13 (latest commit + uncommitted work-in-progress)
-**Document compiled:** 2026-08-13, from git history, commit diffs, weekly logs, README, RESEARCH_PLAN, NEXT_STEPS, source code, and data-file schemas. Everything below is sourced from these artifacts; nothing is invented. Anything not found in the repo is explicitly marked **"Not documented / needs verification."**
+**Timeline:** 2026-07-01 (initial commit) → 2026-08-14 (latest commit + uncommitted work-in-progress)
+**Document compiled:** 2026-08-13, from git history, commit diffs, weekly logs, README, RESEARCH_PLAN, NEXT_STEPS, source code, and data-file schemas; updated same-day and again on 2026-08-14 across several follow-up passes (Track A facility-set expansion and exhaustive LOFO, Track A LOFO generalization fixes, and finally locating an independent, non-Climate-TRACE ground-truth emissions source and building the project's first real Q-correcting model against it — §12.15 is the headline result). Everything below is sourced from these artifacts; nothing is invented. Anything not found in the repo is explicitly marked **"Not documented / needs verification."**
 
 ---
 
