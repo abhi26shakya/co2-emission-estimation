@@ -1,0 +1,55 @@
+{
+  "n_facilities": 17,
+  "question_1_two_feature_fit": {
+    "single_feature_hit_days_loo_r2": 0.21178978265586024,
+    "single_feature_hit_days_loo_mae": 0.095475838373878,
+    "two_feature_hit_days_plus_activity_loo_r2": 0.17292235412103452,
+    "two_feature_hit_days_plus_activity_loo_mae": 0.10147853030869006,
+    "activity_signal_improves_fit": false,
+    "predictions": {
+      "Sasan": 0.5192377264048902,
+      "Tirora": 0.6561525561945746,
+      "Vindhyachal": 0.5329861780180998,
+      "Talcher": 0.501594070728012,
+      "Rihand": 0.5223877743979133,
+      "ChandrapurCoal": 0.529075756325475,
+      "Anpara": 0.5354323636850242,
+      "RGundem": 0.6626202535480583,
+      "Korba": 0.7666642615225342,
+      "ShriSingajiMalwa": 0.5809317623942443,
+      "Koradi": 0.30710425278239295,
+      "Tamnar": 0.6638940466277621,
+      "Kudgi": 0.6442335180820927,
+      "Kahalgaon": 0.4990954705643351,
+      "Mouda": 0.4439745648636581,
+      "Chhabra": 0.597365729679714,
+      "Farakka": 0.5264247034700524
+    }
+  },
+  "question_2_fusion_trust_vs_climate_trace": {
+    "fusion_trust_score": {
+      "Sasan": 0.7973033697269525,
+      "Tirora": 0.3005994457176392,
+      "Vindhyachal": 0.6937835001776443,
+      "Talcher": 0.8969137717714412,
+      "Rihand": 0.5774377900123122,
+      "ChandrapurCoal": 0.4861098066215769,
+      "Anpara": 0.6252853841429955,
+      "RGundem": 0.3067465426794888,
+      "Korba": 0.6092221377695817,
+      "ShriSingajiMalwa": 0.006934361038290511,
+      "Koradi": 0.5374381636424163,
+      "Tamnar": 0.48905109427067583,
+      "Kudgi": 0.16986104635592136,
+      "Kahalgaon": 0.3554903204683598,
+      "Mouda": 0.5133083204824549,
+      "Chhabra": 0.3971170389864237,
+      "Farakka": 0.29056114019699364
+    },
+    "n_matched_to_climate_trace": 17,
+    "mean_trust_when_bracketed": 0.47676691006874883,
+    "mean_trust_when_missed": 0.4702826304303037,
+    "expected_direction_observed": true
+  },
+  "caveat": "N=17 facilities (N<=17 for the CT-matched subset in question 2). The fusion trust score is built ONLY from q_rel_std and activity_prob_mean (both already computed independently of Climate TRACE) and is never fit to Climate TRACE -- the comparison in question 2 is a post-hoc evaluation of an already-fixed score, not model training or tuning. Per RESEARCH_PLAN.md Sec 7, Climate TRACE is not, and must not become, a training label; per Sec 8, no multi-feature nonlinear model was attempted at this facility count. This is still an indicative feasibility result, not a validated correction model -- the genuine Q-correcting A1-A5 ablation ladder remains unbuilt and requires an independent ground-truth emissions source this project does not have."
+}
