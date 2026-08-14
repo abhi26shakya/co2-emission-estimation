@@ -1,0 +1,191 @@
+{
+  "source": "Central Electricity Authority (CEA), Government of India -- CO2 Baseline Database v17.0",
+  "source_url": "https://cea.nic.in/cdm-co2-baseline-database/?lang=en",
+  "fiscal_year": "2020-21",
+  "fiscal_year_caveat": "India's fiscal year is April-March. FY2020-21 = 2020-04-01 to 2021-03-31, overlapping 9 of the 12 months Track B's 2020-calendar-year OCO-3 soundings cover (Apr-Dec 2020) -- closest available single-FY match, not exact.",
+  "methodology_note": "Bottom-up: fuel consumption x gross calorific value x IPCC/national emission factor, using activity data reported by each plant's own operator to CEA. NOT satellite/thermal-proxy inferred -- fundamentally different in kind from Climate TRACE, and therefore usable as a training/validation label per RESEARCH_PLAN.md Sec 7's Climate-TRACE-specific restriction.",
+  "n_matched": 30,
+  "n_missing": 0,
+  "facilities": {
+    "Vindhyachal": {
+      "cea_station_name": "VINDH_CHAL STPS",
+      "net_gen_gwh": 34569.07,
+      "abs_emissions_t_co2": 33212767.71488738,
+      "spec_emissions_t_per_mwh": 0.9607654390149165
+    },
+    "Mundra": {
+      "cea_station_name": "MUNDRA TPP",
+      "net_gen_gwh": 23758.895,
+      "abs_emissions_t_co2": 22703827.85610032,
+      "spec_emissions_t_per_mwh": 0.9555927519398659
+    },
+    "Sasan": {
+      "cea_station_name": "SASAN UMPP",
+      "net_gen_gwh": 31391.3343433,
+      "abs_emissions_t_co2": 28487432.95134419,
+      "spec_emissions_t_per_mwh": 0.9074935343557448
+    },
+    "Tirora": {
+      "cea_station_name": "TIRORA TPP",
+      "net_gen_gwh": 17065.216,
+      "abs_emissions_t_co2": 16340330.386389213,
+      "spec_emissions_t_per_mwh": 0.957522623000448
+    },
+    "Talcher": {
+      "cea_station_name": "TALCHER STPS",
+      "net_gen_gwh": 20460.65,
+      "abs_emissions_t_co2": 19813520.559970044,
+      "spec_emissions_t_per_mwh": 0.9683719999105621
+    },
+    "Rihand": {
+      "cea_station_name": "RIHAND",
+      "net_gen_gwh": 21952.96,
+      "abs_emissions_t_co2": 20613491.507199902,
+      "spec_emissions_t_per_mwh": 0.9389846065040843
+    },
+    "Sipat": {
+      "cea_station_name": "SIPAT STPS",
+      "net_gen_gwh": 22225.62,
+      "abs_emissions_t_co2": 20839981.025321007,
+      "spec_emissions_t_per_mwh": 0.9376557785709018
+    },
+    "ChandrapurCoal": {
+      "cea_station_name": "CHANDRAPUR_COAL",
+      "net_gen_gwh": 14887.72,
+      "abs_emissions_t_co2": 15337056.06459695,
+      "spec_emissions_t_per_mwh": 1.0301816574060334
+    },
+    "Anpara": {
+      "cea_station_name": "ANPARA",
+      "net_gen_gwh": 14072.4546,
+      "abs_emissions_t_co2": 13722404.308511863,
+      "spec_emissions_t_per_mwh": 0.9751251433073989
+    },
+    "RGundem": {
+      "cea_station_name": "R_GUNDEM STPS",
+      "net_gen_gwh": 15588.430000000002,
+      "abs_emissions_t_co2": 14899296.830563854,
+      "spec_emissions_t_per_mwh": 0.9557920092378676
+    },
+    "Korba": {
+      "cea_station_name": "KORBA STPS",
+      "net_gen_gwh": 20041.72,
+      "abs_emissions_t_co2": 18975469.790738955,
+      "spec_emissions_t_per_mwh": 0.9467984679328398
+    },
+    "ShriSingajiMalwa": {
+      "cea_station_name": "SHRI SINGAJI MALWA TPP",
+      "net_gen_gwh": 5524.295,
+      "abs_emissions_t_co2": 5551406.256321217,
+      "spec_emissions_t_per_mwh": 1.0049076409426392
+    },
+    "Koradi": {
+      "cea_station_name": "KORADI",
+      "net_gen_gwh": 7714.398,
+      "abs_emissions_t_co2": 7854266.949155973,
+      "spec_emissions_t_per_mwh": 1.0181308961705078
+    },
+    "Tamnar": {
+      "cea_station_name": "TAMNAR TPP",
+      "net_gen_gwh": 8227.331,
+      "abs_emissions_t_co2": 7588827.127865394,
+      "spec_emissions_t_per_mwh": 0.922392344232339
+    },
+    "Kudgi": {
+      "cea_station_name": "KUDGI",
+      "net_gen_gwh": 4369.95,
+      "abs_emissions_t_co2": 3709288.0223523015,
+      "spec_emissions_t_per_mwh": 0.8488170396348474
+    },
+    "Kahalgaon": {
+      "cea_station_name": "KAHALGAON",
+      "net_gen_gwh": 12223.289999999999,
+      "abs_emissions_t_co2": 11997559.352225631,
+      "spec_emissions_t_per_mwh": 0.9815327421852572
+    },
+    "Mouda": {
+      "cea_station_name": "MOUDA STPS",
+      "net_gen_gwh": 6242.17,
+      "abs_emissions_t_co2": 6162675.9236346455,
+      "spec_emissions_t_per_mwh": 0.9872649933652312
+    },
+    "Chhabra": {
+      "cea_station_name": "CHHABRA TPS",
+      "net_gen_gwh": 13328.718,
+      "abs_emissions_t_co2": 13042665.171933467,
+      "spec_emissions_t_per_mwh": 0.9785386090345272
+    },
+    "Farakka": {
+      "cea_station_name": "FARAKKA STPS",
+      "net_gen_gwh": 11002.61,
+      "abs_emissions_t_co2": 10968604.33375641,
+      "spec_emissions_t_per_mwh": 0.9969093091326885
+    },
+    "Simhadri": {
+      "cea_station_name": "SIMHADRI",
+      "net_gen_gwh": 8102.549999999999,
+      "abs_emissions_t_co2": 7926584.475669609,
+      "spec_emissions_t_per_mwh": 0.978282698122148
+    },
+    "TalwandiSabo": {
+      "cea_station_name": "TALWANDI SABO",
+      "net_gen_gwh": 6483.502,
+      "abs_emissions_t_co2": 6027232.374077083,
+      "spec_emissions_t_per_mwh": 0.9296260530307668
+    },
+    "Lalitpur": {
+      "cea_station_name": "LALITPUR TPP",
+      "net_gen_gwh": 6868,
+      "abs_emissions_t_co2": 6343378.859006597,
+      "spec_emissions_t_per_mwh": 0.9236136952543094
+    },
+    "Pryagraj(Bara)": {
+      "cea_station_name": "PRYAGRAJ (BARA) TPP",
+      "net_gen_gwh": 10093.174,
+      "abs_emissions_t_co2": 9183979.25047249,
+      "spec_emissions_t_per_mwh": 0.9099198379491416
+    },
+    "Dadri(Nctpp)": {
+      "cea_station_name": "DADRI (NCTPP)",
+      "net_gen_gwh": 3649.04,
+      "abs_emissions_t_co2": 3701158.721310604,
+      "spec_emissions_t_per_mwh": 1.0142828583163253
+    },
+    "Akaltara": {
+      "cea_station_name": "AKALTARA TPP",
+      "net_gen_gwh": 9716.15,
+      "abs_emissions_t_co2": 9379103.177429585,
+      "spec_emissions_t_per_mwh": 0.9653106608512204
+    },
+    "KGudemNew": {
+      "cea_station_name": "K_GUDEM NEW",
+      "net_gen_gwh": 11662.4556,
+      "abs_emissions_t_co2": 10230323.064503325,
+      "spec_emissions_t_per_mwh": 0.8772014587136628
+    },
+    "Raichur": {
+      "cea_station_name": "RAICHUR",
+      "net_gen_gwh": 3500.635,
+      "abs_emissions_t_co2": 3340332.9973285063,
+      "spec_emissions_t_per_mwh": 0.9542077358332148
+    },
+    "Bellary": {
+      "cea_station_name": "BELLARY TPS",
+      "net_gen_gwh": 2869.245,
+      "abs_emissions_t_co2": 2843065.9709077897,
+      "spec_emissions_t_per_mwh": 0.9908759868563994
+    },
+    "RayalSeema": {
+      "cea_station_name": "RAYAL SEEMA",
+      "net_gen_gwh": 2046.276,
+      "abs_emissions_t_co2": 2061468.6607228625,
+      "spec_emissions_t_per_mwh": 1.0074245413242702
+    },
+    "Sagardighi": {
+      "cea_station_name": "SAGARDIGHI TPP",
+      "net_gen_gwh": 8900.511,
+      "abs_emissions_t_co2": 8883276.020209212,
+      "spec_emissions_t_per_mwh": 0.9980635965967809
+    }
+  }
+}
