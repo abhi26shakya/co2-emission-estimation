@@ -1,9 +1,11 @@
-# CO2 Emission Estimation
+# CO2 Emission Estimation (Now Validated Against Real Ground Truth)
 
 Research and implementation work on detecting and estimating CO2 emissions from coal power plants using satellite data and deep learning. The project has two parallel tracks:
 
-1. **Plant detector** — a small CNN that classifies satellite tiles as "power plant" vs. "not a power plant," built up incrementally by fusing more pollutant/thermal channels (Weeks 2–5, described below).
-2. **CO2 enhancement estimation** — a separate, physics-driven track that estimates near-plant XCO2 enhancement directly from OCO-3 soundings, cross-checked against NO2 co-location and wind direction.
+1. **Plant detector (Track A)** — a small CNN that classifies satellite tiles as "power plant" vs. "not a power plant," built up incrementally by fusing more pollutant/thermal channels (Weeks 2–5, described below). Since expanded to 20 positive-class facilities; exhaustive leave-one-facility-out recall is currently **69.1%**.
+2. **CO2 enhancement estimation (Track B)** — a physics-driven track that estimates near-plant XCO2 enhancement and a per-plant emission rate directly from OCO-3 soundings, cross-checked against NO2 co-location and wind direction. Now benchmarked against **two** independent references: Climate TRACE (satellite-inferred) and, more importantly, India's Central Electricity Authority CO2 Baseline Database — a real, non-satellite ground-truth source computed from each plant's reported fuel consumption. A working, cross-validated correction model exists against this real ground truth (MAE 1.01→0.902 in log-ratio space).
+
+**This README describes the project's original Week 2–7 state and has not been kept current since.** For up-to-date status, results, and the full same-day findings referenced above, see `NEXT_STEPS.md` (running status + roadmap), `RESEARCH_PAPER.md` (full write-up), and `PROJECT_RESEARCH_DOCUMENTATION.md` (exhaustive research log). The sections below are accurate as historical record through Week 7 but should not be read as the current state of the project.
 
 ## Weekly progress (plant detector track)
 
@@ -73,7 +75,7 @@ Python 3, with:
 * `earthaccess` — OCO-3 sounding download (CO2-enhancement track only)
 * `xarray` — reading OCO-3 NetCDF granules
 
-There is no `requirements.txt` yet; install the above with `pip install torch numpy pandas matplotlib earthengine-api earthaccess xarray`.
+`requirements.txt` now exists (added later than this README), pinned to the project's working conda environment — `pip install -r requirements.txt`.
 
 ## Earth Engine setup
 
@@ -87,7 +89,7 @@ OCO-3 sounding download additionally requires a NASA Earthdata login (`earthacce
 
 ## Known limitations
 
-* `physics_gaussian.py`'s emission-rate estimate (Week 6) uses a single annual-mean wind speed and standard surface pressure per plant, not per-overpass conditions, and a fixed approximate footprint area per OCO-3 sounding — treat outputs as order-of-magnitude, not validated against reported plant-level emissions.
+* `physics_gaussian.py`'s emission-rate estimate described here (Week 6) used a single annual-mean wind speed — since replaced with per-overpass wind conditioning and a three-term uncertainty budget (see `NEXT_STEPS.md`). It is also now benchmarked against real reported plant-level emissions (India's CEA CO2 Baseline Database, not just Climate TRACE), not merely "order-of-magnitude" as originally caveated here — see `PROJECT_RESEARCH_DOCUMENTATION.md` §12.15 for the current accuracy numbers.
 * The plant detector's "mixed" accuracy (plants vs. all negatives including rural) is not directly comparable across weeks — only the "hard-only" number (plants vs. hard negatives, balanced) is tracked consistently and shown in `summary_figure.py`.
 * Dataset is small (600 tiles total per detector variant, ~240 in the balanced hard-only split), so accuracy differences within a few points should be treated as noisy.
 
