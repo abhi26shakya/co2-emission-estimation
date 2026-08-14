@@ -89,6 +89,22 @@ def train_and_eval(Xtr, ytr, Xte, seed):
     return recall
 
 
+def facility_fold_indices(groups, held_out):
+    """
+    Split a list of per-tile facility-group labels into (train_idx, test_idx)
+    for one LOFO fold: every tile whose group != held_out goes to train,
+    every tile whose group == held_out goes to test. Factored out of main()
+    so it's directly unit-testable -- this exact split (by facility, not by
+    tile) is what Week 11's leakage bug got wrong (a random tile-level split
+    let the same facility's tiles land in both train and test), so this
+    function is the one piece of this harness a regression here would be
+    most costly to miss silently.
+    """
+    tr_idx = [j for j, g in enumerate(groups) if g != held_out]
+    te_idx = [j for j, g in enumerate(groups) if g == held_out]
+    return tr_idx, te_idx
+
+
 def main():
     Xp, yp, gp = load_folder("data/threech/positive", 1)
     Xh, yh, gh = load_folder("data/threech/hard_negative", 0)
@@ -101,8 +117,7 @@ def main():
     results = []
     t0 = time.time()
     for i, held_out in enumerate(plant_groups):
-        tr_idx = [j for j, g in enumerate(gp) if g != held_out]
-        te_idx = [j for j, g in enumerate(gp) if g == held_out]
+        tr_idx, te_idx = facility_fold_indices(gp, held_out)
         Xtr = [Xp[j] for j in tr_idx] + Xh + Xr
         ytr = [yp[j] for j in tr_idx] + yh + yr
         Xte = [Xp[j] for j in te_idx]

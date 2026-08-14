@@ -26,9 +26,10 @@ def triple_folder(no2_dir, so2_dir, viirs_dir, out_dir):
     print(f"{out_dir:32s} paired={saved}  (NO2={len(no2_files)}, SO2={len(so2_files)}, VIIRS={len(viirs_files)})")
     return saved
 
-os.makedirs("data/threech", exist_ok=True)
-p = triple_folder("data/monthly/positive",      "data/so2/positive",      "data/viirs/positive",      "data/threech/positive")
-h = triple_folder("data/monthly/hard_negative", "data/so2/hard_negative", "data/viirs/hard_negative", "data/threech/hard_negative")
-r = triple_folder("data/monthly/negative",      "data/so2/negative",      "data/viirs/negative",      "data/threech/negative")
-print(f"\nTotal 3-channel tiles: plants={p}  hard_neg={h}  rural={r}")
-print("Each tile shape = (3, 64, 64): channel 0 = NO2, channel 1 = SO2, channel 2 = VIIRS MaxFRP")
+if __name__ == "__main__":
+    os.makedirs("data/threech", exist_ok=True)
+    p = triple_folder("data/monthly/positive",      "data/so2/positive",      "data/viirs/positive",      "data/threech/positive")
+    h = triple_folder("data/monthly/hard_negative", "data/so2/hard_negative", "data/viirs/hard_negative", "data/threech/hard_negative")
+    r = triple_folder("data/monthly/negative",      "data/so2/negative",      "data/viirs/negative",      "data/threech/negative")
+    print(f"\nTotal 3-channel tiles: plants={p}  hard_neg={h}  rural={r}")
+    print("Each tile shape = (3, 64, 64): channel 0 = NO2, channel 1 = SO2, channel 2 = VIIRS MaxFRP")
