@@ -1,15 +1,15 @@
-# Project Status & Next Steps (as of Week 11)
+# Project Status & Next Steps (Week 11 baseline, extended through same-day Q-correction against real ground truth)
 
-This document consolidates the project's history and remaining work across both tracks. It complements `README.md` (setup/usage) and `RESEARCH_PLAN.md` (the original research roadmap, written after Week 7) with a running "where we are now" view, since that synthesis previously required reading all of `WEEK2_LOG.txt`–`WEEK11_LOG.txt` together.
+This document consolidates the project's history and remaining work across both tracks. It complements `README.md` (setup/usage) and `RESEARCH_PLAN.md` (the original research roadmap, written after Week 7) with a running "where we are now" view, since that synthesis previously required reading all of `WEEK2_LOG.txt`–`WEEK11_LOG.txt` together. The step-by-step history below stops at Week 11; everything past that point — facility-set completion, the exhaustive LOFO harness, and finally locating an independent ground-truth emissions source and building the project's first real Q-correcting model — is tracked in the "Same-day follow-up" entries that follow it.
 
 ## Context
 
 The project has two parallel tracks estimating CO2 emissions from Indian coal power plants using satellite data:
 
-- **Track A (plant detector):** a CNN classifying satellite tiles as "power plant" vs. not, using NO2/SO2/VIIRS channels.
-- **Track B (CO2 estimation):** a physics-based mass-balance (IME) method estimating tons CO2/yr directly from OCO-3 XCO2 soundings.
+- **Track A (plant detector):** a CNN classifying satellite tiles as "power plant" vs. not, using NO2/SO2/VIIRS channels. Exhaustive LOFO recall currently **69.1%** (up from an initial 47.2%), after closing a real data-quantity gap for the 16 newly-added facilities.
+- **Track B (CO2 estimation):** a physics-based mass-balance (IME) method estimating tons CO2/yr directly from OCO-3 XCO2 soundings. Now validated against a real, independent ground-truth source — India's CEA CO2 Baseline Database, not another satellite-inferred proxy — with a working, cross-validated correction model (MAE 1.01→0.902 in log-ratio space).
 
-`RESEARCH_PLAN.md` §14 laid out a 7-step roadmap to turn this into a research contribution. This document tracks progress against that roadmap and records unplanned but important findings discovered along the way.
+`RESEARCH_PLAN.md` §14 laid out a 7-step roadmap to turn this into a research contribution. All 7 steps are now done, most recently step 4 (the correction model), which was the roadmap's longest-standing open item. This document tracks progress against that roadmap and records unplanned but important findings discovered along the way.
 
 ## Step-by-step history
 
@@ -129,9 +129,9 @@ The project has two parallel tracks estimating CO2 emissions from Indian coal po
 | 1. Per-overpass wind + uncertainty in `physics_gaussian.py` | Done (Week 8), later strengthened with a 3rd uncertainty term (background-sensitivity) |
 | 2. Facility-set expansion (10–20 candidates) | Done — 20/20 processed, all merged into `data/plant_results.json` |
 | 3. Activity signal extraction from Track A CNN | Done (Week 10), low-confidence flag from Week 11 resolved this session — re-run against the 20-facility checkpoint shows the activity signal is now stable regardless of training-set membership |
-| 4. Correction model (A1→A5 ablation ladder, §9) | Feasibility check re-run at N=17 (up from 7), a positive result (hit_days predicts q_rel_std, LOO R²=0.212). A first fusion attempt without a ground-truth label (`track_fusion_model.py`) tested negative on both questions asked — activity signal doesn't improve the uncertainty fit, and a fused trust score doesn't track actual Climate TRACE bracketing. The A1→A5 Q-correcting ladder itself still needs Climate-TRACE-independent ground truth and remains unbuilt |
-| 5. Leave-one-facility-out CV harness | Done for Track A this session (`lofo_track_a.py`); revealed the single-split 88% recall was not representative — true mean recall was 47.2% on the original 12-tile-depth dataset, then **rose to 69.1%** after a follow-up (24-tile-depth, matching the original top-5's temporal coverage) closed most of the gap. Data augmentation tested separately and found not to help. Track B's correction model (step 4) still needs its own LOFO harness once it exists |
-| 6. Climate TRACE benchmark comparison | Done (Week 10), re-run this session at N=17 (up from 7) — calibration dropped from 71% to 53% bracketed, a more honest number from the larger sample |
+| 4. Correction model (A1→A5 ablation ladder, §9) | **Done.** Feasibility check re-run at N=17 (up from 7), a positive result (hit_days predicts q_rel_std, LOO R²=0.212). A first fusion attempt without a ground-truth label (`track_fusion_model.py`) tested negative on both questions asked. The actual blocker — a Climate-TRACE-independent ground-truth source — was then found: CEA's CO2 Baseline Database, bottom-up from reported fuel consumption, matched to all 30 candidate facilities. `q_correction_model.py` built the real correction against it: baseline MAE 1.01 (log-ratio space, N=17), corrected to 0.902 via a single-feature (`bg_std_ppm`) LOO-CV fit — a genuine ~11% improvement |
+| 5. Leave-one-facility-out CV harness | Done for Track A this session (`lofo_track_a.py`); revealed the single-split 88% recall was not representative — true mean recall was 47.2% on the original 12-tile-depth dataset, then **rose to 69.1%** after a follow-up (24-tile-depth, matching the original top-5's temporal coverage) closed most of the gap. Data augmentation tested separately and found not to help. Track B's correction model (step 4) used its own leave-one-out CV (N=17, single-feature) rather than a full multi-fold LOFO harness — reasonable at this facility count per the same small-N discipline used elsewhere |
+| 6. Climate TRACE benchmark comparison | Done (Week 10), re-run this session at N=17 (up from 7) — calibration dropped from 71% to 53%, then to **35.3%** after the month-stratification fix (§ physics_gaussian.py hardening). A second, independently meaningful accuracy figure now also exists: **47.1% bracketing against real CEA ground truth** (step 4) — the two numbers measure different things and neither supersedes the other |
 | 7. Full evaluation figure set (§12) | Done this session (`evaluation_figures.py`) for everything that doesn't require the unbuilt A1→A5 correction model — Climate TRACE comparison panels, Track A ablation table, LOFO recall distribution, feature-importance panels |
 
 ## What's needed next
