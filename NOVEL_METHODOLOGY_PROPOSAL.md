@@ -103,7 +103,25 @@ Ran `build_plume_maps.py` for all three prototype facilities. Full numeric outpu
 
 **Honest caveat, not yet resolved**: the sector test as built does not fully rule out a confound where soundings simply closer to the source read higher regardless of true direction (a pure distance effect masquerading as a directional one), since near-source soundings could disproportionately land in any given 90°-wide sector by chance. A stronger version of this test — comparing against a *random*-direction sector as a null baseline, repeated many times, to establish what correlation/z-score would arise from distance alone — is the natural next robustness check before this spatial-consistency finding is presented as strong evidence in a paper. Flagged here explicitly rather than presented as fully conclusive.
 
-## 10. Next steps (not started)
+## 10. Phase 2 robustness follow-up (DONE) — the naive result was substantially inflated
 
-- **Phase 2 robustness follow-up**: the random-sector null-baseline test described above.
-- **Phase 3** (Grad-CAM spatial fusion) and beyond, per §5's table — not started, checking in before continuing further given the scope already covered this session.
+`validate_plume_random_sector_baseline.py`: for each facility, repeats Phase 2's exact sector test (same soundings, same excess values, same ±45° half-width) but centered on 2000 random bearings instead of the plume-predicted one, building an empirical null distribution of z-scores. Controls for two confounds at once: (a) a pure distance-from-source effect independent of true direction, and (b) OCO-3 swath/orbital-geometry azimuthal sampling bias — a real, already-documented phenomenon in this project (`diagnose_shrisingajimalwa.py` found exactly this kind of non-uniform sampling for a different reason, seasonally).
+
+**Results** (`data/plume_maps/random_sector_baseline_results.json`):
+
+| Facility | True (wind-predicted) z | Null distribution (mean ± std, from 2000 random sectors) | Percentile of true z | Empirical p (one-sided) | Survives at p<0.05? |
+|---|---|---|---|---|---|
+| Rihand | 11.43 | +0.52 ± 6.18 | 95.2th | 0.0480 | **Marginally yes** |
+| Talcher | 1.97 | −0.22 ± 2.23 | 84.4th | 0.1560 | No |
+| Anpara | 10.60 | −1.09 ± 12.54 | 73.8th | 0.2625 | **No** |
+
+**Only 1 of 3 facilities (Rihand) survives this robustness check, and only marginally (p=0.048, right at the conventional threshold).** Talcher and Anpara's apparent "significant" sector effects from Phase 2 turn out to be statistically indistinguishable from what a randomly-oriented sector produces on the same sounding set — the null distributions themselves have large spread (Anpara's null std, 12.54, is even larger than its own observed z-score of 10.60), meaning OCO-3's azimuthal sampling around these plants is substantially non-uniform for reasons unrelated to the plume. **The Phase 2 write-up's headline claim ("all three facilities show a positive, mostly statistically significant spatial-consistency signal") is revised down by this robustness check and should not be quoted without this context.**
+
+**Methodological lesson for the paper, stated as a first-class finding, not a footnote**: a naive in-sector-vs-out-of-sector significance test on satellite sounding data is not reliable on its own — a permutation/randomization-based null baseline is *necessary*, not optional, whenever claiming spatial consistency against this kind of data, because satellite revisit/swath geometry alone can produce apparent directional structure. This mirrors this project's own prior discipline (the Week 11 leakage catch, the LOFO single-split-vs-exhaustive lesson): a headline number without the right control can look far more convincing than it should.
+
+**Revised honest conclusion**: the plume model's spatial predictions are weakly, marginally supported by real sounding data for one of three prototype facilities (Rihand), not confirmed for the other two. This is a genuine, if modest, result — not a failure of the overall approach, since it demonstrates the validation methodology itself works as intended (it correctly identified that 2 of 3 apparent effects were not robust, rather than accepting all three at face value). Scaling to more facilities (Phase 1's original 21-facility scope) would materially strengthen or weaken this conclusion with more statistical power — worth prioritizing over further methodology-building (e.g. Phase 3) until this core spatial claim is on firmer footing.
+
+## 11. Next steps (not started)
+
+- **Scale Phase 1+2+2-robustness to more facilities** (beyond the 3-facility prototype) — the natural next step, given the robustness check shows N=3 facilities isn't enough to draw a confident conclusion either way.
+- **Phase 3** (Grad-CAM spatial fusion) and beyond, per §5's table — not started, deprioritized relative to strengthening the core spatial-consistency claim above.
