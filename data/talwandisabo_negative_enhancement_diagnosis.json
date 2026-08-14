@@ -1,0 +1,103 @@
+{
+  "target": "TalwandiSabo",
+  "comparison_plant": "Rihand",
+  "comparison_plant_stats": {
+    "near_bg_stats": {
+      "near_n": 1543,
+      "bg_n": 2463,
+      "bg_mean": 413.2850646972656,
+      "bg_std": 1.481845498085022,
+      "near_mean": 415.1727600097656,
+      "n_used": 1166,
+      "frac_near_above_bg": 0.7556707712248866,
+      "excess_used_mean": 2.8950681686401367,
+      "excess_used_median": 1.973968505859375,
+      "signal_to_noise": 1.2738813161849976
+    },
+    "bg_definition_sensitivity": {
+      "definitions_tested": 5,
+      "ime_proxy_min": 3304.4716796875,
+      "ime_proxy_max": 3449.43994140625,
+      "ime_proxy_range_pct_of_default": 4.2945295537750985
+    },
+    "significance": {
+      "near_n": 1543,
+      "bg_n": 2463,
+      "diff_ppm": 1.8876953125,
+      "se_ppm": 0.08006471772530273,
+      "z_score": 23.57711818802097,
+      "consistent_with_zero_at_2sigma": false
+    }
+  },
+  "stage1_near_bg_stats": {
+    "near_n": 37,
+    "bg_n": 166,
+    "bg_mean": 413.1238098144531,
+    "bg_std": 2.018026351928711,
+    "near_mean": 411.84698486328125,
+    "n_used": 0,
+    "frac_near_above_bg": 0.0,
+    "excess_used_mean": null,
+    "excess_used_median": null,
+    "signal_to_noise": -0.6327097415924072
+  },
+  "stage1_bg_definition_sensitivity": {
+    "definitions_tested": 5,
+    "ime_proxy_min": 0.0,
+    "ime_proxy_max": 0.0,
+    "ime_proxy_range_pct_of_default": NaN
+  },
+  "stage1_significance": {
+    "near_n": 37,
+    "bg_n": 166,
+    "diff_ppm": -1.276824951171875,
+    "se_ppm": 0.17387965781505507,
+    "z_score": -7.343153116449964,
+    "consistent_with_zero_at_2sigma": false
+  },
+  "wind_co2_diff_deg": 121.0,
+  "stage2_seasonal_check_run": true,
+  "seasonal_breakdown": {
+    "near_month_counts": {
+      "2": 37
+    },
+    "bg_month_counts": {
+      "2": 91,
+      "5": 20,
+      "12": 55
+    },
+    "near_mean_month": 2.0,
+    "bg_mean_month": 5.674698795180723,
+    "month_offset": -3.6746987951807233
+  },
+  "directional_breakdown": {
+    "quadrant_stats": {
+      "N": {
+        "n": 48,
+        "mean_xco2": 411.7647399902344
+      },
+      "E": {
+        "n": 72,
+        "mean_xco2": 414.7697448730469
+      },
+      "W": {
+        "n": 46,
+        "mean_xco2": 411.9658203125
+      }
+    },
+    "quadrant_spread_ppm": 3.0050048828125
+  },
+  "same_month_comparison": {
+    "common_months": [
+      2
+    ],
+    "near_n": 37,
+    "bg_n": 91,
+    "near_mean_xco2": 411.84698486328125,
+    "bg_mean_xco2": 411.6945495605469,
+    "diff_ppm": 0.152435302734375,
+    "se_ppm": 0.12126993103842444,
+    "z_score": 1.256991749142463
+  },
+  "conclusion": "TalwandiSabo's negative sign IS statistically significant (z=-7.34), same as ShriSingajiMalwa. Seasonal breakdown: near-plant soundings averaged month 2.0, background averaged month 5.674698795180723 (offset -3.6746987951807233). Restricting to the 1 shared month(s) flips the sign to positive (same-month diff=+0.152 ppm, z=1.256991749142463). This matches the ShriSingajiMalwa pattern: a seasonal-sampling-imbalance artifact, not a real negative signal or pipeline bug."
+}
