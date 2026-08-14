@@ -1,0 +1,152 @@
+{
+  "n_random_trials": 2000,
+  "sector_half_width_deg": 45.0,
+  "results": {
+    "Anpara": {
+      "n_total_within_extent": 1710,
+      "n_day_matched": 526,
+      "true_z": 1.739951091770634,
+      "null_mean_z": -0.053604380094387054,
+      "null_std_z": 2.8667927251208254,
+      "true_z_percentile_in_null": 71.55,
+      "empirical_p_one_sided": 0.2845,
+      "distinguishable_from_rotated_null": false
+    },
+    "ChandrapurCoal": {
+      "n_day_matched": 29,
+      "skipped": true,
+      "reason": "day-matched sector too small"
+    },
+    "Chhabra": {
+      "n_day_matched": 111,
+      "skipped": true,
+      "reason": "day-matched sector too small"
+    },
+    "Farakka": {
+      "n_total_within_extent": 492,
+      "n_day_matched": 342,
+      "true_z": -7.513597711800374,
+      "null_mean_z": -0.06447385725212162,
+      "null_std_z": 9.772144719416383,
+      "true_z_percentile_in_null": 31.3,
+      "empirical_p_one_sided": 0.687,
+      "distinguishable_from_rotated_null": false
+    },
+    "Kahalgaon": {
+      "n_total_within_extent": 117,
+      "n_day_matched": 79,
+      "true_z": -4.991237867977149,
+      "null_mean_z": -0.2212667909514515,
+      "null_std_z": 4.460140545790672,
+      "true_z_percentile_in_null": 21.6,
+      "empirical_p_one_sided": 0.784,
+      "distinguishable_from_rotated_null": false
+    },
+    "Koradi": {
+      "n_total_within_extent": 700,
+      "n_day_matched": 346,
+      "true_z": -0.044664834941815175,
+      "null_mean_z": 0.37946862283998806,
+      "null_std_z": 2.1188233097863787,
+      "true_z_percentile_in_null": 48.25,
+      "empirical_p_one_sided": 0.5175,
+      "distinguishable_from_rotated_null": false
+    },
+    "Korba": {
+      "n_day_matched": 0,
+      "skipped": true,
+      "reason": "too few day-matched soundings"
+    },
+    "Kudgi": {
+      "n_total_within_extent": 141,
+      "n_day_matched": 141,
+      "true_z": -1.1201498318239578,
+      "null_mean_z": 1.5081859461064897,
+      "null_std_z": 6.387845468459075,
+      "true_z_percentile_in_null": 53.41386554621849,
+      "empirical_p_one_sided": 0.46586134453781514,
+      "distinguishable_from_rotated_null": false
+    },
+    "Mouda": {
+      "n_total_within_extent": 803,
+      "n_day_matched": 337,
+      "true_z": 2.6440988487840262,
+      "null_mean_z": -0.3368780842246194,
+      "null_std_z": 4.423288327200257,
+      "true_z_percentile_in_null": 72.59136212624585,
+      "empirical_p_one_sided": 0.27408637873754155,
+      "distinguishable_from_rotated_null": false
+    },
+    "RGundem": {
+      "n_total_within_extent": 20,
+      "n_day_matched": 20,
+      "true_z": 0.3610731498644355,
+      "null_mean_z": -0.6425824455763351,
+      "null_std_z": 2.509853483655526,
+      "true_z_percentile_in_null": 41.124260355029584,
+      "empirical_p_one_sided": 0.5887573964497042,
+      "distinguishable_from_rotated_null": false
+    },
+    "Rihand": {
+      "n_total_within_extent": 2028,
+      "n_day_matched": 614,
+      "true_z": -4.8850181259931835,
+      "null_mean_z": 0.2615834930392865,
+      "null_std_z": 3.427145820265208,
+      "true_z_percentile_in_null": 12.25,
+      "empirical_p_one_sided": 0.8775,
+      "distinguishable_from_rotated_null": false
+    },
+    "Sasan": {
+      "n_total_within_extent": 2440,
+      "n_day_matched": 785,
+      "true_z": 0.7136079221936894,
+      "null_mean_z": 0.4296550512857409,
+      "null_std_z": 6.95233079929856,
+      "true_z_percentile_in_null": 59.699999999999996,
+      "empirical_p_one_sided": 0.403,
+      "distinguishable_from_rotated_null": false
+    },
+    "ShriSingajiMalwa": {
+      "n_day_matched": 77,
+      "skipped": true,
+      "reason": "day-matched sector too small"
+    },
+    "Talcher": {
+      "n_total_within_extent": 305,
+      "n_day_matched": 259,
+      "true_z": 3.164746720825698,
+      "null_mean_z": -0.23062483604002104,
+      "null_std_z": 2.56363822147729,
+      "true_z_percentile_in_null": 83.7,
+      "empirical_p_one_sided": 0.163,
+      "distinguishable_from_rotated_null": false
+    },
+    "TalwandiSabo": {
+      "n_day_matched": 83,
+      "skipped": true,
+      "reason": "day-matched sector too small"
+    },
+    "Tamnar": {
+      "n_day_matched": 0,
+      "skipped": true,
+      "reason": "too few day-matched soundings"
+    },
+    "Tirora": {
+      "n_day_matched": 18,
+      "skipped": true,
+      "reason": "day-matched sector too small"
+    },
+    "Vindhyachal": {
+      "n_total_within_extent": 2416,
+      "n_day_matched": 744,
+      "true_z": -8.049658597437608,
+      "null_mean_z": 0.3330452896542948,
+      "null_std_z": 6.05436563183856,
+      "true_z_percentile_in_null": 6.6000000000000005,
+      "empirical_p_one_sided": 0.934,
+      "distinguishable_from_rotated_null": false
+    }
+  },
+  "conclusion": "0/11 facilities show a day-matched wind-direction sector effect distinguishable from a rotated-null baseline at p<0.05, using each sounding's own overpass-day wind direction instead of one annual/overpass-averaged direction per facility. Compare against the non-day-matched result (1/14) in data/plume_maps/random_sector_baseline_results.json."
+}
