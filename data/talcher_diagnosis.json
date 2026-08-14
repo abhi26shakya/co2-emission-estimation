@@ -6,9 +6,9 @@
     "climate_trace_year": 2021,
     "climate_trace_co2_t": 14235000,
     "match_dist_deg": 0.0011180339887552333,
-    "our_q_t_per_year": 7163462.163807527,
+    "our_q_t_per_year": 6914642.893860566,
     "our_q_year": 2020,
-    "ratio_ours_over_ct": 0.5032288137553584,
+    "ratio_ours_over_ct": 0.48574941298634117,
     "bracketed_by_our_interval": false
   },
   "climate_trace_year_trend": {

@@ -45,7 +45,7 @@
     "definitions_tested": 5,
     "ime_proxy_min": 0.0,
     "ime_proxy_max": 0.0,
-    "ime_proxy_range_pct_of_default": NaN
+    "ime_proxy_range_pct_of_default": null
   },
   "stage1_significance": {
     "near_n": 37,

@@ -30,6 +30,12 @@ TARGETS = ["ShriSingajiMalwa", "Koradi", "Tamnar"]
 COMPARISON_PLANT = "Rihand"  # same well-bracketed baseline used in diagnose_talcher.py
 
 
+def _pct_str(pct):
+    """bg_definition_sensitivity() reports None when the default-definition
+    IME proxy is 0 (percent-of-default is undefined, not just unstable)."""
+    return f"{pct:.0f}%" if pct is not None else "n/a"
+
+
 def significance_check(name, plant_row, near_r=0.25, bg_in=0.4, bg_out=0.9):
     d = np.load(f"data/{name}_soundings.npz")
     lat, lon, xco2 = d["lat"], d["lon"], d["xco2"]
@@ -53,7 +59,7 @@ def main():
     base_sens = bg_definition_sensitivity(COMPARISON_PLANT, plant_rows[COMPARISON_PLANT])
     base_sig = significance_check(COMPARISON_PLANT, plant_rows[COMPARISON_PLANT])
     print(f"  signal/noise={base_stats['signal_to_noise']:.3f}  "
-          f"bg-def range={base_sens['ime_proxy_range_pct_of_default']:.0f}%  "
+          f"bg-def range={_pct_str(base_sens['ime_proxy_range_pct_of_default'])}  "
           f"z={base_sig['z_score']:.2f}")
 
     results = {}
@@ -66,8 +72,8 @@ def main():
         print(f"  near_n={stats['near_n']} bg_n={stats['bg_n']}  "
               f"signal/noise={stats['signal_to_noise']:.3f}  "
               f"frac_near_above_bg={stats['frac_near_above_bg']:.1%}")
-        print(f"  bg-definition IME-proxy range: {sens['ime_proxy_range_pct_of_default']:.0f}% "
-              f"of default (baseline {COMPARISON_PLANT}: {base_sens['ime_proxy_range_pct_of_default']:.0f}%)")
+        print(f"  bg-definition IME-proxy range: {_pct_str(sens['ime_proxy_range_pct_of_default'])} "
+              f"of default (baseline {COMPARISON_PLANT}: {_pct_str(base_sens['ime_proxy_range_pct_of_default'])})")
         print(f"  significance: diff={sig['diff_ppm']:+.3f} ppm  se={sig['se_ppm']:.3f} ppm  "
               f"z={sig['z_score']:.2f}  consistent_with_zero_at_2sigma={sig['consistent_with_zero_at_2sigma']}")
         print(f"  wind/CO2 offset alignment: {wind_diff} deg")

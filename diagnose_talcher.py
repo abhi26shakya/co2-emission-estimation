@@ -76,12 +76,19 @@ def bg_definition_sensitivity(name, plant_row, near_r=NEAR):
     if not ime_proxies:
         return None
     ime_proxies = np.array(ime_proxies)
+    default_ime_proxy = ime_proxies[0]  # definitions[0] == (0.4, 0.9), the main pipeline's default
+    # When near soundings never exceed the default background's mean (all
+    # excess clipped to 0, e.g. TalwandiSabo), default_ime_proxy is 0 and
+    # "percent of default" is undefined, not just numerically unstable --
+    # there's no nonzero baseline to express the range as a percentage of.
+    # Report None (an explicit "not computable"), not a silent 0/0 NaN.
+    range_pct = (float((ime_proxies.max() - ime_proxies.min()) / default_ime_proxy * 100)
+                 if default_ime_proxy > 0 else None)
     return {
         "definitions_tested": len(ime_proxies),
         "ime_proxy_min": float(ime_proxies.min()),
         "ime_proxy_max": float(ime_proxies.max()),
-        "ime_proxy_range_pct_of_default": float(
-            (ime_proxies.max() - ime_proxies.min()) / ime_proxies[0] * 100),
+        "ime_proxy_range_pct_of_default": range_pct,
     }
 
 
@@ -138,7 +145,9 @@ def main():
     for name in ["Talcher", COMPARISON_PLANT]:
         sens = bg_definition_sensitivity(name, plant_rows[name])
         sensitivity[name] = sens
-        print(f"  {name}: IME proxy range = {sens['ime_proxy_range_pct_of_default']:.0f}% "
+        pct = sens["ime_proxy_range_pct_of_default"]
+        pct_str = f"{pct:.0f}%" if pct is not None else "n/a (default-definition IME proxy is 0)"
+        print(f"  {name}: IME proxy range = {pct_str} "
               f"of the default-definition value across {sens['definitions_tested']} "
               f"reasonable background definitions")
 

@@ -25,7 +25,7 @@ import json
 import numpy as np
 
 from diagnose_talcher import near_bg_stats, bg_definition_sensitivity
-from diagnose_negative_enhancement import significance_check
+from diagnose_negative_enhancement import significance_check, _pct_str
 from diagnose_shrisingajimalwa import seasonal_breakdown, same_month_comparison, directional_breakdown
 
 TARGET = "TalwandiSabo"
@@ -41,7 +41,7 @@ def main():
     base_sens = bg_definition_sensitivity(COMPARISON_PLANT, plant_rows[COMPARISON_PLANT])
     base_sig = significance_check(COMPARISON_PLANT, plant_rows[COMPARISON_PLANT])
     print(f"  signal/noise={base_stats['signal_to_noise']:.3f}  "
-          f"bg-def range={base_sens['ime_proxy_range_pct_of_default']:.0f}%  "
+          f"bg-def range={_pct_str(base_sens['ime_proxy_range_pct_of_default'])}  "
           f"z={base_sig['z_score']:.2f}")
 
     print(f"\n=== {TARGET}: Stage 1 -- statistical-significance check ===")
@@ -52,8 +52,8 @@ def main():
     print(f"  near_n={stats['near_n']} bg_n={stats['bg_n']}  "
           f"signal/noise={stats['signal_to_noise']:.3f}  "
           f"frac_near_above_bg={stats['frac_near_above_bg']:.1%}")
-    print(f"  bg-definition IME-proxy range: {sens['ime_proxy_range_pct_of_default']:.0f}% "
-          f"of default (baseline {COMPARISON_PLANT}: {base_sens['ime_proxy_range_pct_of_default']:.0f}%)")
+    print(f"  bg-definition IME-proxy range: {_pct_str(sens['ime_proxy_range_pct_of_default'])} "
+          f"of default (baseline {COMPARISON_PLANT}: {_pct_str(base_sens['ime_proxy_range_pct_of_default'])})")
     print(f"  significance: diff={sig['diff_ppm']:+.3f} ppm  se={sig['se_ppm']:.3f} ppm  "
           f"z={sig['z_score']:.2f}  consistent_with_zero_at_2sigma={sig['consistent_with_zero_at_2sigma']}")
     print(f"  wind/CO2 offset alignment: {wind_diff} deg")
