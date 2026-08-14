@@ -119,8 +119,15 @@ def plume_grid(Q_t_per_year, wind_speed_ms, wind_from_deg,
     point in the actual downwind direction.
 
     wind_from_deg: meteorological convention -- the compass direction the
-    wind is blowing FROM (matches plant_results.json's existing wind_deg
-    field, computed the same way in process_plant.py / physics_gaussian.py).
+    wind is blowing FROM. NOTE: data/plant_results.json's own "wind_deg"
+    field is NOT this convention -- it is the direction the wind blows
+    TOWARD (see process_plant.py's "toward {wind_deg} deg" print and its
+    atan2(u,v) computation on the raw wind vector). Callers reading from
+    plant_results.json must convert explicitly: wind_from_deg =
+    (wind_deg + 180) % 360 -- see build_plume_maps.py for the reference
+    conversion. This bug was caught during Phase 1 verification before it
+    propagated (NOVEL_METHODOLOGY_PROPOSAL.md Sec 8).
+
     The plume travels in the direction wind_from_deg + 180.
 
     Returns (grid_kg_m3, east_km_axis, north_km_axis).
@@ -128,11 +135,35 @@ def plume_grid(Q_t_per_year, wind_speed_ms, wind_from_deg,
     n = int(2 * extent_km * 1000 / resolution_m) + 1
     axis_m = np.linspace(-extent_km * 1000, extent_km * 1000, n)
     east_m, north_m = np.meshgrid(axis_m, axis_m)
-
-    theta = np.radians(wind_from_deg + 180.0)
-    downwind_x = east_m * np.sin(theta) + north_m * np.cos(theta)
-    crosswind_y = east_m * np.cos(theta) - north_m * np.sin(theta)
+    downwind_x, crosswind_y = _rotate_to_plume_frame(east_m, north_m, wind_from_deg)
 
     conc = ground_level_concentration(Q_t_per_year, wind_speed_ms, H_m,
                                        downwind_x, crosswind_y, stability_class)
     return conc, axis_m / 1000.0, axis_m / 1000.0
+
+
+def _rotate_to_plume_frame(east_m, north_m, wind_from_deg):
+    """Shared rotation logic: north-up (east, north) meters -> the plume's
+    own (downwind, crosswind) frame. Factored out so plume_grid() (grid
+    evaluation) and concentration_at_locations() (point evaluation, used
+    for validating against real sounding coordinates) can't drift apart."""
+    theta = np.radians(wind_from_deg + 180.0)
+    downwind_x = east_m * np.sin(theta) + north_m * np.cos(theta)
+    crosswind_y = east_m * np.cos(theta) - north_m * np.sin(theta)
+    return downwind_x, crosswind_y
+
+
+def concentration_at_locations(Q_t_per_year, wind_speed_ms, wind_from_deg, east_km, north_km,
+                                H_m=DEFAULT_STACK_HEIGHT_M, stability_class=DEFAULT_STABILITY_CLASS):
+    """
+    Evaluates the plume at arbitrary (east_km, north_km) points relative to
+    the plant -- e.g. real OCO-3 sounding locations -- rather than a
+    regular grid. Same physics as plume_grid(), same wind_from_deg
+    convention caveat applies. Returns concentration in kg/m^3, same shape
+    as the input east_km/north_km arrays.
+    """
+    east_m = np.asarray(east_km, dtype=np.float64) * 1000.0
+    north_m = np.asarray(north_km, dtype=np.float64) * 1000.0
+    downwind_x, crosswind_y = _rotate_to_plume_frame(east_m, north_m, wind_from_deg)
+    return ground_level_concentration(Q_t_per_year, wind_speed_ms, H_m,
+                                       downwind_x, crosswind_y, stability_class)

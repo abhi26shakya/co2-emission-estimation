@@ -85,6 +85,25 @@ Ran `build_plume_maps.py` for all three prototype facilities. Full numeric outpu
 - **One real bug caught by verification, before it propagated anywhere**: `data/plant_results.json`'s `wind_deg` field turned out to be the direction the wind blows *toward* (confirmed from `process_plant.py`'s own `"toward {wind_deg} deg"` print statement and its `atan2(u,v)` computation on the raw wind vector), not the standard meteorological "blows *from*" convention `plume_grid()` expects. Checking this before running the prototype (rather than after) avoided every plume silently pointing 180° in the wrong direction — `build_plume_maps.py` now converts explicitly (`wind_from_deg = wind_deg + 180`), documented in its own module docstring.
 - **Known limitation carried forward honestly, not new**: Track B's own pre-existing wind/CO2-offset alignment check (`wind_co2_diff_deg`, already in `plant_results.json`) shows only moderate-to-poor alignment for Rihand (109°) and Anpara (80°) — good for Talcher (25°). Since the plume model uses the same wind direction, its predicted plume axis inherits this same limitation for Rihand/Anpara. This is not a new problem introduced by the plume model; it's an existing, already-documented data-quality caveat that now has a second, spatially-visible consequence worth stating plainly in any write-up.
 
-## 9. Next: Phase 2 (not started)
+## 9. Phase 2 — spatial self-consistency validation (DONE)
 
-Phase 2 (spatial self-consistency validation against actual OCO-3 sounding locations) is the natural next step and was explicitly out of scope for this turn — it requires its own verification pass before being trusted, consistent with the step-by-step approach. Recommend checking in before starting it, given Phase 1's own wind-convention bug is a reminder that each phase needs its own independent verification, not just physics-level unit tests.
+`validate_plume_spatial_consistency.py`, plus 2 more unit tests in `plume_model.py`'s new `concentration_at_locations()` (point evaluation, factored to share `_rotate_to_plume_frame()` with `plume_grid()` so grid and point evaluation cannot drift apart — full suite now 37 tests, all pass).
+
+**Method**: for each prototype facility, project every real OCO-3 sounding within the plume's 30km extent into the same local (east_km, north_km) frame the plume grid uses, compute each sounding's XCO2 excess using the *same* background definition `physics_gaussian.py` already uses (imported, not reimplemented), evaluate the plume model's predicted concentration at each sounding's exact location, and test two things: (a) Pearson correlation between predicted concentration and observed excess, (b) whether soundings inside the plume's predicted downwind sector (±45°) show significantly higher excess than soundings outside it.
+
+**Results** (`data/plume_maps/spatial_consistency_results.json`):
+
+| Facility | N soundings | Pearson r | Sector test (in vs. out, ppm) | z-score |
+|---|---|---|---|---|
+| Rihand | 2028 | +0.144 | +2.74 vs. +1.25 | 11.43 |
+| Talcher | 305 | +0.380 | +0.83 vs. +0.17 | 1.97 |
+| Anpara | 1710 | +0.078 | +2.88 vs. +1.03 | 10.60 |
+
+**All three show a positive, mostly statistically significant spatial-consistency signal** — including Rihand and Anpara, whose existing single-centroid wind/CO2 alignment check (`wind_co2_diff_deg` = 109° and 80°, computed independently in `process_plant.py`) suggested poor alignment. This isn't necessarily a contradiction: the sector test uses thousands of individual soundings, not one aggregate centroid bearing dominated by whichever soundings happen to be in the top-20%-CO2 subset — it's a statistically richer test that may be detecting a real but diffuse effect the coarser single-number metric missed.
+
+**Honest caveat, not yet resolved**: the sector test as built does not fully rule out a confound where soundings simply closer to the source read higher regardless of true direction (a pure distance effect masquerading as a directional one), since near-source soundings could disproportionately land in any given 90°-wide sector by chance. A stronger version of this test — comparing against a *random*-direction sector as a null baseline, repeated many times, to establish what correlation/z-score would arise from distance alone — is the natural next robustness check before this spatial-consistency finding is presented as strong evidence in a paper. Flagged here explicitly rather than presented as fully conclusive.
+
+## 10. Next steps (not started)
+
+- **Phase 2 robustness follow-up**: the random-sector null-baseline test described above.
+- **Phase 3** (Grad-CAM spatial fusion) and beyond, per §5's table — not started, checking in before continuing further given the scope already covered this session.

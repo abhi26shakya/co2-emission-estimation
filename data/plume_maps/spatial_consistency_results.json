@@ -1,0 +1,63 @@
+{
+  "prototype_facilities": [
+    "Rihand",
+    "Talcher",
+    "Anpara"
+  ],
+  "extent_km": 30.0,
+  "sector_half_width_deg": 45.0,
+  "results": {
+    "Rihand": {
+      "n_within_extent": 2028,
+      "bg_mean_ppm": 413.2850646972656,
+      "wind_from_deg": 288.0,
+      "plume_travel_deg": 108.0,
+      "pearson_r_predicted_vs_observed": 0.14364957189449135,
+      "sector_test": {
+        "n_in_sector": 470,
+        "n_out_sector": 1558,
+        "mean_excess_in_sector_ppm": 2.7400622367858887,
+        "mean_excess_out_sector_ppm": 1.245619535446167,
+        "diff_ppm": 1.4944427013397217,
+        "se_ppm": 0.13078479947766092,
+        "z_score": 11.426730838051133,
+        "in_sector_significantly_higher": true
+      }
+    },
+    "Talcher": {
+      "n_within_extent": 305,
+      "bg_mean_ppm": 413.56121826171875,
+      "wind_from_deg": 138.0,
+      "plume_travel_deg": 318.0,
+      "pearson_r_predicted_vs_observed": 0.3798634379541366,
+      "sector_test": {
+        "n_in_sector": 34,
+        "n_out_sector": 271,
+        "mean_excess_in_sector_ppm": 0.8272992372512817,
+        "mean_excess_out_sector_ppm": 0.17209966480731964,
+        "diff_ppm": 0.6551995873451233,
+        "se_ppm": 0.33307205302490106,
+        "z_score": 1.96714068741198,
+        "in_sector_significantly_higher": false
+      }
+    },
+    "Anpara": {
+      "n_within_extent": 1710,
+      "bg_mean_ppm": 413.3420715332031,
+      "wind_from_deg": 288.0,
+      "plume_travel_deg": 108.0,
+      "pearson_r_predicted_vs_observed": 0.07834124444238293,
+      "sector_test": {
+        "n_in_sector": 272,
+        "n_out_sector": 1438,
+        "mean_excess_in_sector_ppm": 2.880908966064453,
+        "mean_excess_out_sector_ppm": 1.029917597770691,
+        "diff_ppm": 1.8509913682937622,
+        "se_ppm": 0.17458427706697277,
+        "z_score": 10.602279881043916,
+        "in_sector_significantly_higher": true
+      }
+    }
+  },
+  "note": "This is a spatial CONSISTENCY check, not a pixel-accuracy benchmark -- OCO-3's sparse per-sounding footprint (~1.6km, non-daily revisit) cannot support a claim that the plume map is pixel-accurate. A weak or null result for a facility with already-poor wind/CO2 alignment (see plant_results.json's wind_co2_diff_deg, computed independently in process_plant.py) is an EXPECTED, consistent finding, not a failure of this validation --  the plume model inherits whatever wind-alignment quality that facility already had."
+}

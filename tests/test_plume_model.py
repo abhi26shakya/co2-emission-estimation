@@ -71,6 +71,23 @@ class TestGroundLevelConcentration(unittest.TestCase):
         self.assertGreater(float(short_stack), float(tall_stack))
 
 
+class TestConcentrationAtLocations(unittest.TestCase):
+    def test_point_evaluation_matches_grid_evaluation(self):
+        # concentration_at_locations() and plume_grid() must agree at
+        # coincident points -- they share _rotate_to_plume_frame(), but
+        # this guards against the two call sites drifting apart.
+        grid, ex, nx = pm.plume_grid(1e6, 2.0, wind_from_deg=200.0, extent_km=20, resolution_m=1000)
+        i, j = 15, 10  # arbitrary interior grid point
+        east_km, north_km = ex[j], nx[i]
+        point_val = pm.concentration_at_locations(1e6, 2.0, 200.0, east_km, north_km)
+        self.assertAlmostEqual(float(point_val), float(grid[i, j]), places=6)
+
+    def test_accepts_array_of_locations(self):
+        vals = pm.concentration_at_locations(1e6, 2.0, 90.0, east_km=[1.0, 2.0, 3.0], north_km=[0.0, 0.0, 0.0])
+        self.assertEqual(len(vals), 3)
+        self.assertTrue(np.all(np.isfinite(vals)))
+
+
 class TestPlumeGrid(unittest.TestCase):
     def test_grid_shape_matches_axes(self):
         grid, ex, nx = pm.plume_grid(1e6, 2.0, wind_from_deg=270.0, extent_km=10, resolution_m=1000)
