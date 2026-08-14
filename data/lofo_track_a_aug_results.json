@@ -1,0 +1,165 @@
+{
+  "epochs": 30,
+  "n_facilities": 22,
+  "per_facility": [
+    {
+      "plant": "Anpara",
+      "n_tiles": 24,
+      "recall": 1.0,
+      "baseline_recall": 1.0,
+      "delta": 0.0
+    },
+    {
+      "plant": "ChandrapurCoal",
+      "n_tiles": 24,
+      "recall": 0.7916666666666666,
+      "baseline_recall": 0.875,
+      "delta": -0.08333333333333337
+    },
+    {
+      "plant": "Chhabra",
+      "n_tiles": 24,
+      "recall": 0.5416666666666666,
+      "baseline_recall": 0.5416666666666666,
+      "delta": 0.0
+    },
+    {
+      "plant": "Farakka",
+      "n_tiles": 24,
+      "recall": 0.5,
+      "baseline_recall": 0.375,
+      "delta": 0.125
+    },
+    {
+      "plant": "Kahalgaon",
+      "n_tiles": 24,
+      "recall": 0.4166666666666667,
+      "baseline_recall": 0.5,
+      "delta": -0.08333333333333331
+    },
+    {
+      "plant": "Koradi",
+      "n_tiles": 24,
+      "recall": 0.7083333333333334,
+      "baseline_recall": 0.9583333333333334,
+      "delta": -0.25
+    },
+    {
+      "plant": "Korba",
+      "n_tiles": 24,
+      "recall": 1.0,
+      "baseline_recall": 1.0,
+      "delta": 0.0
+    },
+    {
+      "plant": "Kudgi",
+      "n_tiles": 24,
+      "recall": 0.0,
+      "baseline_recall": 0.0,
+      "delta": 0.0
+    },
+    {
+      "plant": "MUNDRA_TPP",
+      "n_tiles": 24,
+      "recall": 0.5833333333333334,
+      "baseline_recall": 0.625,
+      "delta": -0.04166666666666663
+    },
+    {
+      "plant": "MUNDRA_UMPP",
+      "n_tiles": 24,
+      "recall": 0.9583333333333334,
+      "baseline_recall": 0.9583333333333334,
+      "delta": 0.0
+    },
+    {
+      "plant": "Mouda",
+      "n_tiles": 24,
+      "recall": 0.7083333333333334,
+      "baseline_recall": 0.7083333333333334,
+      "delta": 0.0
+    },
+    {
+      "plant": "RGundem",
+      "n_tiles": 24,
+      "recall": 0.7083333333333334,
+      "baseline_recall": 0.625,
+      "delta": 0.08333333333333337
+    },
+    {
+      "plant": "Rihand",
+      "n_tiles": 24,
+      "recall": 0.9583333333333334,
+      "baseline_recall": 0.9583333333333334,
+      "delta": 0.0
+    },
+    {
+      "plant": "SASAN_UMPP",
+      "n_tiles": 24,
+      "recall": 1.0,
+      "baseline_recall": 0.9166666666666666,
+      "delta": 0.08333333333333337
+    },
+    {
+      "plant": "ShriSingajiMalwa",
+      "n_tiles": 24,
+      "recall": 0.0,
+      "baseline_recall": 0.0,
+      "delta": 0.0
+    },
+    {
+      "plant": "Simhadri",
+      "n_tiles": 24,
+      "recall": 0.375,
+      "baseline_recall": 0.5,
+      "delta": -0.125
+    },
+    {
+      "plant": "Sipat",
+      "n_tiles": 24,
+      "recall": 0.9583333333333334,
+      "baseline_recall": 0.9583333333333334,
+      "delta": 0.0
+    },
+    {
+      "plant": "TIRORA_TPP",
+      "n_tiles": 24,
+      "recall": 0.5,
+      "baseline_recall": 0.6666666666666666,
+      "delta": -0.16666666666666663
+    },
+    {
+      "plant": "Talcher",
+      "n_tiles": 24,
+      "recall": 1.0,
+      "baseline_recall": 1.0,
+      "delta": 0.0
+    },
+    {
+      "plant": "TalwandiSabo",
+      "n_tiles": 12,
+      "recall": 0.16666666666666666,
+      "baseline_recall": 0.08333333333333333,
+      "delta": 0.08333333333333333
+    },
+    {
+      "plant": "Tamnar",
+      "n_tiles": 24,
+      "recall": 0.9166666666666666,
+      "baseline_recall": 0.9583333333333334,
+      "delta": -0.04166666666666674
+    },
+    {
+      "plant": "VINDH_CHAL_STPS",
+      "n_tiles": 24,
+      "recall": 1.0,
+      "baseline_recall": 1.0,
+      "delta": 0.0
+    }
+  ],
+  "mean_recall": 0.6723484848484849,
+  "tile_weighted_mean_recall": 0.6841085271317829,
+  "baseline_mean_recall": 0.4722222222222222,
+  "baseline_tile_weighted_mean_recall": 0.48717948717948717,
+  "note": "Same 21-fold LOFO structure as lofo_track_a.py, but training tiles get a random dihedral-4 spatial transform (identity/hflip/vflip/90-rot) applied per-epoch via AugmentedTiles. Tests whether the baseline LOFO recall gap was partly a training-set-diversity artifact (16 of 20 facilities have only 12 tiles each) rather than purely a weak-signal problem."
+}
