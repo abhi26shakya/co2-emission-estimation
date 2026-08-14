@@ -1,0 +1,1425 @@
+{
+  "schema_reference": "data/schema/emission_record_schema.json",
+  "n_facilities": 21,
+  "facilities": [
+    {
+      "facility_id": "Anpara",
+      "name": "Anpara",
+      "lat": 24.201,
+      "lon": 82.7891,
+      "capacity_mw": 2630.0,
+      "track_a": {
+        "activity_prob_mean": 0.964180663228035,
+        "activity_prob_std": 0.044491808809639447,
+        "exhaustive_lofo_recall": 1.0,
+        "validation_status": "exhaustive_lofo_tested"
+      },
+      "track_b": {
+        "raw_estimate": {
+          "q_t_per_year": 31660051.120184448,
+          "q_t_per_year_std": 21471037.029337596,
+          "wind_mode": "per-overpass",
+          "month_stratified": true,
+          "hit_days": 16,
+          "n_soundings": 5768
+        },
+        "ground_truth_correction": {
+          "available": true,
+          "corrected_q_t_per_year": 48861052.4183455,
+          "correction_significant": false,
+          "validation_status": "cea_ground_truth_matched"
+        },
+        "climate_trace_comparison": {
+          "climate_trace_co2_t": 18173000,
+          "ratio_ours_over_ct": 1.7421477532704808,
+          "bracketed_by_our_interval": true
+        }
+      },
+      "plume": {
+        "available": true,
+        "validated": false,
+        "validation_summary": "Physics-consistent visualization calibrated to a validated total mass flux. Two robustness checks (random-sector null baseline, per-overpass day-matched wind) found the predicted spatial orientation does not reliably align with real OCO-3 data for the large majority of facilities tested -- NOT a validated spatial prediction. See NOVEL_METHODOLOGY_PROPOSAL.md Sec 11-12.",
+        "grid_reference": "plume_maps/Anpara_default.npz",
+        "default_assumptions": {
+          "stability_class": "B",
+          "stack_height_m": 220.0
+        }
+      },
+      "temporal": {
+        "available": true,
+        "n_months_usable": 6,
+        "months_with_data": [
+          2,
+          3,
+          4,
+          6,
+          11,
+          12
+        ],
+        "absolute_values_comparable_to_annual": false,
+        "monsoon_sampling_gap_caveat": "Months 7/8/10 have no usable data for ANY facility in this dataset, likely an OCO-3 monsoon-cloud-cover retrieval gap, not a genuine emissions pattern."
+      },
+      "provenance": {
+        "exported_at": "2026-08-14T11:45:59.696262Z",
+        "source_files": [
+          "data/plant_results.json",
+          "data/emission_estimates.json",
+          "data/cea_ground_truth_2020_21.json",
+          "data/q_correction_model_results.json",
+          "data/q_correction_model_strengthened_results.json",
+          "data/activity_signals.json",
+          "data/lofo_track_a_results.json",
+          "data/climate_trace_comparison.json",
+          "data/temporal_q_model_results.json",
+          "data/plume_maps/prototype_summary.json"
+        ],
+        "methodology_reference": "NOVEL_METHODOLOGY_PROPOSAL.md"
+      }
+    },
+    {
+      "facility_id": "ChandrapurCoal",
+      "name": "ChandrapurCoal",
+      "lat": 20.0063,
+      "lon": 79.29,
+      "capacity_mw": 2920.0,
+      "track_a": {
+        "activity_prob_mean": 0.5346000716090202,
+        "activity_prob_std": 0.14370898758973397,
+        "exhaustive_lofo_recall": 0.875,
+        "validation_status": "exhaustive_lofo_tested"
+      },
+      "track_b": {
+        "raw_estimate": {
+          "q_t_per_year": 7106246.984691159,
+          "q_t_per_year_std": 4108938.033814528,
+          "wind_mode": "annual-mean (fallback)",
+          "month_stratified": true,
+          "hit_days": 14,
+          "n_soundings": 1136
+        },
+        "ground_truth_correction": {
+          "available": true,
+          "corrected_q_t_per_year": 6280970.967718118,
+          "correction_significant": false,
+          "validation_status": "cea_ground_truth_matched"
+        },
+        "climate_trace_comparison": {
+          "climate_trace_co2_t": 14623000,
+          "ratio_ours_over_ct": 0.4859636862949572,
+          "bracketed_by_our_interval": false
+        }
+      },
+      "plume": {
+        "available": true,
+        "validated": false,
+        "validation_summary": "Physics-consistent visualization calibrated to a validated total mass flux. Two robustness checks (random-sector null baseline, per-overpass day-matched wind) found the predicted spatial orientation does not reliably align with real OCO-3 data for the large majority of facilities tested -- NOT a validated spatial prediction. See NOVEL_METHODOLOGY_PROPOSAL.md Sec 11-12.",
+        "grid_reference": "plume_maps/ChandrapurCoal_default.npz",
+        "default_assumptions": {
+          "stability_class": "B",
+          "stack_height_m": 220.0
+        }
+      },
+      "temporal": {
+        "available": true,
+        "n_months_usable": 2,
+        "months_with_data": [
+          5,
+          10
+        ],
+        "absolute_values_comparable_to_annual": false,
+        "monsoon_sampling_gap_caveat": "Months 7/8/10 have no usable data for ANY facility in this dataset, likely an OCO-3 monsoon-cloud-cover retrieval gap, not a genuine emissions pattern."
+      },
+      "provenance": {
+        "exported_at": "2026-08-14T11:45:59.696390Z",
+        "source_files": [
+          "data/plant_results.json",
+          "data/emission_estimates.json",
+          "data/cea_ground_truth_2020_21.json",
+          "data/q_correction_model_results.json",
+          "data/q_correction_model_strengthened_results.json",
+          "data/activity_signals.json",
+          "data/lofo_track_a_results.json",
+          "data/climate_trace_comparison.json",
+          "data/temporal_q_model_results.json",
+          "data/plume_maps/prototype_summary.json"
+        ],
+        "methodology_reference": "NOVEL_METHODOLOGY_PROPOSAL.md"
+      }
+    },
+    {
+      "facility_id": "Chhabra",
+      "name": "Chhabra",
+      "lat": 24.6217,
+      "lon": 77.0357,
+      "capacity_mw": 2320.0,
+      "track_a": {
+        "activity_prob_mean": 0.42430850863456726,
+        "activity_prob_std": 0.20441999181000392,
+        "exhaustive_lofo_recall": 0.5416666666666666,
+        "validation_status": "exhaustive_lofo_tested"
+      },
+      "track_b": {
+        "raw_estimate": {
+          "q_t_per_year": 1010757.2865149596,
+          "q_t_per_year_std": 624682.8562314494,
+          "wind_mode": "annual-mean (fallback)",
+          "month_stratified": true,
+          "hit_days": 9,
+          "n_soundings": 874
+        },
+        "ground_truth_correction": {
+          "available": true,
+          "corrected_q_t_per_year": 2003912.777930247,
+          "correction_significant": false,
+          "validation_status": "cea_ground_truth_matched"
+        },
+        "climate_trace_comparison": {
+          "climate_trace_co2_t": 9498300,
+          "ratio_ours_over_ct": 0.10641454644672832,
+          "bracketed_by_our_interval": false
+        }
+      },
+      "plume": {
+        "available": true,
+        "validated": false,
+        "validation_summary": "Physics-consistent visualization calibrated to a validated total mass flux. Two robustness checks (random-sector null baseline, per-overpass day-matched wind) found the predicted spatial orientation does not reliably align with real OCO-3 data for the large majority of facilities tested -- NOT a validated spatial prediction. See NOVEL_METHODOLOGY_PROPOSAL.md Sec 11-12.",
+        "grid_reference": "plume_maps/Chhabra_default.npz",
+        "default_assumptions": {
+          "stability_class": "B",
+          "stack_height_m": 220.0
+        }
+      },
+      "temporal": {
+        "available": true,
+        "n_months_usable": 1,
+        "months_with_data": [
+          6
+        ],
+        "absolute_values_comparable_to_annual": false,
+        "monsoon_sampling_gap_caveat": "Months 7/8/10 have no usable data for ANY facility in this dataset, likely an OCO-3 monsoon-cloud-cover retrieval gap, not a genuine emissions pattern."
+      },
+      "provenance": {
+        "exported_at": "2026-08-14T11:45:59.696394Z",
+        "source_files": [
+          "data/plant_results.json",
+          "data/emission_estimates.json",
+          "data/cea_ground_truth_2020_21.json",
+          "data/q_correction_model_results.json",
+          "data/q_correction_model_strengthened_results.json",
+          "data/activity_signals.json",
+          "data/lofo_track_a_results.json",
+          "data/climate_trace_comparison.json",
+          "data/temporal_q_model_results.json",
+          "data/plume_maps/prototype_summary.json"
+        ],
+        "methodology_reference": "NOVEL_METHODOLOGY_PROPOSAL.md"
+      }
+    },
+    {
+      "facility_id": "Farakka",
+      "name": "Farakka",
+      "lat": 24.772,
+      "lon": 87.894,
+      "capacity_mw": 2100.0,
+      "track_a": {
+        "activity_prob_mean": 0.36917757615447044,
+        "activity_prob_std": 0.0954639141813908,
+        "exhaustive_lofo_recall": 0.375,
+        "validation_status": "exhaustive_lofo_tested"
+      },
+      "track_b": {
+        "raw_estimate": {
+          "q_t_per_year": 11105118.959295532,
+          "q_t_per_year_std": 6054577.747940437,
+          "wind_mode": "per-overpass",
+          "month_stratified": true,
+          "hit_days": 12,
+          "n_soundings": 1504
+        },
+        "ground_truth_correction": {
+          "available": true,
+          "corrected_q_t_per_year": 2945397.3198111425,
+          "correction_significant": false,
+          "validation_status": "cea_ground_truth_matched"
+        },
+        "climate_trace_comparison": {
+          "climate_trace_co2_t": 9965200,
+          "ratio_ours_over_ct": 1.1143899730357174,
+          "bracketed_by_our_interval": true
+        }
+      },
+      "plume": {
+        "available": true,
+        "validated": false,
+        "validation_summary": "Physics-consistent visualization calibrated to a validated total mass flux. Two robustness checks (random-sector null baseline, per-overpass day-matched wind) found the predicted spatial orientation does not reliably align with real OCO-3 data for the large majority of facilities tested -- NOT a validated spatial prediction. See NOVEL_METHODOLOGY_PROPOSAL.md Sec 11-12.",
+        "grid_reference": "plume_maps/Farakka_default.npz",
+        "default_assumptions": {
+          "stability_class": "B",
+          "stack_height_m": 220.0
+        }
+      },
+      "temporal": {
+        "available": true,
+        "n_months_usable": 4,
+        "months_with_data": [
+          2,
+          3,
+          4,
+          12
+        ],
+        "absolute_values_comparable_to_annual": false,
+        "monsoon_sampling_gap_caveat": "Months 7/8/10 have no usable data for ANY facility in this dataset, likely an OCO-3 monsoon-cloud-cover retrieval gap, not a genuine emissions pattern."
+      },
+      "provenance": {
+        "exported_at": "2026-08-14T11:45:59.696397Z",
+        "source_files": [
+          "data/plant_results.json",
+          "data/emission_estimates.json",
+          "data/cea_ground_truth_2020_21.json",
+          "data/q_correction_model_results.json",
+          "data/q_correction_model_strengthened_results.json",
+          "data/activity_signals.json",
+          "data/lofo_track_a_results.json",
+          "data/climate_trace_comparison.json",
+          "data/temporal_q_model_results.json",
+          "data/plume_maps/prototype_summary.json"
+        ],
+        "methodology_reference": "NOVEL_METHODOLOGY_PROPOSAL.md"
+      }
+    },
+    {
+      "facility_id": "Kahalgaon",
+      "name": "Kahalgaon",
+      "lat": 25.2349,
+      "lon": 87.2635,
+      "capacity_mw": 2340.0,
+      "track_a": {
+        "activity_prob_mean": 0.3649778539935748,
+        "activity_prob_std": 0.09063782633548532,
+        "exhaustive_lofo_recall": 0.5,
+        "validation_status": "exhaustive_lofo_tested"
+      },
+      "track_b": {
+        "raw_estimate": {
+          "q_t_per_year": 29654782.819959152,
+          "q_t_per_year_std": 15267092.104217306,
+          "wind_mode": "annual-mean (fallback)",
+          "month_stratified": true,
+          "hit_days": 14,
+          "n_soundings": 1038
+        },
+        "ground_truth_correction": {
+          "available": true,
+          "corrected_q_t_per_year": 11187073.783213032,
+          "correction_significant": false,
+          "validation_status": "cea_ground_truth_matched"
+        },
+        "climate_trace_comparison": {
+          "climate_trace_co2_t": 11104600,
+          "ratio_ours_over_ct": 2.6704953640796742,
+          "bracketed_by_our_interval": false
+        }
+      },
+      "plume": {
+        "available": true,
+        "validated": false,
+        "validation_summary": "Physics-consistent visualization calibrated to a validated total mass flux. Two robustness checks (random-sector null baseline, per-overpass day-matched wind) found the predicted spatial orientation does not reliably align with real OCO-3 data for the large majority of facilities tested -- NOT a validated spatial prediction. See NOVEL_METHODOLOGY_PROPOSAL.md Sec 11-12.",
+        "grid_reference": "plume_maps/Kahalgaon_default.npz",
+        "default_assumptions": {
+          "stability_class": "B",
+          "stack_height_m": 220.0
+        }
+      },
+      "temporal": {
+        "available": true,
+        "n_months_usable": 2,
+        "months_with_data": [
+          4,
+          9
+        ],
+        "absolute_values_comparable_to_annual": false,
+        "monsoon_sampling_gap_caveat": "Months 7/8/10 have no usable data for ANY facility in this dataset, likely an OCO-3 monsoon-cloud-cover retrieval gap, not a genuine emissions pattern."
+      },
+      "provenance": {
+        "exported_at": "2026-08-14T11:45:59.696400Z",
+        "source_files": [
+          "data/plant_results.json",
+          "data/emission_estimates.json",
+          "data/cea_ground_truth_2020_21.json",
+          "data/q_correction_model_results.json",
+          "data/q_correction_model_strengthened_results.json",
+          "data/activity_signals.json",
+          "data/lofo_track_a_results.json",
+          "data/climate_trace_comparison.json",
+          "data/temporal_q_model_results.json",
+          "data/plume_maps/prototype_summary.json"
+        ],
+        "methodology_reference": "NOVEL_METHODOLOGY_PROPOSAL.md"
+      }
+    },
+    {
+      "facility_id": "Koradi",
+      "name": "Koradi",
+      "lat": 21.2414,
+      "lon": 79.096,
+      "capacity_mw": 2400.0,
+      "track_a": {
+        "activity_prob_mean": 0.49994858105977374,
+        "activity_prob_std": 0.15106010379079926,
+        "exhaustive_lofo_recall": 0.9583333333333334,
+        "validation_status": "exhaustive_lofo_tested"
+      },
+      "track_b": {
+        "raw_estimate": {
+          "q_t_per_year": 10856286.293151114,
+          "q_t_per_year_std": 4471038.315862282,
+          "wind_mode": "per-overpass",
+          "month_stratified": true,
+          "hit_days": 25,
+          "n_soundings": 3672
+        },
+        "ground_truth_correction": {
+          "available": true,
+          "corrected_q_t_per_year": 16752902.943787677,
+          "correction_significant": false,
+          "validation_status": "cea_ground_truth_matched"
+        },
+        "climate_trace_comparison": {
+          "climate_trace_co2_t": 10946800,
+          "ratio_ours_over_ct": 0.9917314916826026,
+          "bracketed_by_our_interval": true
+        }
+      },
+      "plume": {
+        "available": true,
+        "validated": false,
+        "validation_summary": "Physics-consistent visualization calibrated to a validated total mass flux. Two robustness checks (random-sector null baseline, per-overpass day-matched wind) found the predicted spatial orientation does not reliably align with real OCO-3 data for the large majority of facilities tested -- NOT a validated spatial prediction. See NOVEL_METHODOLOGY_PROPOSAL.md Sec 11-12.",
+        "grid_reference": "plume_maps/Koradi_default.npz",
+        "default_assumptions": {
+          "stability_class": "B",
+          "stack_height_m": 220.0
+        }
+      },
+      "temporal": {
+        "available": true,
+        "n_months_usable": 6,
+        "months_with_data": [
+          2,
+          3,
+          5,
+          9,
+          11,
+          12
+        ],
+        "absolute_values_comparable_to_annual": false,
+        "monsoon_sampling_gap_caveat": "Months 7/8/10 have no usable data for ANY facility in this dataset, likely an OCO-3 monsoon-cloud-cover retrieval gap, not a genuine emissions pattern."
+      },
+      "provenance": {
+        "exported_at": "2026-08-14T11:45:59.696405Z",
+        "source_files": [
+          "data/plant_results.json",
+          "data/emission_estimates.json",
+          "data/cea_ground_truth_2020_21.json",
+          "data/q_correction_model_results.json",
+          "data/q_correction_model_strengthened_results.json",
+          "data/activity_signals.json",
+          "data/lofo_track_a_results.json",
+          "data/climate_trace_comparison.json",
+          "data/temporal_q_model_results.json",
+          "data/plume_maps/prototype_summary.json"
+        ],
+        "methodology_reference": "NOVEL_METHODOLOGY_PROPOSAL.md"
+      }
+    },
+    {
+      "facility_id": "Korba",
+      "name": "Korba",
+      "lat": 22.3881,
+      "lon": 82.6858,
+      "capacity_mw": 2600.0,
+      "track_a": {
+        "activity_prob_mean": 0.9093508819739023,
+        "activity_prob_std": 0.060067933435608574,
+        "exhaustive_lofo_recall": 1.0,
+        "validation_status": "exhaustive_lofo_tested"
+      },
+      "track_b": {
+        "raw_estimate": {
+          "q_t_per_year": 4202731.445047892,
+          "q_t_per_year_std": 2341166.985563346,
+          "wind_mode": "annual-mean (fallback)",
+          "month_stratified": true,
+          "hit_days": 5,
+          "n_soundings": 384
+        },
+        "ground_truth_correction": {
+          "available": true,
+          "corrected_q_t_per_year": 22266487.30524188,
+          "correction_significant": false,
+          "validation_status": "cea_ground_truth_matched"
+        },
+        "climate_trace_comparison": {
+          "climate_trace_co2_t": 12337700,
+          "ratio_ours_over_ct": 0.34064140358801814,
+          "bracketed_by_our_interval": false
+        }
+      },
+      "plume": {
+        "available": true,
+        "validated": false,
+        "validation_summary": "Physics-consistent visualization calibrated to a validated total mass flux. Two robustness checks (random-sector null baseline, per-overpass day-matched wind) found the predicted spatial orientation does not reliably align with real OCO-3 data for the large majority of facilities tested -- NOT a validated spatial prediction. See NOVEL_METHODOLOGY_PROPOSAL.md Sec 11-12.",
+        "grid_reference": "plume_maps/Korba_default.npz",
+        "default_assumptions": {
+          "stability_class": "B",
+          "stack_height_m": 220.0
+        }
+      },
+      "temporal": {
+        "available": true,
+        "n_months_usable": 1,
+        "months_with_data": [
+          10
+        ],
+        "absolute_values_comparable_to_annual": false,
+        "monsoon_sampling_gap_caveat": "Months 7/8/10 have no usable data for ANY facility in this dataset, likely an OCO-3 monsoon-cloud-cover retrieval gap, not a genuine emissions pattern."
+      },
+      "provenance": {
+        "exported_at": "2026-08-14T11:45:59.696408Z",
+        "source_files": [
+          "data/plant_results.json",
+          "data/emission_estimates.json",
+          "data/cea_ground_truth_2020_21.json",
+          "data/q_correction_model_results.json",
+          "data/q_correction_model_strengthened_results.json",
+          "data/activity_signals.json",
+          "data/lofo_track_a_results.json",
+          "data/climate_trace_comparison.json",
+          "data/temporal_q_model_results.json",
+          "data/plume_maps/prototype_summary.json"
+        ],
+        "methodology_reference": "NOVEL_METHODOLOGY_PROPOSAL.md"
+      }
+    },
+    {
+      "facility_id": "Kudgi",
+      "name": "Kudgi",
+      "lat": 16.4994,
+      "lon": 75.8349,
+      "capacity_mw": 2400.0,
+      "track_a": {
+        "activity_prob_mean": 0.24057448407014212,
+        "activity_prob_std": 0.06811214788948884,
+        "exhaustive_lofo_recall": 0.0,
+        "validation_status": "exhaustive_lofo_tested"
+      },
+      "track_b": {
+        "raw_estimate": {
+          "q_t_per_year": 4718025.907087494,
+          "q_t_per_year_std": 2528359.4793015416,
+          "wind_mode": "annual-mean (fallback)",
+          "month_stratified": true,
+          "hit_days": 4,
+          "n_soundings": 338
+        },
+        "ground_truth_correction": {
+          "available": true,
+          "corrected_q_t_per_year": 13867101.065557985,
+          "correction_significant": false,
+          "validation_status": "cea_ground_truth_matched"
+        },
+        "climate_trace_comparison": {
+          "climate_trace_co2_t": 11422100,
+          "ratio_ours_over_ct": 0.4130611627535649,
+          "bracketed_by_our_interval": false
+        }
+      },
+      "plume": {
+        "available": true,
+        "validated": false,
+        "validation_summary": "Physics-consistent visualization calibrated to a validated total mass flux. Two robustness checks (random-sector null baseline, per-overpass day-matched wind) found the predicted spatial orientation does not reliably align with real OCO-3 data for the large majority of facilities tested -- NOT a validated spatial prediction. See NOVEL_METHODOLOGY_PROPOSAL.md Sec 11-12.",
+        "grid_reference": "plume_maps/Kudgi_default.npz",
+        "default_assumptions": {
+          "stability_class": "B",
+          "stack_height_m": 220.0
+        }
+      },
+      "temporal": {
+        "available": true,
+        "n_months_usable": 1,
+        "months_with_data": [
+          4
+        ],
+        "absolute_values_comparable_to_annual": false,
+        "monsoon_sampling_gap_caveat": "Months 7/8/10 have no usable data for ANY facility in this dataset, likely an OCO-3 monsoon-cloud-cover retrieval gap, not a genuine emissions pattern."
+      },
+      "provenance": {
+        "exported_at": "2026-08-14T11:45:59.696410Z",
+        "source_files": [
+          "data/plant_results.json",
+          "data/emission_estimates.json",
+          "data/cea_ground_truth_2020_21.json",
+          "data/q_correction_model_results.json",
+          "data/q_correction_model_strengthened_results.json",
+          "data/activity_signals.json",
+          "data/lofo_track_a_results.json",
+          "data/climate_trace_comparison.json",
+          "data/temporal_q_model_results.json",
+          "data/plume_maps/prototype_summary.json"
+        ],
+        "methodology_reference": "NOVEL_METHODOLOGY_PROPOSAL.md"
+      }
+    },
+    {
+      "facility_id": "Mouda",
+      "name": "Mouda",
+      "lat": 21.1797,
+      "lon": 79.3978,
+      "capacity_mw": 2320.0,
+      "track_a": {
+        "activity_prob_mean": 0.41870154937108356,
+        "activity_prob_std": 0.1432963861530767,
+        "exhaustive_lofo_recall": 0.7083333333333334,
+        "validation_status": "exhaustive_lofo_tested"
+      },
+      "track_b": {
+        "raw_estimate": {
+          "q_t_per_year": 10258309.683101472,
+          "q_t_per_year_std": 4327398.939937261,
+          "wind_mode": "per-overpass",
+          "month_stratified": true,
+          "hit_days": 19,
+          "n_soundings": 2883
+        },
+        "ground_truth_correction": {
+          "available": true,
+          "corrected_q_t_per_year": 13974482.593767961,
+          "correction_significant": false,
+          "validation_status": "cea_ground_truth_matched"
+        },
+        "climate_trace_comparison": {
+          "climate_trace_co2_t": 11009300,
+          "ratio_ours_over_ct": 0.9317858249935483,
+          "bracketed_by_our_interval": true
+        }
+      },
+      "plume": {
+        "available": true,
+        "validated": false,
+        "validation_summary": "Physics-consistent visualization calibrated to a validated total mass flux. Two robustness checks (random-sector null baseline, per-overpass day-matched wind) found the predicted spatial orientation does not reliably align with real OCO-3 data for the large majority of facilities tested -- NOT a validated spatial prediction. See NOVEL_METHODOLOGY_PROPOSAL.md Sec 11-12.",
+        "grid_reference": "plume_maps/Mouda_default.npz",
+        "default_assumptions": {
+          "stability_class": "B",
+          "stack_height_m": 220.0
+        }
+      },
+      "temporal": {
+        "available": true,
+        "n_months_usable": 5,
+        "months_with_data": [
+          2,
+          3,
+          6,
+          11,
+          12
+        ],
+        "absolute_values_comparable_to_annual": false,
+        "monsoon_sampling_gap_caveat": "Months 7/8/10 have no usable data for ANY facility in this dataset, likely an OCO-3 monsoon-cloud-cover retrieval gap, not a genuine emissions pattern."
+      },
+      "provenance": {
+        "exported_at": "2026-08-14T11:45:59.696413Z",
+        "source_files": [
+          "data/plant_results.json",
+          "data/emission_estimates.json",
+          "data/cea_ground_truth_2020_21.json",
+          "data/q_correction_model_results.json",
+          "data/q_correction_model_strengthened_results.json",
+          "data/activity_signals.json",
+          "data/lofo_track_a_results.json",
+          "data/climate_trace_comparison.json",
+          "data/temporal_q_model_results.json",
+          "data/plume_maps/prototype_summary.json"
+        ],
+        "methodology_reference": "NOVEL_METHODOLOGY_PROPOSAL.md"
+      }
+    },
+    {
+      "facility_id": "Mundra",
+      "name": "Mundra",
+      "lat": 22.82,
+      "lon": 69.55,
+      "capacity_mw": 4620.0,
+      "track_a": {
+        "activity_prob_mean": 0.4635506570339203,
+        "activity_prob_std": 0.19927518146389775,
+        "exhaustive_lofo_recall": null,
+        "validation_status": "not_tested"
+      },
+      "track_b": {
+        "raw_estimate": null,
+        "ground_truth_correction": {
+          "available": false,
+          "corrected_q_t_per_year": null,
+          "correction_significant": false,
+          "validation_status": "not_matched"
+        },
+        "climate_trace_comparison": null
+      },
+      "plume": {
+        "available": false,
+        "validated": false,
+        "validation_summary": "Physics-consistent visualization calibrated to a validated total mass flux. Two robustness checks (random-sector null baseline, per-overpass day-matched wind) found the predicted spatial orientation does not reliably align with real OCO-3 data for the large majority of facilities tested -- NOT a validated spatial prediction. See NOVEL_METHODOLOGY_PROPOSAL.md Sec 11-12.",
+        "grid_reference": null,
+        "default_assumptions": null
+      },
+      "temporal": null,
+      "provenance": {
+        "exported_at": "2026-08-14T11:45:59.696415Z",
+        "source_files": [
+          "data/plant_results.json",
+          "data/emission_estimates.json",
+          "data/cea_ground_truth_2020_21.json",
+          "data/q_correction_model_results.json",
+          "data/q_correction_model_strengthened_results.json",
+          "data/activity_signals.json",
+          "data/lofo_track_a_results.json",
+          "data/climate_trace_comparison.json",
+          "data/temporal_q_model_results.json",
+          "data/plume_maps/prototype_summary.json"
+        ],
+        "methodology_reference": "NOVEL_METHODOLOGY_PROPOSAL.md"
+      }
+    },
+    {
+      "facility_id": "RGundem",
+      "name": "RGundem",
+      "lat": 18.7572,
+      "lon": 79.456,
+      "capacity_mw": 2600.0,
+      "track_a": {
+        "activity_prob_mean": 0.4932669053475062,
+        "activity_prob_std": 0.18058853566677188,
+        "exhaustive_lofo_recall": 0.625,
+        "validation_status": "exhaustive_lofo_tested"
+      },
+      "track_b": {
+        "raw_estimate": {
+          "q_t_per_year": 1948492.685083411,
+          "q_t_per_year_std": 1199189.9963528092,
+          "wind_mode": "annual-mean (fallback)",
+          "month_stratified": true,
+          "hit_days": 5,
+          "n_soundings": 172
+        },
+        "ground_truth_correction": {
+          "available": true,
+          "corrected_q_t_per_year": 11653436.972182887,
+          "correction_significant": false,
+          "validation_status": "cea_ground_truth_matched"
+        },
+        "climate_trace_comparison": {
+          "climate_trace_co2_t": 12337700,
+          "ratio_ours_over_ct": 0.15792997763630262,
+          "bracketed_by_our_interval": false
+        }
+      },
+      "plume": {
+        "available": true,
+        "validated": false,
+        "validation_summary": "Physics-consistent visualization calibrated to a validated total mass flux. Two robustness checks (random-sector null baseline, per-overpass day-matched wind) found the predicted spatial orientation does not reliably align with real OCO-3 data for the large majority of facilities tested -- NOT a validated spatial prediction. See NOVEL_METHODOLOGY_PROPOSAL.md Sec 11-12.",
+        "grid_reference": "plume_maps/RGundem_default.npz",
+        "default_assumptions": {
+          "stability_class": "B",
+          "stack_height_m": 220.0
+        }
+      },
+      "temporal": {
+        "available": true,
+        "n_months_usable": 1,
+        "months_with_data": [
+          4
+        ],
+        "absolute_values_comparable_to_annual": false,
+        "monsoon_sampling_gap_caveat": "Months 7/8/10 have no usable data for ANY facility in this dataset, likely an OCO-3 monsoon-cloud-cover retrieval gap, not a genuine emissions pattern."
+      },
+      "provenance": {
+        "exported_at": "2026-08-14T11:45:59.696417Z",
+        "source_files": [
+          "data/plant_results.json",
+          "data/emission_estimates.json",
+          "data/cea_ground_truth_2020_21.json",
+          "data/q_correction_model_results.json",
+          "data/q_correction_model_strengthened_results.json",
+          "data/activity_signals.json",
+          "data/lofo_track_a_results.json",
+          "data/climate_trace_comparison.json",
+          "data/temporal_q_model_results.json",
+          "data/plume_maps/prototype_summary.json"
+        ],
+        "methodology_reference": "NOVEL_METHODOLOGY_PROPOSAL.md"
+      }
+    },
+    {
+      "facility_id": "Rihand",
+      "name": "Rihand",
+      "lat": 24.027,
+      "lon": 82.7915,
+      "capacity_mw": 3000.0,
+      "track_a": {
+        "activity_prob_mean": 0.9721457461516062,
+        "activity_prob_std": 0.050108819156970796,
+        "exhaustive_lofo_recall": 0.9583333333333334,
+        "validation_status": "exhaustive_lofo_tested"
+      },
+      "track_b": {
+        "raw_estimate": {
+          "q_t_per_year": 48347260.30604745,
+          "q_t_per_year_std": 35804919.021015026,
+          "wind_mode": "per-overpass",
+          "month_stratified": true,
+          "hit_days": 16,
+          "n_soundings": 6072
+        },
+        "ground_truth_correction": {
+          "available": true,
+          "corrected_q_t_per_year": 115851196.56602734,
+          "correction_significant": false,
+          "validation_status": "cea_ground_truth_matched"
+        },
+        "climate_trace_comparison": {
+          "climate_trace_co2_t": 14237000,
+          "ratio_ours_over_ct": 3.3958882001859556,
+          "bracketed_by_our_interval": true
+        }
+      },
+      "plume": {
+        "available": true,
+        "validated": false,
+        "validation_summary": "Physics-consistent visualization calibrated to a validated total mass flux. Two robustness checks (random-sector null baseline, per-overpass day-matched wind) found the predicted spatial orientation does not reliably align with real OCO-3 data for the large majority of facilities tested -- NOT a validated spatial prediction. See NOVEL_METHODOLOGY_PROPOSAL.md Sec 11-12.",
+        "grid_reference": "plume_maps/Rihand_default.npz",
+        "default_assumptions": {
+          "stability_class": "B",
+          "stack_height_m": 220.0
+        }
+      },
+      "temporal": {
+        "available": true,
+        "n_months_usable": 5,
+        "months_with_data": [
+          2,
+          3,
+          4,
+          11,
+          12
+        ],
+        "absolute_values_comparable_to_annual": false,
+        "monsoon_sampling_gap_caveat": "Months 7/8/10 have no usable data for ANY facility in this dataset, likely an OCO-3 monsoon-cloud-cover retrieval gap, not a genuine emissions pattern."
+      },
+      "provenance": {
+        "exported_at": "2026-08-14T11:45:59.696420Z",
+        "source_files": [
+          "data/plant_results.json",
+          "data/emission_estimates.json",
+          "data/cea_ground_truth_2020_21.json",
+          "data/q_correction_model_results.json",
+          "data/q_correction_model_strengthened_results.json",
+          "data/activity_signals.json",
+          "data/lofo_track_a_results.json",
+          "data/climate_trace_comparison.json",
+          "data/temporal_q_model_results.json",
+          "data/plume_maps/prototype_summary.json"
+        ],
+        "methodology_reference": "NOVEL_METHODOLOGY_PROPOSAL.md"
+      }
+    },
+    {
+      "facility_id": "Sasan",
+      "name": "Sasan",
+      "lat": 23.98,
+      "lon": 82.62,
+      "capacity_mw": 3960.0,
+      "track_a": {
+        "activity_prob_mean": 0.9343336472908655,
+        "activity_prob_std": 0.048600938955796195,
+        "exhaustive_lofo_recall": null,
+        "validation_status": "not_tested"
+      },
+      "track_b": {
+        "raw_estimate": {
+          "q_t_per_year": 39278810.20737811,
+          "q_t_per_year_std": 17689788.237759978,
+          "wind_mode": "per-overpass",
+          "month_stratified": true,
+          "hit_days": 19,
+          "n_soundings": 7379
+        },
+        "ground_truth_correction": {
+          "available": true,
+          "corrected_q_t_per_year": 49364960.121114306,
+          "correction_significant": false,
+          "validation_status": "cea_ground_truth_matched"
+        },
+        "climate_trace_comparison": {
+          "climate_trace_co2_t": 18792000,
+          "ratio_ours_over_ct": 2.0901878569273156,
+          "bracketed_by_our_interval": false
+        }
+      },
+      "plume": {
+        "available": true,
+        "validated": false,
+        "validation_summary": "Physics-consistent visualization calibrated to a validated total mass flux. Two robustness checks (random-sector null baseline, per-overpass day-matched wind) found the predicted spatial orientation does not reliably align with real OCO-3 data for the large majority of facilities tested -- NOT a validated spatial prediction. See NOVEL_METHODOLOGY_PROPOSAL.md Sec 11-12.",
+        "grid_reference": "plume_maps/Sasan_default.npz",
+        "default_assumptions": {
+          "stability_class": "B",
+          "stack_height_m": 220.0
+        }
+      },
+      "temporal": {
+        "available": true,
+        "n_months_usable": 6,
+        "months_with_data": [
+          2,
+          3,
+          4,
+          5,
+          11,
+          12
+        ],
+        "absolute_values_comparable_to_annual": false,
+        "monsoon_sampling_gap_caveat": "Months 7/8/10 have no usable data for ANY facility in this dataset, likely an OCO-3 monsoon-cloud-cover retrieval gap, not a genuine emissions pattern."
+      },
+      "provenance": {
+        "exported_at": "2026-08-14T11:45:59.696423Z",
+        "source_files": [
+          "data/plant_results.json",
+          "data/emission_estimates.json",
+          "data/cea_ground_truth_2020_21.json",
+          "data/q_correction_model_results.json",
+          "data/q_correction_model_strengthened_results.json",
+          "data/activity_signals.json",
+          "data/lofo_track_a_results.json",
+          "data/climate_trace_comparison.json",
+          "data/temporal_q_model_results.json",
+          "data/plume_maps/prototype_summary.json"
+        ],
+        "methodology_reference": "NOVEL_METHODOLOGY_PROPOSAL.md"
+      }
+    },
+    {
+      "facility_id": "ShriSingajiMalwa",
+      "name": "ShriSingajiMalwa",
+      "lat": 22.0971,
+      "lon": 76.5317,
+      "capacity_mw": 2520.0,
+      "track_a": {
+        "activity_prob_mean": 0.25072044258316356,
+        "activity_prob_std": 0.053212096937517155,
+        "exhaustive_lofo_recall": 0.0,
+        "validation_status": "exhaustive_lofo_tested"
+      },
+      "track_b": {
+        "raw_estimate": {
+          "q_t_per_year": 3528645.9180780356,
+          "q_t_per_year_std": 1825512.0158410985,
+          "wind_mode": "annual-mean (fallback)",
+          "month_stratified": true,
+          "hit_days": 5,
+          "n_soundings": 228
+        },
+        "ground_truth_correction": {
+          "available": true,
+          "corrected_q_t_per_year": 3759104.4006539434,
+          "correction_significant": false,
+          "validation_status": "cea_ground_truth_matched"
+        },
+        "climate_trace_comparison": {
+          "climate_trace_co2_t": 9867100,
+          "ratio_ours_over_ct": 0.35761732607129104,
+          "bracketed_by_our_interval": false
+        }
+      },
+      "plume": {
+        "available": true,
+        "validated": false,
+        "validation_summary": "Physics-consistent visualization calibrated to a validated total mass flux. Two robustness checks (random-sector null baseline, per-overpass day-matched wind) found the predicted spatial orientation does not reliably align with real OCO-3 data for the large majority of facilities tested -- NOT a validated spatial prediction. See NOVEL_METHODOLOGY_PROPOSAL.md Sec 11-12.",
+        "grid_reference": "plume_maps/ShriSingajiMalwa_default.npz",
+        "default_assumptions": {
+          "stability_class": "B",
+          "stack_height_m": 220.0
+        }
+      },
+      "temporal": {
+        "available": true,
+        "n_months_usable": 1,
+        "months_with_data": [
+          1
+        ],
+        "absolute_values_comparable_to_annual": false,
+        "monsoon_sampling_gap_caveat": "Months 7/8/10 have no usable data for ANY facility in this dataset, likely an OCO-3 monsoon-cloud-cover retrieval gap, not a genuine emissions pattern."
+      },
+      "provenance": {
+        "exported_at": "2026-08-14T11:45:59.696427Z",
+        "source_files": [
+          "data/plant_results.json",
+          "data/emission_estimates.json",
+          "data/cea_ground_truth_2020_21.json",
+          "data/q_correction_model_results.json",
+          "data/q_correction_model_strengthened_results.json",
+          "data/activity_signals.json",
+          "data/lofo_track_a_results.json",
+          "data/climate_trace_comparison.json",
+          "data/temporal_q_model_results.json",
+          "data/plume_maps/prototype_summary.json"
+        ],
+        "methodology_reference": "NOVEL_METHODOLOGY_PROPOSAL.md"
+      }
+    },
+    {
+      "facility_id": "Simhadri",
+      "name": "Simhadri",
+      "lat": 17.591,
+      "lon": 83.0917,
+      "capacity_mw": 2000.0,
+      "track_a": {
+        "activity_prob_mean": 0.34336021294196445,
+        "activity_prob_std": 0.12040061932714213,
+        "exhaustive_lofo_recall": 0.5,
+        "validation_status": "exhaustive_lofo_tested"
+      },
+      "track_b": {
+        "raw_estimate": null,
+        "ground_truth_correction": {
+          "available": false,
+          "corrected_q_t_per_year": null,
+          "correction_significant": false,
+          "validation_status": "not_matched"
+        },
+        "climate_trace_comparison": null
+      },
+      "plume": {
+        "available": false,
+        "validated": false,
+        "validation_summary": "Physics-consistent visualization calibrated to a validated total mass flux. Two robustness checks (random-sector null baseline, per-overpass day-matched wind) found the predicted spatial orientation does not reliably align with real OCO-3 data for the large majority of facilities tested -- NOT a validated spatial prediction. See NOVEL_METHODOLOGY_PROPOSAL.md Sec 11-12.",
+        "grid_reference": null,
+        "default_assumptions": null
+      },
+      "temporal": null,
+      "provenance": {
+        "exported_at": "2026-08-14T11:45:59.696429Z",
+        "source_files": [
+          "data/plant_results.json",
+          "data/emission_estimates.json",
+          "data/cea_ground_truth_2020_21.json",
+          "data/q_correction_model_results.json",
+          "data/q_correction_model_strengthened_results.json",
+          "data/activity_signals.json",
+          "data/lofo_track_a_results.json",
+          "data/climate_trace_comparison.json",
+          "data/temporal_q_model_results.json",
+          "data/plume_maps/prototype_summary.json"
+        ],
+        "methodology_reference": "NOVEL_METHODOLOGY_PROPOSAL.md"
+      }
+    },
+    {
+      "facility_id": "Sipat",
+      "name": "Sipat",
+      "lat": 22.13,
+      "lon": 82.293,
+      "capacity_mw": 2980.0,
+      "track_a": {
+        "activity_prob_mean": 0.7144295771916708,
+        "activity_prob_std": 0.1717364021850717,
+        "exhaustive_lofo_recall": 0.9583333333333334,
+        "validation_status": "exhaustive_lofo_tested"
+      },
+      "track_b": {
+        "raw_estimate": null,
+        "ground_truth_correction": {
+          "available": false,
+          "corrected_q_t_per_year": null,
+          "correction_significant": false,
+          "validation_status": "not_matched"
+        },
+        "climate_trace_comparison": null
+      },
+      "plume": {
+        "available": false,
+        "validated": false,
+        "validation_summary": "Physics-consistent visualization calibrated to a validated total mass flux. Two robustness checks (random-sector null baseline, per-overpass day-matched wind) found the predicted spatial orientation does not reliably align with real OCO-3 data for the large majority of facilities tested -- NOT a validated spatial prediction. See NOVEL_METHODOLOGY_PROPOSAL.md Sec 11-12.",
+        "grid_reference": null,
+        "default_assumptions": null
+      },
+      "temporal": null,
+      "provenance": {
+        "exported_at": "2026-08-14T11:45:59.696430Z",
+        "source_files": [
+          "data/plant_results.json",
+          "data/emission_estimates.json",
+          "data/cea_ground_truth_2020_21.json",
+          "data/q_correction_model_results.json",
+          "data/q_correction_model_strengthened_results.json",
+          "data/activity_signals.json",
+          "data/lofo_track_a_results.json",
+          "data/climate_trace_comparison.json",
+          "data/temporal_q_model_results.json",
+          "data/plume_maps/prototype_summary.json"
+        ],
+        "methodology_reference": "NOVEL_METHODOLOGY_PROPOSAL.md"
+      }
+    },
+    {
+      "facility_id": "Talcher",
+      "name": "Talcher",
+      "lat": 21.0966,
+      "lon": 85.074,
+      "capacity_mw": 3000.0,
+      "track_a": {
+        "activity_prob_mean": 0.821315901974837,
+        "activity_prob_std": 0.15141892612954913,
+        "exhaustive_lofo_recall": 1.0,
+        "validation_status": "exhaustive_lofo_tested"
+      },
+      "track_b": {
+        "raw_estimate": {
+          "q_t_per_year": 6914642.893860566,
+          "q_t_per_year_std": 1697787.2740303124,
+          "wind_mode": "per-overpass",
+          "month_stratified": true,
+          "hit_days": 21,
+          "n_soundings": 2165
+        },
+        "ground_truth_correction": {
+          "available": true,
+          "corrected_q_t_per_year": 17109436.770306885,
+          "correction_significant": false,
+          "validation_status": "cea_ground_truth_matched"
+        },
+        "climate_trace_comparison": {
+          "climate_trace_co2_t": 14235000,
+          "ratio_ours_over_ct": 0.48574941298634117,
+          "bracketed_by_our_interval": false
+        }
+      },
+      "plume": {
+        "available": true,
+        "validated": false,
+        "validation_summary": "Physics-consistent visualization calibrated to a validated total mass flux. Two robustness checks (random-sector null baseline, per-overpass day-matched wind) found the predicted spatial orientation does not reliably align with real OCO-3 data for the large majority of facilities tested -- NOT a validated spatial prediction. See NOVEL_METHODOLOGY_PROPOSAL.md Sec 11-12.",
+        "grid_reference": "plume_maps/Talcher_default.npz",
+        "default_assumptions": {
+          "stability_class": "B",
+          "stack_height_m": 220.0
+        }
+      },
+      "temporal": {
+        "available": true,
+        "n_months_usable": 4,
+        "months_with_data": [
+          2,
+          3,
+          11,
+          12
+        ],
+        "absolute_values_comparable_to_annual": false,
+        "monsoon_sampling_gap_caveat": "Months 7/8/10 have no usable data for ANY facility in this dataset, likely an OCO-3 monsoon-cloud-cover retrieval gap, not a genuine emissions pattern."
+      },
+      "provenance": {
+        "exported_at": "2026-08-14T11:45:59.696433Z",
+        "source_files": [
+          "data/plant_results.json",
+          "data/emission_estimates.json",
+          "data/cea_ground_truth_2020_21.json",
+          "data/q_correction_model_results.json",
+          "data/q_correction_model_strengthened_results.json",
+          "data/activity_signals.json",
+          "data/lofo_track_a_results.json",
+          "data/climate_trace_comparison.json",
+          "data/temporal_q_model_results.json",
+          "data/plume_maps/prototype_summary.json"
+        ],
+        "methodology_reference": "NOVEL_METHODOLOGY_PROPOSAL.md"
+      }
+    },
+    {
+      "facility_id": "TalwandiSabo",
+      "name": "TalwandiSabo",
+      "lat": 29.924,
+      "lon": 75.2372,
+      "capacity_mw": 1980.0,
+      "track_a": {
+        "activity_prob_mean": null,
+        "activity_prob_std": null,
+        "exhaustive_lofo_recall": 0.08333333333333333,
+        "validation_status": "exhaustive_lofo_tested"
+      },
+      "track_b": {
+        "raw_estimate": {
+          "q_t_per_year": 1509508.367099197,
+          "q_t_per_year_std": 960821.6847505871,
+          "wind_mode": "annual-mean (fallback)",
+          "month_stratified": true,
+          "hit_days": 4,
+          "n_soundings": 387
+        },
+        "ground_truth_correction": {
+          "available": false,
+          "corrected_q_t_per_year": null,
+          "correction_significant": false,
+          "validation_status": "cea_ground_truth_matched"
+        },
+        "climate_trace_comparison": {
+          "climate_trace_co2_t": 8782100,
+          "ratio_ours_over_ct": 0.171884670762027,
+          "bracketed_by_our_interval": false
+        }
+      },
+      "plume": {
+        "available": true,
+        "validated": false,
+        "validation_summary": "Physics-consistent visualization calibrated to a validated total mass flux. Two robustness checks (random-sector null baseline, per-overpass day-matched wind) found the predicted spatial orientation does not reliably align with real OCO-3 data for the large majority of facilities tested -- NOT a validated spatial prediction. See NOVEL_METHODOLOGY_PROPOSAL.md Sec 11-12.",
+        "grid_reference": "plume_maps/TalwandiSabo_default.npz",
+        "default_assumptions": {
+          "stability_class": "B",
+          "stack_height_m": 220.0
+        }
+      },
+      "temporal": {
+        "available": true,
+        "n_months_usable": 1,
+        "months_with_data": [
+          2
+        ],
+        "absolute_values_comparable_to_annual": false,
+        "monsoon_sampling_gap_caveat": "Months 7/8/10 have no usable data for ANY facility in this dataset, likely an OCO-3 monsoon-cloud-cover retrieval gap, not a genuine emissions pattern."
+      },
+      "provenance": {
+        "exported_at": "2026-08-14T11:45:59.696435Z",
+        "source_files": [
+          "data/plant_results.json",
+          "data/emission_estimates.json",
+          "data/cea_ground_truth_2020_21.json",
+          "data/q_correction_model_results.json",
+          "data/q_correction_model_strengthened_results.json",
+          "data/activity_signals.json",
+          "data/lofo_track_a_results.json",
+          "data/climate_trace_comparison.json",
+          "data/temporal_q_model_results.json",
+          "data/plume_maps/prototype_summary.json"
+        ],
+        "methodology_reference": "NOVEL_METHODOLOGY_PROPOSAL.md"
+      }
+    },
+    {
+      "facility_id": "Tamnar",
+      "name": "Tamnar",
+      "lat": 22.0987,
+      "lon": 83.4513,
+      "capacity_mw": 2400.0,
+      "track_a": {
+        "activity_prob_mean": 0.6236672426263491,
+        "activity_prob_std": 0.195820821906691,
+        "exhaustive_lofo_recall": 0.9583333333333334,
+        "validation_status": "exhaustive_lofo_tested"
+      },
+      "track_b": {
+        "raw_estimate": {
+          "q_t_per_year": 3223070.645572659,
+          "q_t_per_year_std": 1815185.1901807499,
+          "wind_mode": "annual-mean (fallback)",
+          "month_stratified": true,
+          "hit_days": 7,
+          "n_soundings": 842
+        },
+        "ground_truth_correction": {
+          "available": true,
+          "corrected_q_t_per_year": 11797170.898908133,
+          "correction_significant": false,
+          "validation_status": "cea_ground_truth_matched"
+        },
+        "climate_trace_comparison": {
+          "climate_trace_co2_t": 16134000,
+          "ratio_ours_over_ct": 0.1997688512193293,
+          "bracketed_by_our_interval": false
+        }
+      },
+      "plume": {
+        "available": true,
+        "validated": false,
+        "validation_summary": "Physics-consistent visualization calibrated to a validated total mass flux. Two robustness checks (random-sector null baseline, per-overpass day-matched wind) found the predicted spatial orientation does not reliably align with real OCO-3 data for the large majority of facilities tested -- NOT a validated spatial prediction. See NOVEL_METHODOLOGY_PROPOSAL.md Sec 11-12.",
+        "grid_reference": "plume_maps/Tamnar_default.npz",
+        "default_assumptions": {
+          "stability_class": "B",
+          "stack_height_m": 220.0
+        }
+      },
+      "temporal": {
+        "available": true,
+        "n_months_usable": 2,
+        "months_with_data": [
+          10,
+          11
+        ],
+        "absolute_values_comparable_to_annual": false,
+        "monsoon_sampling_gap_caveat": "Months 7/8/10 have no usable data for ANY facility in this dataset, likely an OCO-3 monsoon-cloud-cover retrieval gap, not a genuine emissions pattern."
+      },
+      "provenance": {
+        "exported_at": "2026-08-14T11:45:59.696438Z",
+        "source_files": [
+          "data/plant_results.json",
+          "data/emission_estimates.json",
+          "data/cea_ground_truth_2020_21.json",
+          "data/q_correction_model_results.json",
+          "data/q_correction_model_strengthened_results.json",
+          "data/activity_signals.json",
+          "data/lofo_track_a_results.json",
+          "data/climate_trace_comparison.json",
+          "data/temporal_q_model_results.json",
+          "data/plume_maps/prototype_summary.json"
+        ],
+        "methodology_reference": "NOVEL_METHODOLOGY_PROPOSAL.md"
+      }
+    },
+    {
+      "facility_id": "Tirora",
+      "name": "Tirora",
+      "lat": 21.41,
+      "lon": 79.94,
+      "capacity_mw": 3300.0,
+      "track_a": {
+        "activity_prob_mean": 0.3142467960715294,
+        "activity_prob_std": 0.07697343950648862,
+        "exhaustive_lofo_recall": null,
+        "validation_status": "not_tested"
+      },
+      "track_b": {
+        "raw_estimate": {
+          "q_t_per_year": 337852.0873580591,
+          "q_t_per_year_std": 271053.7303612373,
+          "wind_mode": "annual-mean (fallback)",
+          "month_stratified": true,
+          "hit_days": 5,
+          "n_soundings": 671
+        },
+        "ground_truth_correction": {
+          "available": true,
+          "corrected_q_t_per_year": 832089.8712093985,
+          "correction_significant": false,
+          "validation_status": "cea_ground_truth_matched"
+        },
+        "climate_trace_comparison": {
+          "climate_trace_co2_t": 15659000,
+          "ratio_ours_over_ct": 0.02157558511769967,
+          "bracketed_by_our_interval": false
+        }
+      },
+      "plume": {
+        "available": true,
+        "validated": false,
+        "validation_summary": "Physics-consistent visualization calibrated to a validated total mass flux. Two robustness checks (random-sector null baseline, per-overpass day-matched wind) found the predicted spatial orientation does not reliably align with real OCO-3 data for the large majority of facilities tested -- NOT a validated spatial prediction. See NOVEL_METHODOLOGY_PROPOSAL.md Sec 11-12.",
+        "grid_reference": "plume_maps/Tirora_default.npz",
+        "default_assumptions": {
+          "stability_class": "B",
+          "stack_height_m": 220.0
+        }
+      },
+      "temporal": {
+        "available": true,
+        "n_months_usable": 1,
+        "months_with_data": [
+          6
+        ],
+        "absolute_values_comparable_to_annual": false,
+        "monsoon_sampling_gap_caveat": "Months 7/8/10 have no usable data for ANY facility in this dataset, likely an OCO-3 monsoon-cloud-cover retrieval gap, not a genuine emissions pattern."
+      },
+      "provenance": {
+        "exported_at": "2026-08-14T11:45:59.696440Z",
+        "source_files": [
+          "data/plant_results.json",
+          "data/emission_estimates.json",
+          "data/cea_ground_truth_2020_21.json",
+          "data/q_correction_model_results.json",
+          "data/q_correction_model_strengthened_results.json",
+          "data/activity_signals.json",
+          "data/lofo_track_a_results.json",
+          "data/climate_trace_comparison.json",
+          "data/temporal_q_model_results.json",
+          "data/plume_maps/prototype_summary.json"
+        ],
+        "methodology_reference": "NOVEL_METHODOLOGY_PROPOSAL.md"
+      }
+    },
+    {
+      "facility_id": "Vindhyachal",
+      "name": "Vindhyachal",
+      "lat": 24.1,
+      "lon": 82.67,
+      "capacity_mw": 4760.0,
+      "track_a": {
+        "activity_prob_mean": 0.963891992966334,
+        "activity_prob_std": 0.029829251534526213,
+        "exhaustive_lofo_recall": null,
+        "validation_status": "not_tested"
+      },
+      "track_b": {
+        "raw_estimate": {
+          "q_t_per_year": 36738050.02086989,
+          "q_t_per_year_std": 21935562.6491217,
+          "wind_mode": "per-overpass",
+          "month_stratified": true,
+          "hit_days": 17,
+          "n_soundings": 7114
+        },
+        "ground_truth_correction": {
+          "available": true,
+          "corrected_q_t_per_year": 48524457.08011625,
+          "correction_significant": false,
+          "validation_status": "cea_ground_truth_matched"
+        },
+        "climate_trace_comparison": {
+          "climate_trace_co2_t": 22589000,
+          "ratio_ours_over_ct": 1.6263690300973876,
+          "bracketed_by_our_interval": true
+        }
+      },
+      "plume": {
+        "available": true,
+        "validated": false,
+        "validation_summary": "Physics-consistent visualization calibrated to a validated total mass flux. Two robustness checks (random-sector null baseline, per-overpass day-matched wind) found the predicted spatial orientation does not reliably align with real OCO-3 data for the large majority of facilities tested -- NOT a validated spatial prediction. See NOVEL_METHODOLOGY_PROPOSAL.md Sec 11-12.",
+        "grid_reference": "plume_maps/Vindhyachal_default.npz",
+        "default_assumptions": {
+          "stability_class": "B",
+          "stack_height_m": 220.0
+        }
+      },
+      "temporal": {
+        "available": true,
+        "n_months_usable": 5,
+        "months_with_data": [
+          2,
+          3,
+          4,
+          11,
+          12
+        ],
+        "absolute_values_comparable_to_annual": false,
+        "monsoon_sampling_gap_caveat": "Months 7/8/10 have no usable data for ANY facility in this dataset, likely an OCO-3 monsoon-cloud-cover retrieval gap, not a genuine emissions pattern."
+      },
+      "provenance": {
+        "exported_at": "2026-08-14T11:45:59.696442Z",
+        "source_files": [
+          "data/plant_results.json",
+          "data/emission_estimates.json",
+          "data/cea_ground_truth_2020_21.json",
+          "data/q_correction_model_results.json",
+          "data/q_correction_model_strengthened_results.json",
+          "data/activity_signals.json",
+          "data/lofo_track_a_results.json",
+          "data/climate_trace_comparison.json",
+          "data/temporal_q_model_results.json",
+          "data/plume_maps/prototype_summary.json"
+        ],
+        "methodology_reference": "NOVEL_METHODOLOGY_PROPOSAL.md"
+      }
+    }
+  ]
+}

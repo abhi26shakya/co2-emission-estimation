@@ -174,6 +174,14 @@ Full results: `data/q_correction_model_strengthened_results.json`.
 
 Full results: `data/temporal_q_model_results.json`.
 
+## 12.7 API/integration schema (Phase 7, DONE)
+
+`data/schema/emission_record_schema.json` (JSON Schema draft 2020-12) and `export_api_schema.py` produce `data/api_export/facilities.json` — one record per facility, for integration with an external visualization platform. Design principle: **no field representing a modeled/estimated quantity appears without an explicit validation status alongside it** — a consumer cannot read `plume.grid_reference` without also seeing `plume.validated: false` and why; cannot read `corrected_q_t_per_year` without `correction_significant: false`. This directly operationalizes the honesty discipline used throughout this proposal, rather than leaving it in prose a downstream integrator might not read.
+
+**Caught a real bug via manual spot-check before trusting the export**: Mundra (0 near-plant soundings, no Track B estimate at all) initially showed `ground_truth_correction.validation_status: "cea_ground_truth_matched"` — wrong, because the logic checked only "does this facility's name appear in the CEA download," not "is there an actual Track B estimate to compare against." Fixed to require both a CEA row *and* a raw estimate before calling it "matched." Re-verified: Mundra, Sipat, and Simhadri (the three facilities Track B excludes entirely) now correctly show `not_matched`.
+
+**21/21 facilities exported and pass the (lightweight, hand-rolled — no new `jsonschema` dependency added for one validation pass) schema check.**
+
 ## 13. Next steps (not started)
 
 - **True per-overpass-time wind matching** (not daily-mean) — the one remaining untested hypothesis before concluding the plume-direction claim is unsupported by available data, not just by the two matching approaches tried so far. Requires sub-daily ERA5/reanalysis wind and extracting each sounding's exact overpass time from its `sounding_id`.

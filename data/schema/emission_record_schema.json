@@ -1,0 +1,106 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://co2-emission-estimation/schema/emission_record_schema.json",
+  "title": "Per-facility CO2 emission record",
+  "description": "Phase 7 of NOVEL_METHODOLOGY_PROPOSAL.md: the interchange format this project exports for downstream integration (e.g. an external visualization platform). One record per facility. Every field that represents a modeled/estimated quantity carries an explicit validation_status alongside it -- this schema deliberately does not let a consumer read a number without also seeing whether it has been validated against real ground truth, only against another satellite-inferred benchmark, or not validated at all. See NOVEL_METHODOLOGY_PROPOSAL.md for the full methodology and honesty caveats behind every field.",
+  "type": "object",
+  "required": ["facility_id", "name", "lat", "lon", "track_a", "track_b", "plume", "provenance"],
+  "properties": {
+    "facility_id": {"type": "string", "description": "Stable identifier, currently the same as 'name' (this project's internal facility name)."},
+    "name": {"type": "string"},
+    "lat": {"type": "number"},
+    "lon": {"type": "number"},
+    "capacity_mw": {"type": ["number", "null"]},
+
+    "track_a": {
+      "type": "object",
+      "description": "Satellite-tile plant detector (NO2+SO2+VIIRS CNN).",
+      "required": ["activity_prob_mean", "validation_status"],
+      "properties": {
+        "activity_prob_mean": {"type": ["number", "null"], "description": "Mean plant-classifier confidence across this facility's monthly tiles, inference-only (model not retrained on this facility)."},
+        "activity_prob_std": {"type": ["number", "null"]},
+        "exhaustive_lofo_recall": {"type": ["number", "null"], "description": "This facility's own leave-one-facility-out recall when held out during Track A's exhaustive LOFO evaluation (69.1% mean across all facilities). Null if this facility wasn't part of that evaluation."},
+        "validation_status": {"type": "string", "enum": ["exhaustive_lofo_tested", "not_tested"], "description": "Whether this facility's detection was evaluated by holding it out entirely during training (the rigorous test), not just inference on an already-seen facility."}
+      }
+    },
+
+    "track_b": {
+      "type": "object",
+      "description": "Physics-based IME mass-balance CO2 emission-rate estimate from OCO-3.",
+      "required": ["raw_estimate", "ground_truth_correction", "climate_trace_comparison"],
+      "properties": {
+        "raw_estimate": {
+          "type": ["object", "null"],
+          "properties": {
+            "q_t_per_year": {"type": "number", "description": "Point estimate, tons CO2/year."},
+            "q_t_per_year_std": {"type": "number", "description": "3-term uncertainty (wind, IME-sampling, background-definition sensitivity)."},
+            "wind_mode": {"type": "string", "enum": ["per-overpass", "annual-mean (fallback)"]},
+            "month_stratified": {"type": "boolean", "description": "Whether the near/background comparison was restricted to shared months (fixes a real seasonal-sampling-bias bug found for one facility; see PROJECT_RESEARCH_DOCUMENTATION.md Sec 12.7)."},
+            "hit_days": {"type": "integer"},
+            "n_soundings": {"type": "integer"}
+          }
+        },
+        "ground_truth_correction": {
+          "type": "object",
+          "required": ["available", "validation_status"],
+          "properties": {
+            "available": {"type": "boolean"},
+            "corrected_q_t_per_year": {"type": ["number", "null"], "description": "Leave-one-out cross-validated corrected estimate, ONLY meaningful for the N=17 facilities in q_correction_model.py's own fit -- this is not a general-purpose correction function applicable to arbitrary new facilities without refitting."},
+            "correction_significant": {"type": ["boolean", "null"], "description": "False as of this export: the correction's improvement has a bootstrap 95% CI that includes zero at N=17 (see NOVEL_METHODOLOGY_PROPOSAL.md Sec 12.5) -- real and directionally consistent, but not yet statistically significant."},
+            "validation_status": {"type": "string", "enum": ["cea_ground_truth_matched", "not_matched"], "description": "Whether this facility has a matched India CEA CO2 Baseline Database entry (real, non-satellite, fuel-consumption-based ground truth) -- as opposed to only a Climate TRACE benchmark comparison."}
+          }
+        },
+        "climate_trace_comparison": {
+          "type": ["object", "null"],
+          "description": "Independent benchmark, NOT ground truth (Climate TRACE is itself a satellite-thermal-proxy estimator, unvalidated for India).",
+          "properties": {
+            "climate_trace_co2_t": {"type": "number"},
+            "ratio_ours_over_ct": {"type": "number"},
+            "bracketed_by_our_interval": {"type": "boolean"}
+          }
+        }
+      }
+    },
+
+    "plume": {
+      "type": "object",
+      "description": "Gaussian plume hotspot/density map (Briggs/Pasquill-Gifford), calibrated to track_b.raw_estimate.q_t_per_year.",
+      "required": ["available", "validated", "validation_summary"],
+      "properties": {
+        "available": {"type": "boolean"},
+        "validated": {"const": false, "description": "Always false as of this export. Two independent robustness checks (random-sector null baseline, per-overpass day-matched wind) found the plume's predicted spatial orientation does not reliably align with real OCO-3 spatial data for the large majority of facilities tested -- see NOVEL_METHODOLOGY_PROPOSAL.md Sec 11-12. This map is a physics-consistent VISUALIZATION calibrated to a validated total mass flux, not a validated spatial prediction, and downstream consumers must not present it as one."},
+        "validation_summary": {"type": "string"},
+        "grid_reference": {"type": ["string", "null"], "description": "Path to the .npz grid file (east_km, north_km, grid in kg/m^3), relative to this project's data/ directory."},
+        "default_assumptions": {
+          "type": "object",
+          "properties": {
+            "stability_class": {"type": "string"},
+            "stack_height_m": {"type": "number"}
+          }
+        }
+      }
+    },
+
+    "temporal": {
+      "type": ["object", "null"],
+      "description": "Monthly CO2 signal shape, where enough OCO-3 coverage exists.",
+      "properties": {
+        "available": {"type": "boolean"},
+        "n_months_usable": {"type": "integer"},
+        "months_with_data": {"type": "array", "items": {"type": "integer", "minimum": 1, "maximum": 12}},
+        "absolute_values_comparable_to_annual": {"const": false, "description": "Always false. Monthly Q values from a smaller subsample are systematically biased relative to the annual scalar due to L_eff's sqrt(n) scaling (see NOVEL_METHODOLOGY_PROPOSAL.md Sec 12.6) -- only relative month-to-month comparison within this facility is meaningful."},
+        "monsoon_sampling_gap_caveat": {"type": "string", "description": "Months 7/8/10 have no usable data for ANY facility in this dataset, likely an OCO-3 monsoon-cloud-cover retrieval gap, not a genuine emissions pattern."}
+      }
+    },
+
+    "provenance": {
+      "type": "object",
+      "required": ["exported_at", "source_files"],
+      "properties": {
+        "exported_at": {"type": "string", "format": "date-time"},
+        "source_files": {"type": "array", "items": {"type": "string"}},
+        "methodology_reference": {"type": "string", "const": "NOVEL_METHODOLOGY_PROPOSAL.md"}
+      }
+    }
+  }
+}
