@@ -17,3 +17,4 @@ __pycache__/
 .DS_Store
 data/*_scan_checkpoint.npz
 .claude/scheduled_tasks.lock
+logs/

@@ -17,7 +17,7 @@ print("\nSaved data/top5_plants.csv")
 # physical site (keep the highest-capacity unit) before taking the top N,
 # so process_plant.py doesn't waste an OCO-3 scan re-processing the same
 # plume from two names.
-N_CANDIDATES = 20
+N_CANDIDATES = 30
 CLUSTER_DEG = 0.05  # ~5 km; units this close are treated as one site
 
 # The 4 plants already processed in Weeks 6-8 (data/plant_results.json,

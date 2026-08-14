@@ -258,5 +258,18 @@
     "wind_deg": 28.0,
     "co2_offset_deg": 220.0,
     "wind_co2_diff_deg": 168.0
+  },
+  {
+    "plant": "TalwandiSabo",
+    "lat": 29.924,
+    "lon": 75.2372,
+    "hit_days": 4,
+    "soundings": 387,
+    "co2_enhancement_ppm": -1.277,
+    "bg_std_ppm": 2.018,
+    "no2_peak_km": 27.8,
+    "wind_deg": 215.0,
+    "co2_offset_deg": 95.0,
+    "wind_co2_diff_deg": 121.0
   }
 ]
