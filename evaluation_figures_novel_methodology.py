@@ -165,8 +165,33 @@ def fig4_cea_correction_model():
     print("[SAVED] data/eval_cea_correction_model.png")
 
 
+def fig5_temporal_q_seasonal():
+    d = json.load(open("data/temporal_q_model_results.json"))
+    results = {k: v for k, v in d["results"].items() if not v.get("skipped") and v["n_months_usable"] >= 5}
+    names = sorted(results, key=lambda k: -results[k]["n_months_usable"])[:6]
+
+    fig, ax = plt.subplots(figsize=(10, 6))
+    for name in names:
+        series = results[name]["monthly_series"]
+        months = sorted(int(m) for m in series)
+        q_norm = np.array([series[str(m)]["q_t_per_year"] for m in months])
+        q_norm = q_norm / q_norm.max()  # normalize to each facility's own peak month -- shape only, see caveat
+        ax.plot(months, q_norm, marker="o", label=name)
+    ax.set_xlabel("Month"); ax.set_ylabel("Monthly Q, normalized to facility's own peak month")
+    ax.set_xticks(range(1, 13))
+    ax.set_title("Seasonal shape of monthly CO2 signal (relative within each facility only --\n"
+                  "absolute monthly Q is NOT comparable to the annual estimate, see "
+                  "temporal_q_model.py docstring)")
+    ax.legend(fontsize=8, loc="lower right")
+    fig.tight_layout()
+    fig.savefig("data/eval_temporal_q_seasonal.png", dpi=150)
+    plt.close(fig)
+    print("[SAVED] data/eval_temporal_q_seasonal.png")
+
+
 if __name__ == "__main__":
     fig1_plume_hotspot_maps()
     fig2_spatial_robustness()
     fig3_day_matching_comparison()
     fig4_cea_correction_model()
+    fig5_temporal_q_seasonal()

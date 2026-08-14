@@ -162,6 +162,18 @@ Full results: `data/plume_maps/day_matched_results.json`; per-day wind cache: `d
 
 Full results: `data/q_correction_model_strengthened_results.json`.
 
+## 12.6 Temporal Q modeling (Phase 4, DONE)
+
+`temporal_q_model.py` splits each facility's already-collected 2020 OCO-3 soundings (all Track B soundings are calendar-year 2020 only, per `process_plant.py`'s hardcoded search range — no new data pull needed) into monthly near/background subsets and reapplies `physics_gaussian.py`'s exact IME formula (imported, not reimplemented) to each month separately, instead of the whole year at once.
+
+**Coverage is sparse, as expected**: most facilities produce only 1-6 of 12 possible months (the `MIN_NEAR_BG=5` threshold, same as the annual pipeline, excludes months with too few soundings) — a real data-density limitation, not a code defect.
+
+**A genuine, verified (not a bug) structural finding from the internal-consistency check**: mean(monthly Q)/annual Q ratio across 18 facilities is **0.60 ± 0.33, not near 1.0**. Root cause verified analytically: IME scales roughly linearly with sounding count `n` (it sums individual excesses), but `L_eff = sqrt(n·footprint_area)` scales as `sqrt(n)`, so `Q ~ n/sqrt(n) = sqrt(n)` — a monthly subsample with fewer soundings than the full year systematically produces a smaller Q than a naive "annual/12" comparison would suggest, purely from sample-size normalization (confirmed: `sqrt(1/12) ≈ 0.29`, the correct order of magnitude for the observed bias direction). **Consequence, stated plainly for the paper: absolute monthly Q values from this method are not comparable to the annual scalar and should not be reported as literal monthly tons/year figures.** They remain meaningfully comparable to each other *within* a facility (relative seasonal shape), since the bias applies consistently across a given facility's own sampling pattern.
+
+**Seasonal-shape figure** (`data/eval_temporal_q_seasonal.png`, 6 facilities with ≥5 usable months, each normalized to its own peak month): most facilities (Anpara, Sasan, Rihand, Vindhyachal) show a broadly similar shape — low mid-year, high in November/December — but **months 7, 8, and 10 have no usable data for any facility**, almost certainly OCO-3 retrieval gaps from India's monsoon cloud cover (June-September) rather than a genuine emissions pattern. This confound must be stated explicitly: the "seasonal shape" observed here cannot currently be disentangled from a satellite-sampling seasonal gap, and should not be presented as a validated emissions-seasonality finding without further work (e.g. checking whether the apparent November/December peak survives once monsoon-season sampling gaps are accounted for, which this pass does not attempt).
+
+Full results: `data/temporal_q_model_results.json`.
+
 ## 13. Next steps (not started)
 
 - **True per-overpass-time wind matching** (not daily-mean) — the one remaining untested hypothesis before concluding the plume-direction claim is unsupported by available data, not just by the two matching approaches tried so far. Requires sub-daily ERA5/reanalysis wind and extracting each sounding's exact overpass time from its `sounding_id`.

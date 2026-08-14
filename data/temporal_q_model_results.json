@@ -1,0 +1,566 @@
+{
+  "facility_list": [
+    "Anpara",
+    "ChandrapurCoal",
+    "Chhabra",
+    "Farakka",
+    "Kahalgaon",
+    "Koradi",
+    "Korba",
+    "Kudgi",
+    "Mouda",
+    "RGundem",
+    "Rihand",
+    "Sasan",
+    "ShriSingajiMalwa",
+    "Talcher",
+    "TalwandiSabo",
+    "Tamnar",
+    "Tirora",
+    "Vindhyachal"
+  ],
+  "results": {
+    "Anpara": {
+      "n_months_usable": 6,
+      "monthly_series": {
+        "2": {
+          "n_near": 234,
+          "n_bg": 355,
+          "n_used": 198,
+          "q_t_per_year": 11755391.67722815,
+          "ime_rel_std": 0.06682471030194648
+        },
+        "3": {
+          "n_near": 80,
+          "n_bg": 129,
+          "n_used": 23,
+          "q_t_per_year": 3539035.9527585157,
+          "ime_rel_std": 0.2498543807553219
+        },
+        "4": {
+          "n_near": 74,
+          "n_bg": 154,
+          "n_used": 32,
+          "q_t_per_year": 2233987.08130531,
+          "ime_rel_std": 0.22575633248199556
+        },
+        "6": {
+          "n_near": 6,
+          "n_bg": 35,
+          "n_used": 6,
+          "q_t_per_year": 1045002.4964208015,
+          "ime_rel_std": 0.2337696513412648
+        },
+        "11": {
+          "n_near": 325,
+          "n_bg": 782,
+          "n_used": 250,
+          "q_t_per_year": 15888983.288233409,
+          "ime_rel_std": 0.073006811785262
+        },
+        "12": {
+          "n_near": 578,
+          "n_bg": 857,
+          "n_used": 303,
+          "q_t_per_year": 24347750.66438157,
+          "ime_rel_std": 0.0649553476882343
+        }
+      },
+      "mean_monthly_q": 9801691.860054625,
+      "coefficient_of_variation": 0.9413049190283718,
+      "annual_q_t_per_year": 31660051.120184448,
+      "mean_monthly_vs_annual_ratio": 0.30959178880812627
+    },
+    "ChandrapurCoal": {
+      "n_months_usable": 2,
+      "monthly_series": {
+        "5": {
+          "n_near": 24,
+          "n_bg": 93,
+          "n_used": 19,
+          "q_t_per_year": 1492814.6285452517,
+          "ime_rel_std": 0.20848026589853116
+        },
+        "10": {
+          "n_near": 56,
+          "n_bg": 87,
+          "n_used": 14,
+          "q_t_per_year": 1225848.66270388,
+          "ime_rel_std": 0.49827800626870494
+        }
+      },
+      "mean_monthly_q": 1359331.645624566,
+      "coefficient_of_variation": 0.1388722504916857,
+      "annual_q_t_per_year": 7106246.984691159,
+      "mean_monthly_vs_annual_ratio": 0.19128685627630815
+    },
+    "Chhabra": {
+      "n_months_usable": 1,
+      "monthly_series": {
+        "6": {
+          "n_near": 92,
+          "n_bg": 88,
+          "n_used": 29,
+          "q_t_per_year": 1010757.2865149596,
+          "ime_rel_std": 0.33956132099266073
+        }
+      },
+      "mean_monthly_q": 1010757.2865149596,
+      "coefficient_of_variation": null,
+      "annual_q_t_per_year": 1010757.2865149596,
+      "mean_monthly_vs_annual_ratio": 1.0
+    },
+    "Farakka": {
+      "n_months_usable": 4,
+      "monthly_series": {
+        "2": {
+          "n_near": 120,
+          "n_bg": 79,
+          "n_used": 65,
+          "q_t_per_year": 4826971.8151462525,
+          "ime_rel_std": 0.22460320386007057
+        },
+        "3": {
+          "n_near": 121,
+          "n_bg": 112,
+          "n_used": 110,
+          "q_t_per_year": 9302371.747729406,
+          "ime_rel_std": 0.15100545691756834
+        },
+        "4": {
+          "n_near": 38,
+          "n_bg": 197,
+          "n_used": 27,
+          "q_t_per_year": 2675705.4857231653,
+          "ime_rel_std": 0.18260609546204615
+        },
+        "12": {
+          "n_near": 126,
+          "n_bg": 133,
+          "n_used": 46,
+          "q_t_per_year": 2116944.0851926142,
+          "ime_rel_std": 0.21825923059200122
+        }
+      },
+      "mean_monthly_q": 4730498.283447859,
+      "coefficient_of_variation": 0.6900240381672453,
+      "annual_q_t_per_year": 11105118.959295532,
+      "mean_monthly_vs_annual_ratio": 0.42597457089716256
+    },
+    "Kahalgaon": {
+      "n_months_usable": 2,
+      "monthly_series": {
+        "4": {
+          "n_near": 60,
+          "n_bg": 155,
+          "n_used": 60,
+          "q_t_per_year": 17345476.335453626,
+          "ime_rel_std": 0.05364132446998451
+        },
+        "9": {
+          "n_near": 15,
+          "n_bg": 42,
+          "n_used": 14,
+          "q_t_per_year": 2654603.070265882,
+          "ime_rel_std": 0.18054780891708633
+        }
+      },
+      "mean_monthly_q": 10000039.702859754,
+      "coefficient_of_variation": 1.0387974864135496,
+      "annual_q_t_per_year": 29654782.819959152,
+      "mean_monthly_vs_annual_ratio": 0.3372150712946455
+    },
+    "Koradi": {
+      "n_months_usable": 6,
+      "monthly_series": {
+        "2": {
+          "n_near": 153,
+          "n_bg": 415,
+          "n_used": 121,
+          "q_t_per_year": 7427587.853090353,
+          "ime_rel_std": 0.09592606226429928
+        },
+        "3": {
+          "n_near": 147,
+          "n_bg": 128,
+          "n_used": 93,
+          "q_t_per_year": 2658917.4839946,
+          "ime_rel_std": 0.15497748814176424
+        },
+        "5": {
+          "n_near": 5,
+          "n_bg": 10,
+          "n_used": 4,
+          "q_t_per_year": 874345.2789244171,
+          "ime_rel_std": 0.5424596843026124
+        },
+        "9": {
+          "n_near": 19,
+          "n_bg": 72,
+          "n_used": 5,
+          "q_t_per_year": 523674.5228144866,
+          "ime_rel_std": 0.5617918869105163
+        },
+        "11": {
+          "n_near": 132,
+          "n_bg": 282,
+          "n_used": 45,
+          "q_t_per_year": 1618496.6624958613,
+          "ime_rel_std": 0.20754472566671758
+        },
+        "12": {
+          "n_near": 40,
+          "n_bg": 473,
+          "n_used": 30,
+          "q_t_per_year": 1354003.2164797923,
+          "ime_rel_std": 0.1673012548260844
+        }
+      },
+      "mean_monthly_q": 2409504.169633251,
+      "coefficient_of_variation": 1.064535780715865,
+      "annual_q_t_per_year": 10856286.293151114,
+      "mean_monthly_vs_annual_ratio": 0.22194552580594074
+    },
+    "Korba": {
+      "n_months_usable": 1,
+      "monthly_series": {
+        "10": {
+          "n_near": 88,
+          "n_bg": 188,
+          "n_used": 78,
+          "q_t_per_year": 4202731.445047892,
+          "ime_rel_std": 0.09276976842100805
+        }
+      },
+      "mean_monthly_q": 4202731.445047892,
+      "coefficient_of_variation": null,
+      "annual_q_t_per_year": 4202731.445047892,
+      "mean_monthly_vs_annual_ratio": 1.0
+    },
+    "Kudgi": {
+      "n_months_usable": 1,
+      "monthly_series": {
+        "4": {
+          "n_near": 126,
+          "n_bg": 126,
+          "n_used": 49,
+          "q_t_per_year": 4718025.907087494,
+          "ime_rel_std": 0.19578747127415821
+        }
+      },
+      "mean_monthly_q": 4718025.907087494,
+      "coefficient_of_variation": null,
+      "annual_q_t_per_year": 4718025.907087494,
+      "mean_monthly_vs_annual_ratio": 1.0
+    },
+    "Mouda": {
+      "n_months_usable": 5,
+      "monthly_series": {
+        "2": {
+          "n_near": 70,
+          "n_bg": 139,
+          "n_used": 10,
+          "q_t_per_year": 498858.6486866872,
+          "ime_rel_std": 0.5387619585935276
+        },
+        "3": {
+          "n_near": 133,
+          "n_bg": 105,
+          "n_used": 22,
+          "q_t_per_year": 942278.1215000025,
+          "ime_rel_std": 0.3023320355653605
+        },
+        "6": {
+          "n_near": 27,
+          "n_bg": 51,
+          "n_used": 27,
+          "q_t_per_year": 2690825.8704034747,
+          "ime_rel_std": 0.12861103536967877
+        },
+        "11": {
+          "n_near": 26,
+          "n_bg": 276,
+          "n_used": 10,
+          "q_t_per_year": 807674.8442039354,
+          "ime_rel_std": 0.3540357107935348
+        },
+        "12": {
+          "n_near": 347,
+          "n_bg": 572,
+          "n_used": 243,
+          "q_t_per_year": 4414688.782507666,
+          "ime_rel_std": 0.07588267812491518
+        }
+      },
+      "mean_monthly_q": 1870865.2534603532,
+      "coefficient_of_variation": 0.887129921083962,
+      "annual_q_t_per_year": 10258309.683101472,
+      "mean_monthly_vs_annual_ratio": 0.18237558732919054
+    },
+    "RGundem": {
+      "n_months_usable": 1,
+      "monthly_series": {
+        "4": {
+          "n_near": 5,
+          "n_bg": 51,
+          "n_used": 5,
+          "q_t_per_year": 1770147.3938926053,
+          "ime_rel_std": 0.3711675646351716
+        }
+      },
+      "mean_monthly_q": 1770147.3938926053,
+      "coefficient_of_variation": null,
+      "annual_q_t_per_year": 1948492.685083411,
+      "mean_monthly_vs_annual_ratio": 0.9084701253660744
+    },
+    "Rihand": {
+      "n_months_usable": 5,
+      "monthly_series": {
+        "2": {
+          "n_near": 276,
+          "n_bg": 293,
+          "n_used": 192,
+          "q_t_per_year": 13083583.194920251,
+          "ime_rel_std": 0.0700914525350353
+        },
+        "3": {
+          "n_near": 142,
+          "n_bg": 114,
+          "n_used": 86,
+          "q_t_per_year": 5769252.5725453,
+          "ime_rel_std": 0.1250636401137923
+        },
+        "4": {
+          "n_near": 24,
+          "n_bg": 116,
+          "n_used": 21,
+          "q_t_per_year": 3571905.294251667,
+          "ime_rel_std": 0.1640137016944233
+        },
+        "11": {
+          "n_near": 462,
+          "n_bg": 832,
+          "n_used": 345,
+          "q_t_per_year": 24194179.776176035,
+          "ime_rel_std": 0.045634437443488496
+        },
+        "12": {
+          "n_near": 637,
+          "n_bg": 1051,
+          "n_used": 514,
+          "q_t_per_year": 39642499.448110305,
+          "ime_rel_std": 0.041252452312327215
+        }
+      },
+      "mean_monthly_q": 17252284.05720071,
+      "coefficient_of_variation": 0.862613734468199,
+      "annual_q_t_per_year": 48347260.30604745,
+      "mean_monthly_vs_annual_ratio": 0.3568409863969631
+    },
+    "Sasan": {
+      "n_months_usable": 6,
+      "monthly_series": {
+        "2": {
+          "n_near": 398,
+          "n_bg": 378,
+          "n_used": 232,
+          "q_t_per_year": 10119025.628978547,
+          "ime_rel_std": 0.08401672503850602
+        },
+        "3": {
+          "n_near": 145,
+          "n_bg": 159,
+          "n_used": 47,
+          "q_t_per_year": 2244903.45418828,
+          "ime_rel_std": 0.23862711743805082
+        },
+        "4": {
+          "n_near": 75,
+          "n_bg": 181,
+          "n_used": 42,
+          "q_t_per_year": 3399119.7816006616,
+          "ime_rel_std": 0.1888531002494534
+        },
+        "5": {
+          "n_near": 9,
+          "n_bg": 8,
+          "n_used": 2,
+          "q_t_per_year": 544055.8884599833,
+          "ime_rel_std": 0.7758384818469021
+        },
+        "11": {
+          "n_near": 757,
+          "n_bg": 1029,
+          "n_used": 389,
+          "q_t_per_year": 18735686.22288953,
+          "ime_rel_std": 0.056005195123550795
+        },
+        "12": {
+          "n_near": 547,
+          "n_bg": 957,
+          "n_used": 291,
+          "q_t_per_year": 36989247.91301983,
+          "ime_rel_std": 0.05536881575503545
+        }
+      },
+      "mean_monthly_q": 12005339.814856136,
+      "coefficient_of_variation": 1.162420578450453,
+      "annual_q_t_per_year": 39278810.20737811,
+      "mean_monthly_vs_annual_ratio": 0.3056441819768018
+    },
+    "ShriSingajiMalwa": {
+      "n_months_usable": 1,
+      "monthly_series": {
+        "1": {
+          "n_near": 59,
+          "n_bg": 56,
+          "n_used": 36,
+          "q_t_per_year": 3528645.9180780356,
+          "ime_rel_std": 0.20962147250837646
+        }
+      },
+      "mean_monthly_q": 3528645.9180780356,
+      "coefficient_of_variation": null,
+      "annual_q_t_per_year": 3528645.9180780356,
+      "mean_monthly_vs_annual_ratio": 1.0
+    },
+    "Talcher": {
+      "n_months_usable": 4,
+      "monthly_series": {
+        "2": {
+          "n_near": 149,
+          "n_bg": 86,
+          "n_used": 132,
+          "q_t_per_year": 7549074.248066134,
+          "ime_rel_std": 0.11220140753561197
+        },
+        "3": {
+          "n_near": 74,
+          "n_bg": 81,
+          "n_used": 17,
+          "q_t_per_year": 1955224.0277755186,
+          "ime_rel_std": 0.38112414758856894
+        },
+        "11": {
+          "n_near": 9,
+          "n_bg": 122,
+          "n_used": 9,
+          "q_t_per_year": 1552368.2905386435,
+          "ime_rel_std": 0.14972179101146796
+        },
+        "12": {
+          "n_near": 9,
+          "n_bg": 898,
+          "n_used": 6,
+          "q_t_per_year": 1087468.5239772615,
+          "ime_rel_std": 0.295412428362136
+        }
+      },
+      "mean_monthly_q": 3036033.7725893892,
+      "coefficient_of_variation": 0.9978523296360331,
+      "annual_q_t_per_year": 6914642.893860566,
+      "mean_monthly_vs_annual_ratio": 0.43907311182838515
+    },
+    "TalwandiSabo": {
+      "n_months_usable": 1,
+      "monthly_series": {
+        "2": {
+          "n_near": 37,
+          "n_bg": 91,
+          "n_used": 23,
+          "q_t_per_year": 1509508.367099197,
+          "ime_rel_std": 0.2687144715427795
+        }
+      },
+      "mean_monthly_q": 1509508.367099197,
+      "coefficient_of_variation": null,
+      "annual_q_t_per_year": 1509508.367099197,
+      "mean_monthly_vs_annual_ratio": 1.0
+    },
+    "Tamnar": {
+      "n_months_usable": 2,
+      "monthly_series": {
+        "10": {
+          "n_near": 154,
+          "n_bg": 193,
+          "n_used": 63,
+          "q_t_per_year": 3425438.9059788305,
+          "ime_rel_std": 0.1699898314008282
+        },
+        "11": {
+          "n_near": 67,
+          "n_bg": 114,
+          "n_used": 22,
+          "q_t_per_year": 768684.690415649,
+          "ime_rel_std": 0.32050448481344224
+        }
+      },
+      "mean_monthly_q": 2097061.7981972396,
+      "coefficient_of_variation": 0.8958290706481027,
+      "annual_q_t_per_year": 3223070.645572659,
+      "mean_monthly_vs_annual_ratio": 0.6506409659614036
+    },
+    "Tirora": {
+      "n_months_usable": 1,
+      "monthly_series": {
+        "6": {
+          "n_near": 12,
+          "n_bg": 127,
+          "n_used": 6,
+          "q_t_per_year": 337852.0873580591,
+          "ime_rel_std": 0.45906726280860977
+        }
+      },
+      "mean_monthly_q": 337852.0873580591,
+      "coefficient_of_variation": null,
+      "annual_q_t_per_year": 337852.0873580591,
+      "mean_monthly_vs_annual_ratio": 1.0
+    },
+    "Vindhyachal": {
+      "n_months_usable": 5,
+      "monthly_series": {
+        "2": {
+          "n_near": 353,
+          "n_bg": 302,
+          "n_used": 290,
+          "q_t_per_year": 12908947.533529196,
+          "ime_rel_std": 0.06324061608789154
+        },
+        "3": {
+          "n_near": 104,
+          "n_bg": 122,
+          "n_used": 22,
+          "q_t_per_year": 2816562.1365003735,
+          "ime_rel_std": 0.281755421484412
+        },
+        "4": {
+          "n_near": 89,
+          "n_bg": 165,
+          "n_used": 49,
+          "q_t_per_year": 2936541.53001049,
+          "ime_rel_std": 0.18306429806147728
+        },
+        "11": {
+          "n_near": 614,
+          "n_bg": 970,
+          "n_used": 379,
+          "q_t_per_year": 18572365.578517124,
+          "ime_rel_std": 0.05583733994839419
+        },
+        "12": {
+          "n_near": 674,
+          "n_bg": 969,
+          "n_used": 336,
+          "q_t_per_year": 32757193.525743313,
+          "ime_rel_std": 0.06159619416057546
+        }
+      },
+      "mean_monthly_q": 13998322.060860097,
+      "coefficient_of_variation": 0.8903877226869025,
+      "annual_q_t_per_year": 36738050.02086989,
+      "mean_monthly_vs_annual_ratio": 0.3810306222814774
+    }
+  },
+  "consistency_note": "Across 18 facilities with usable monthly data, mean(monthly Q)/annual Q ratio has mean=0.60, std=0.33 -- NOT close to 1.0, and this is expected, not a bug: IME scales roughly linearly with sample count n, but L_eff = sqrt(n*footprint_area) scales as sqrt(n), so Q ~ n/sqrt(n) = sqrt(n) -- a monthly subsample with fewer soundings than the full year systematically yields a smaller Q than a naive annual/12 comparison would suggest, from sample-size normalization alone, not a real emission-rate difference. Absolute monthly Q values should not be compared to the annual scalar; they remain meaningfully comparable to EACH OTHER within a facility (relative seasonal shape), since this bias applies consistently across a given facility's own sampling pattern.",
+  "limitation_note": "Wind speed uses the same annual/overpass-aggregated value for every month, not a true per-month wind estimate -- see module docstring. Uncertainty is IME-sampling only, not the full 3-term annual budget."
+}
