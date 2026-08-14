@@ -25,7 +25,16 @@ Earth Engine, OCO-3 downloads, or the real `data/` directory.
 
 Anything requiring network access (Earth Engine, `earthaccess`), GPU/CPU
 model training end-to-end, or real satellite data — those are exercised by
-actually running the pipeline scripts, not by this test suite. There's no
-CI configured to run these automatically; run them manually before trusting
-a change to `physics_gaussian.py`, `build_3channel.py`, or the LOFO
-harnesses.
+actually running the pipeline scripts, not by this test suite. Run them
+manually before trusting a change to `physics_gaussian.py`,
+`build_3channel.py`, or the LOFO harnesses.
+
+## CI
+
+This suite runs automatically on every push and pull request via
+`.github/workflows/tests.yml` (GitHub Actions, `ubuntu-latest`). The
+workflow installs only `numpy` and a CPU-only `torch` build — not the
+full `requirements.txt` — since none of the tested modules import
+`earthaccess`/`geemap`/`xarray`/`earthengine-api` at module level, and
+those packages are unnecessary weight for a suite that never touches
+Earth Engine or OCO-3 downloads (see "What's not covered" above).

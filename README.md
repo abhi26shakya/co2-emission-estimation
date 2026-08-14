@@ -93,20 +93,20 @@ OCO-3 sounding download additionally requires a NASA Earthdata login (`earthacce
 
 ## Testing
 
-A basic test suite exists (`tests/`, 22 stdlib-`unittest` tests, no extra dependency) covering the pipeline's most bug-prone deterministic logic — `physics_gaussian.py`'s IME math and month-stratification, `build_3channel.py`'s tile pairing, and `lofo_track_a.py`'s facility fold-splitting. Run with:
+A basic test suite exists (`tests/`, 37 stdlib-`unittest` tests, no extra dependency) covering the pipeline's most bug-prone deterministic logic — `physics_gaussian.py`'s IME math and month-stratification, `build_3channel.py`'s tile pairing, `lofo_track_a.py`'s facility fold-splitting, and `plume_model.py`'s Gaussian-plume physics. Run with:
 
 ```
 python -m unittest discover -s tests -v
 ```
 
-Doesn't cover Earth Engine, OCO-3 downloads, or model training end-to-end — no CI configured to run these automatically. See `tests/README.md`.
+Doesn't cover Earth Engine, OCO-3 downloads, or model training end-to-end. Runs automatically on every push/PR via `.github/workflows/tests.yml`. See `tests/README.md`.
 
 ## Known limitations
 
 * Track A's exhaustive LOFO recall (69.1%) is still meaningfully below tile-level or single-split numbers you might see quoted elsewhere for similar work — treat any single-split facility-level recall figure with suspicion unless it comes from a full leave-one-facility-out evaluation, since this project's own experience shows a single split can differ from the true rate by up to 2×. Two facilities (Kudgi, ShriSingajiMalwa) are diagnosed as a genuine satellite-observability limit, not a training gap.
 * Track B's Q-correcting model (against real CEA ground truth) is still indicative, not production-validated: N=17, a single-feature linear correction, one fiscal year (FY2020-21) of ground-truth data compared against 2020-calendar-year Track B estimates (not an exact year match), and one CEA database version.
 * Climate TRACE and CEA ground-truth bracketing rates (35.3% and 47.1% respectively) measure different things and should not be conflated — Climate TRACE is itself a satellite-inferred estimator (independent benchmark, not ground truth); CEA is bottom-up from reported fuel consumption (genuine ground truth). Neither number supersedes the other.
-* No CI is configured; the test suite (above) must be run manually.
+* CI (`.github/workflows/tests.yml`) only runs the fast unit-test suite on push/PR; it does not cover Earth Engine, OCO-3 downloads, or model training end-to-end — those still require running the pipeline scripts manually before trusting a change.
 * Scripts have historically been run under two different Python installations (a conda env at `/opt/miniconda3/envs/co2` with everything needed, and a separate macOS framework Python missing `earthaccess`/`xarray`/`geemap`) — use `requirements.txt` and the conda env to avoid import errors on `process_plant.py` or other OCO-3-touching scripts.
 
 ## Original Week 2–7 walkthrough (historical record, superseded)

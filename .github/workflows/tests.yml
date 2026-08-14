@@ -1,0 +1,36 @@
+name: tests
+
+# Runs the tests/ unittest suite (see tests/README.md) automatically on
+# every push and pull request, closing the gap RESEARCH_PAPER.md Sec 7
+# flagged: "A basic test suite ... was also added ... but it has no CI
+# wired up." Deliberately installs only numpy + a CPU-only torch build,
+# not the full requirements.txt -- none of the tested modules
+# (physics_gaussian.py, plume_model.py, build_3channel.py,
+# lofo_track_a.py) import earthaccess/geemap/xarray/earthengine-api at
+# module level (verified by grepping their top-level imports), and those
+# packages are unnecessary weight/fragility for a suite that, per
+# tests/README.md's own "What's not covered" section, never touches
+# Earth Engine, OCO-3 downloads, or GPU training.
+
+on:
+  push:
+  pull_request:
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Install test dependencies (numpy + CPU-only torch)
+        run: |
+          python -m pip install --upgrade pip
+          pip install numpy==2.4.6
+          pip install torch==2.12.1 --index-url https://download.pytorch.org/whl/cpu
+
+      - name: Run test suite
+        run: python -m unittest discover -s tests -v
