@@ -59,8 +59,16 @@ for name in common:
 df = pd.DataFrame(rows).set_index("plant")
 n = len(df)
 y = df["log_ratio"].values
-BEST_FEATURE = "bg_std_ppm"  # matches q_correction_model.py's own finding
-print(f"N={n} facilities (matches q_correction_model.py's original run)\n")
+# Picked the same way q_correction_model.py picks its best single feature --
+# strongest |Pearson r| with log_ratio -- rather than a hardcoded name, since
+# which feature wins can change as the facility set grows (it did: bg_std_ppm
+# at N=17 -> hit_days at N=24, see RESEARCH_PAPER.md's revision log).
+_candidate_features = ["activity_prob_mean", "activity_prob_std", "wind_co2_diff_deg",
+                        "hit_days", "n_soundings", "bg_std_ppm", "no2_peak_km", "capacity_mw"]
+_corrs = {f: float(np.corrcoef(df[f].values, y)[0, 1]) for f in _candidate_features}
+BEST_FEATURE = max(_corrs, key=lambda k: abs(_corrs[k]))
+print(f"N={n} facilities (matches q_correction_model.py's current run)")
+print(f"Best single feature (by |r| with log_ratio): {BEST_FEATURE} (r={_corrs[BEST_FEATURE]:+.3f})\n")
 
 
 def loo_linear_fit(X, y):
@@ -117,8 +125,7 @@ print(f"  improvement stays positive in {still_positive}/{n} leave-one-out re-fi
 
 # --- 3. Two-feature LOO-CV ---
 print(f"\n=== 3. Does a second feature beyond {BEST_FEATURE} help? ===")
-candidate_features = ["activity_prob_mean", "activity_prob_std", "wind_co2_diff_deg",
-                       "hit_days", "n_soundings", "no2_peak_km", "capacity_mw"]
+candidate_features = [f for f in _candidate_features if f != BEST_FEATURE]
 two_feat_results = {}
 for feat in candidate_features:
     X2 = df[[BEST_FEATURE, feat]].values
@@ -142,7 +149,7 @@ result = {
                           "best_second_feature": best_second_feat,
                           "best_two_feature_mae": two_feat_results[best_second_feat],
                           "two_feature_helps": bool(two_feature_helps)},
-    "caveat": ("N=17, same facility set and ground-truth source as q_correction_model.py. "
+    "caveat": (f"N={n}, same facility set and ground-truth source as q_correction_model.py. "
                "Bootstrap CI resamples facilities, not the underlying physics -- it quantifies "
                "sampling uncertainty in the improvement estimate given this specific facility "
                "set, not a claim the model would generalize to unseen facilities (that would "
