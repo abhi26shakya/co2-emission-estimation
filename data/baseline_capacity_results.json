@@ -1,0 +1,220 @@
+{
+  "seed": 42,
+  "n_facilities": 24,
+  "gate": {
+    "hit_days_min": 10,
+    "wind_co2_diff_deg_max": 60,
+    "n_passing": 7
+  },
+  "predictors": [
+    {
+      "label": "A: capacity_mw only (N=24)",
+      "n": 24,
+      "loo_mae_log": 0.39750468188964483,
+      "loo_r2": 0.5270747396319944,
+      "within_2x": 20,
+      "within_2x_frac": 0.8333333333333334,
+      "per_plant_abs_log_error": {
+        "Anpara": 0.1708211740096104,
+        "ChandrapurCoal": 0.06523930947983914,
+        "Chhabra": 0.38404327791502446,
+        "Dadri(Nctpp)": 0.43682799518559,
+        "Farakka": 0.41993243967112015,
+        "KGudemNew": 0.7084725095533102,
+        "Kahalgaon": 0.27842288703063645,
+        "Koradi": 0.217649353988568,
+        "Korba": 0.5344629655443995,
+        "Kudgi": 1.0005058576738346,
+        "Mouda": 0.3990784749337468,
+        "Pryagraj(Bara)": 0.3636054877690551,
+        "RGundem": 0.2812518961524475,
+        "Raichur": 0.43317683224526426,
+        "RayalSeema": 0.899516449922773,
+        "Rihand": 0.3244435647068187,
+        "Sagardighi": 0.8656327248336098,
+        "Sasan": 0.07356258371454416,
+        "ShriSingajiMalwa": 0.6842269301829891,
+        "Talcher": 0.28188009917300505,
+        "TalwandiSabo": 0.08715119408095084,
+        "Tamnar": 0.25352500538440204,
+        "Tirora": 0.13872048415674598,
+        "Vindhyachal": 0.23796286804319067
+      }
+    },
+    {
+      "label": "B: IME Q, ungated (N=24)",
+      "n": 24,
+      "loo_mae_log": 0.595790016178368,
+      "loo_r2": -0.15245817800981132,
+      "within_2x": 15,
+      "within_2x_frac": 0.625,
+      "per_plant_abs_log_error": {
+        "Anpara": 0.15555471922665376,
+        "ChandrapurCoal": 0.46026796110288615,
+        "Chhabra": 0.6088796003549515,
+        "Dadri(Nctpp)": 1.274214052313834,
+        "Farakka": 0.051462397875216226,
+        "KGudemNew": 0.007894523609206061,
+        "Kahalgaon": 0.0150947189310493,
+        "Koradi": 0.29612437939006675,
+        "Korba": 0.7567211602519599,
+        "Kudgi": 0.969867284893029,
+        "Mouda": 0.5424266640208533,
+        "Pryagraj(Bara)": 0.1971068143480963,
+        "RGundem": 0.627842671071738,
+        "Raichur": 1.00781229105597,
+        "RayalSeema": 1.6025171172712245,
+        "Rihand": 0.5730764161239144,
+        "Sagardighi": 0.09141049648683008,
+        "Sasan": 0.958158648120083,
+        "ShriSingajiMalwa": 0.5129722435761348,
+        "Talcher": 0.7311057812876633,
+        "TalwandiSabo": 0.3282575446619056,
+        "Tamnar": 0.17143633914583667,
+        "Tirora": 1.2239995383736364,
+        "Vindhyachal": 1.1347570247880938
+      }
+    },
+    {
+      "label": "C: IME Q, gated only (N=7)",
+      "n": 7,
+      "loo_mae_log": 0.5166767196560874,
+      "loo_r2": -0.24223669462051944,
+      "within_2x": 5,
+      "within_2x_frac": 0.7142857142857143,
+      "per_plant_abs_log_error": {
+        "Farakka": 0.08528341786465532,
+        "KGudemNew": 0.09832318020579223,
+        "Mouda": 0.7498022180293145,
+        "Pryagraj(Bara)": 0.5986759486983999,
+        "Sasan": 0.2427453016284069,
+        "Talcher": 1.282766284521184,
+        "Vindhyachal": 0.5591406866448594
+      }
+    },
+    {
+      "label": "D: capacity_mw + IME Q combined (N=24)",
+      "n": 24,
+      "loo_mae_log": 0.4043996079951013,
+      "loo_r2": 0.5052859946681039,
+      "within_2x": 20,
+      "within_2x_frac": 0.8333333333333334,
+      "per_plant_abs_log_error": {
+        "Anpara": 0.14963067698989008,
+        "ChandrapurCoal": 0.06938981612718464,
+        "Chhabra": 0.46851857499197,
+        "Dadri(Nctpp)": 0.5260519127185646,
+        "Farakka": 0.4111263795756912,
+        "KGudemNew": 0.7040553662705467,
+        "Kahalgaon": 0.26418060706066626,
+        "Koradi": 0.22917604833684457,
+        "Korba": 0.5515001797612449,
+        "Kudgi": 0.9967002736803838,
+        "Mouda": 0.4113802029635263,
+        "Pryagraj(Bara)": 0.35280546831039317,
+        "RGundem": 0.3259645961322448,
+        "Raichur": 0.42383756287605046,
+        "RayalSeema": 0.9082587959299335,
+        "Rihand": 0.3146387166239819,
+        "Sagardighi": 0.9107018903790465,
+        "Sasan": 0.047720503101839284,
+        "ShriSingajiMalwa": 0.6791776470327573,
+        "Talcher": 0.2878479584143534,
+        "TalwandiSabo": 0.06336120660905209,
+        "Tamnar": 0.24196029389704243,
+        "Tirora": 0.0976171141561295,
+        "Vindhyachal": 0.26998879994309277
+      }
+    }
+  ],
+  "best_overall": "A: capacity_mw only (N=24)",
+  "capacity_wins": true,
+  "verdict": "Capacity alone wins on LOO accuracy: MAE(log) = 0.398, R^2 = 0.527, within-2x 20/24, versus the best satellite predictor (C: IME Q, gated only (N=7)) at MAE(log) = 0.517, R^2 = -0.242, within-2x 5/7. This is a loss for the satellite approach on raw predictive accuracy and should be reported as such, not spun. The defensible claim for continuing the satellite work is NOT 'more accurate than capacity' -- it currently is not. It is: (1) capacity_mw is nameplate capacity, not actual generation or fuel mix, so it is a proxy that works only because plants run near rated output most of the year in this dataset -- it will fail for plants with unusual capacity factors, retirements, or fuel switching, none of which CEA v17.0 or this N=24 sample can rule out; and (2) satellite estimation needs no self-reported operator data at all, which is the only route to independent verification in geographies without a CEA-grade reporting regime. If the goal is 'best predictor of CEA for these 24 known Indian plants,' use capacity. If the goal is 'verify emissions independent of self-reported data,' capacity is not a competitor -- it doesn't do that job at any accuracy.",
+  "restricted_gated_comparison": {
+    "note": "C, E, F evaluated on the identical N=7 gated plants (LOO within that subset). G is capacity-only on the complementary 17 non-gated plants, for contrast, not a like-for-like comparison with C/E/F.",
+    "results": [
+      {
+        "label": "C: IME Q, gated only (N=7)",
+        "n": 7,
+        "loo_mae_log": 0.5166767196560874,
+        "loo_r2": -0.24223669462051944,
+        "within_2x": 5,
+        "within_2x_frac": 0.7142857142857143,
+        "per_plant_abs_log_error": {
+          "Farakka": 0.08528341786465532,
+          "KGudemNew": 0.09832318020579223,
+          "Mouda": 0.7498022180293145,
+          "Pryagraj(Bara)": 0.5986759486983999,
+          "Sasan": 0.2427453016284069,
+          "Talcher": 1.282766284521184,
+          "Vindhyachal": 0.5591406866448594
+        }
+      },
+      {
+        "label": "E: capacity_mw only, gated subset (N=7)",
+        "n": 7,
+        "loo_mae_log": 0.24074518299066888,
+        "loo_r2": 0.6646222986367042,
+        "within_2x": 6,
+        "within_2x_frac": 0.8571428571428571,
+        "per_plant_abs_log_error": {
+          "Farakka": 0.1316898617340101,
+          "KGudemNew": 0.3989709540844206,
+          "Mouda": 0.748449206382821,
+          "Pryagraj(Bara)": 0.01948803964951651,
+          "Sasan": 0.15280954127983293,
+          "Talcher": 0.18733975885690057,
+          "Vindhyachal": 0.046468918947180526
+        }
+      },
+      {
+        "label": "F: capacity_mw + IME Q combined, gated subset (N=7)",
+        "n": 7,
+        "loo_mae_log": 0.3495897925429046,
+        "loo_r2": 0.3111152356896554,
+        "within_2x": 5,
+        "within_2x_frac": 0.7142857142857143,
+        "per_plant_abs_log_error": {
+          "Farakka": 0.13234233666022277,
+          "KGudemNew": 0.3967455143846532,
+          "Mouda": 0.7689203913035794,
+          "Pryagraj(Bara)": 0.010718561659778914,
+          "Sasan": 0.15874538439859975,
+          "Talcher": 0.9182825516633812,
+          "Vindhyachal": 0.061373807730117136
+        }
+      },
+      {
+        "label": "G: capacity_mw only, non-gated subset (N=17)",
+        "n": 17,
+        "loo_mae_log": 0.41813765801816594,
+        "loo_r2": 0.382555101405607,
+        "within_2x": 14,
+        "within_2x_frac": 0.8235294117647058,
+        "per_plant_abs_log_error": {
+          "Anpara": 0.19950218243429774,
+          "ChandrapurCoal": 0.04865104888836669,
+          "Chhabra": 0.4623122102998547,
+          "Dadri(Nctpp)": 0.2774401931072461,
+          "Kahalgaon": 0.3516159273703394,
+          "Koradi": 0.16376966099437418,
+          "Korba": 0.5799353509980207,
+          "Kudgi": 0.9623540019149228,
+          "RGundem": 0.3178456445918698,
+          "Raichur": 0.25045378867723755,
+          "RayalSeema": 0.7511672658156119,
+          "Rihand": 0.3212637879672151,
+          "Sagardighi": 1.2603352445813378,
+          "ShriSingajiMalwa": 0.6641728144936128,
+          "TalwandiSabo": 0.05019573166526747,
+          "Tamnar": 0.2003660656868984,
+          "Tirora": 0.2469592668223477
+        }
+      }
+    ]
+  },
+  "restricted_verdict": {
+    "gated_satellite_beats_capacity": false,
+    "text": "Within the gated subset specifically (N=7, same 7 plants for all three): capacity-only MAE(log) = 0.241 (R^2=0.665, within-2x 6/7), IME-gated MAE(log) = 0.517 (R^2=-0.242, within-2x 5/7), combined MAE(log) = 0.350 (R^2=0.311, within-2x 5/7). Capacity still wins even on the gated subset -- IME-gated does NOT beat capacity-only here (0.517 vs 0.241). For contrast, capacity-only on the complementary 17 non-gated plants scores MAE(log) = 0.418 (R^2=0.383, within-2x 14/17) -- capacity is noticeably worse outside the gated set than inside it, which matters because it means the 'quality gate' picked plants where satellite ALONE improves (compare B's ungated 0.596 to C's gated 0.517), but capacity improves on that same subset too (A's all-plant 0.398 vs E's gated-only 0.241), so the gate may just be selecting easier plants in general, not plants where satellite specifically becomes competitive with capacity. See Week 12's validate_quality_gate.py for the permutation test on that question."
+  }
+}

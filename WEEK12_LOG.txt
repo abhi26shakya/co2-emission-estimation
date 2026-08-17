@@ -1,0 +1,131 @@
+WEEK 12 — DONE (quality-gate validation, capacity baseline, all three
+                 results negative)
+
+- Prior sessions' CLAUDE.md flagged an open question: is the
+  "hit_days >= 10 AND wind_co2_diff_deg <= 60" quality gate (N=7, bias
+  1.07x, sd(log) 0.55, within-2x 6/7) a real finding, or did we fit it to
+  the same 24 points we then judged it on? Started this week by
+  re-verifying CLAUDE.md's headline numbers against
+  data/q_correction_model_results.json directly -- all of them (median
+  bias 0.69x, sd(log) 1.33, within-2x 10/24, r(log our_q, CEA)=0.236,
+  r(log capacity_mw, CEA)=0.776, and the filtered N=7 numbers above)
+  reproduced exactly. Ground was solid; the open question was not a
+  data-entry error, it needed an actual validation script.
+
+- baseline_capacity.py (new): before touching the gate question, asked
+  the more basic one CLAUDE.md's own correlation numbers implied --
+  does capacity_mw alone predict CEA better than our satellite estimate?
+  Four predictors, all evaluated leave-one-out on the N=24 table so
+  nothing is fit and scored on the same point:
+
+    A. capacity_mw only (N=24):        LOO R^2 = 0.527, MAE(log) = 0.398,
+                                        within-2x 20/24
+    B. IME Q, ungated (N=24):          LOO R^2 = -0.152, MAE(log) = 0.596,
+                                        within-2x 15/24
+    C. IME Q, gated only (N=7):        LOO R^2 = -0.242, MAE(log) = 0.517,
+                                        within-2x 5/7
+    D. capacity_mw + IME Q combined:   LOO R^2 = 0.505, MAE(log) = 0.404,
+                                        within-2x 20/24
+
+  Capacity alone wins outright. Both satellite predictors have NEGATIVE
+  LOO R^2 -- worse than predicting the mean. Combining capacity with IME Q
+  (D) is not better than capacity alone (0.505 vs 0.527 R^2, 0.404 vs
+  0.398 MAE) -- the satellite signal adds nothing once capacity is in the
+  model. Reported plainly, not spun: the defensible claim for continuing
+  satellite work is not "more accurate than capacity," it currently is
+  not. It's that capacity_mw is nameplate, not actual output, and
+  satellite needs no self-reported operator data -- a scope argument, not
+  an accuracy one.
+
+- Restricted comparison (same reviewer objection: comparing C's N=7
+  against A/B/D's N=24 isn't apples-to-apples). Re-ran capacity-only and
+  capacity+IME restricted to the identical 7 gated plants, LOO within that
+  subset:
+
+    E. capacity_mw only, gated subset (N=7):  MAE(log) = 0.241, R^2=0.665,
+                                               within-2x 6/7
+    C. IME Q, gated subset (N=7):             MAE(log) = 0.517, R^2=-0.242,
+                                               within-2x 5/7
+    F. capacity+IME combined, gated (N=7):    MAE(log) = 0.350, R^2=0.311,
+                                               within-2x 5/7
+
+  Capacity still wins on the gated subset, and not narrowly (0.241 vs
+  0.517). Key insight, and the one that reframes the gate question:
+  capacity ALSO improves sharply on the gated subset (all-24 MAE 0.398 ->
+  gated-only 0.241), while capacity restricted to the 17 NON-gated plants
+  stays close to its full-sample number (0.418). That pattern means the
+  "quality gate" is plausibly selecting plants that are generally easier
+  to predict -- for any predictor -- not plants where the satellite
+  estimate specifically becomes trustworthy relative to capacity. This
+  motivated treating the gate itself as suspect, not just under-tested.
+
+- validate_quality_gate.py (new) + tests/test_validate_quality_gate.py
+  (9 tests, all passing): three checks against the N=24 table, seed 42,
+  MIN_GATE_N=5 (minimum plants a candidate gate must keep to be
+  considered, needed since sd() requires n>=2 and to keep candidate gates
+  roughly the scale of the published N=7 gate).
+
+  1. Leave-one-facility-out: for each of 24 facilities, select the best
+     (hit_days, wind_diff) threshold on the OTHER 23 only (minimizing
+     sd(log_ratio) among passing plants), then apply it to the held-out
+     plant. Gated held-out plants (n=6): sd(log_ratio)=0.595, within-2x
+     5/6. Ungated held-out plants (n=18): sd(log_ratio)=1.486, within-2x
+     5/18. Real, out-of-fold improvement for gated plants -- the gate
+     is not nothing.
+
+  2. Permutation test (the decisive one): shuffled log_ratio labels
+     across facilities 1000 times (hit_days/wind_diff held fixed), re-ran
+     the same best-gate search on each shuffle. 234/1000 shuffles matched
+     or beat the real grid-search-optimal gate's sd (0.554). p = 0.235,
+     nowhere near the p<0.05 bar. Random label-scrambled data finds an
+     equally good-looking gate about 1 time in 4 -- the signature of a
+     multiple-comparisons artifact, not a real threshold effect.
+
+  3. Threshold stability: 0/24 LOO folds reproduced the published (10,60)
+     exactly. The search converged on (9, 54.0) in 22/24 folds instead
+     (and, incidentally, (9,54.0) on the full data selects the identical
+     7 plants (10,60) does -- the induced subset is stable even though
+     the literal threshold numbers the search finds are not what's
+     published). That the grid-search optimum doesn't reproduce the
+     published numbers at all is itself worth flagging.
+
+  Per-fold detail: of the 24 held-out plants, 17 had |log_ratio| below
+  the ungated-group average (1.226) -- including 10 that FAILED the gate
+  (e.g. Kudgi 0.241, Koradi 0.324, Raichur 0.426). Most plants in this
+  dataset are just easy; the gate's apparent power partly reflects that
+  base rate rather than a clean separation of easy vs. hard cases.
+
+  VERDICT: GATE IS SELECTION BIAS. Per the pre-agreed criteria
+  (permutation p<0.05 AND LOO shows real gated-vs-ungated improvement),
+  the permutation leg fails even though the LOO leg alone looked
+  supportive. Report the honest nuance, not just the verdict label: gated
+  plants DID show real out-of-fold improvement (sd 0.595 vs 1.486) --
+  the gate is doing something -- it just isn't doing more than what
+  label-shuffled noise does about a quarter of the time, which is not
+  a result you can build a correction model's credibility on.
+
+- Combined picture across all three results this week: capacity beats
+  satellite everywhere it was tested (full sample, gated subset, and
+  combined with satellite), and the gate that was supposed to identify
+  where satellite becomes trustworthy does not survive a permutation
+  test. All three are negative results and are recorded as such, per
+  this repo's convention (VIIRS tying exactly, activity signal not
+  helping, reliability model LOO R^2 = -1.22 -- this is consistent with
+  that pattern, not an aberration).
+
+NEXT: the research question has shifted. It is no longer "how do we make
+this work" -- three independent tests this week say the current N=24
+satellite-only approach does not beat a trivial nameplate-capacity
+baseline, gated or not. The question is now "why doesn't it, and what
+satellite coverage would be required for it to." Week 13 will run an
+overpass-density experiment on Vindhyachal (our best-covered facility,
+n_soundings=7114, hit_days=17) to test whether the limiting factor is
+OCO-3 revisit frequency itself -- i.e. whether Q-estimate precision
+scales with sounding density in a way that predicts how many more
+overpasses the other 23 facilities would need before satellite-only
+Q estimation could plausibly compete with capacity.
+
+Files changed: baseline_capacity.py (new), validate_quality_gate.py
+(new), tests/test_validate_quality_gate.py (new, 9 tests),
+data/baseline_capacity_results.json (new),
+data/quality_gate_validation.json (new). No existing files modified.

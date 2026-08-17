@@ -1,0 +1,346 @@
+{
+  "seed": 42,
+  "n_facilities": 24,
+  "min_gate_n": 5,
+  "published_gate_stats": {
+    "n": 7,
+    "bias": 1.0739341410465821,
+    "sd_log_ratio": 0.5541013647005543,
+    "within_2x": 6,
+    "within_2x_frac": 0.8571428571428571,
+    "hit_days_min": 10,
+    "wind_diff_max": 60,
+    "plants": [
+      "Farakka",
+      "KGudemNew",
+      "Mouda",
+      "Pryagraj(Bara)",
+      "Sasan",
+      "Talcher",
+      "Vindhyachal"
+    ]
+  },
+  "loo": {
+    "per_fold": [
+      {
+        "held_out_plant": "Anpara",
+        "selected_hit_days_min": 9,
+        "selected_wind_diff_max": 54.0,
+        "training_gate_sd": 0.5541013647005543,
+        "training_gate_n": 7,
+        "held_out_passed_gate": false,
+        "held_out_log_ratio": 0.8360258210231225,
+        "held_out_abs_log_ratio": 0.8360258210231225,
+        "lower_error_than_ungated_avg": true
+      },
+      {
+        "held_out_plant": "ChandrapurCoal",
+        "selected_hit_days_min": 9,
+        "selected_wind_diff_max": 54.0,
+        "training_gate_sd": 0.5541013647005543,
+        "training_gate_n": 7,
+        "held_out_passed_gate": false,
+        "held_out_log_ratio": -0.7692976109758224,
+        "held_out_abs_log_ratio": 0.7692976109758224,
+        "lower_error_than_ungated_avg": true
+      },
+      {
+        "held_out_plant": "Chhabra",
+        "selected_hit_days_min": 9,
+        "selected_wind_diff_max": 54.0,
+        "training_gate_sd": 0.5541013647005543,
+        "training_gate_n": 7,
+        "held_out_passed_gate": false,
+        "held_out_log_ratio": -2.5575260814348226,
+        "held_out_abs_log_ratio": 2.5575260814348226,
+        "lower_error_than_ungated_avg": false
+      },
+      {
+        "held_out_plant": "Dadri(Nctpp)",
+        "selected_hit_days_min": 9,
+        "selected_wind_diff_max": 54.0,
+        "training_gate_sd": 0.5541013647005543,
+        "training_gate_n": 7,
+        "held_out_passed_gate": false,
+        "held_out_log_ratio": 2.025458653283861,
+        "held_out_abs_log_ratio": 2.025458653283861,
+        "lower_error_than_ungated_avg": false
+      },
+      {
+        "held_out_plant": "Farakka",
+        "selected_hit_days_min": 9,
+        "selected_wind_diff_max": 54.0,
+        "training_gate_sd": 0.6063191131819994,
+        "training_gate_n": 6,
+        "held_out_passed_gate": true,
+        "held_out_log_ratio": 0.012369129052756576,
+        "held_out_abs_log_ratio": 0.012369129052756576,
+        "lower_error_than_ungated_avg": true
+      },
+      {
+        "held_out_plant": "KGudemNew",
+        "selected_hit_days_min": 9,
+        "selected_wind_diff_max": 54.0,
+        "training_gate_sd": 0.6053380836254326,
+        "training_gate_n": 6,
+        "held_out_passed_gate": true,
+        "held_out_log_ratio": -0.021248507482276625,
+        "held_out_abs_log_ratio": 0.021248507482276625,
+        "lower_error_than_ungated_avg": true
+      },
+      {
+        "held_out_plant": "Kahalgaon",
+        "selected_hit_days_min": 9,
+        "selected_wind_diff_max": 54.0,
+        "training_gate_sd": 0.5541013647005543,
+        "training_gate_n": 7,
+        "held_out_passed_gate": false,
+        "held_out_log_ratio": 0.9049201799208236,
+        "held_out_abs_log_ratio": 0.9049201799208236,
+        "lower_error_than_ungated_avg": true
+      },
+      {
+        "held_out_plant": "Koradi",
+        "selected_hit_days_min": 9,
+        "selected_wind_diff_max": 54.0,
+        "training_gate_sd": 0.5541013647005543,
+        "training_gate_n": 7,
+        "held_out_passed_gate": false,
+        "held_out_log_ratio": 0.32368734954593953,
+        "held_out_abs_log_ratio": 0.32368734954593953,
+        "lower_error_than_ungated_avg": true
+      },
+      {
+        "held_out_plant": "Korba",
+        "selected_hit_days_min": 9,
+        "selected_wind_diff_max": 54.0,
+        "training_gate_sd": 0.5541013647005543,
+        "training_gate_n": 7,
+        "held_out_passed_gate": false,
+        "held_out_log_ratio": -1.507412423414135,
+        "held_out_abs_log_ratio": 1.507412423414135,
+        "lower_error_than_ungated_avg": false
+      },
+      {
+        "held_out_plant": "Kudgi",
+        "selected_hit_days_min": 9,
+        "selected_wind_diff_max": 54.0,
+        "training_gate_sd": 0.5541013647005543,
+        "training_gate_n": 7,
+        "held_out_passed_gate": false,
+        "held_out_log_ratio": 0.24055052160592555,
+        "held_out_abs_log_ratio": 0.24055052160592555,
+        "lower_error_than_ungated_avg": true
+      },
+      {
+        "held_out_plant": "Mouda",
+        "selected_hit_days_min": 9,
+        "selected_wind_diff_max": 54.0,
+        "training_gate_sd": 0.5688757475451631,
+        "training_gate_n": 6,
+        "held_out_passed_gate": true,
+        "held_out_log_ratio": 0.509576991527296,
+        "held_out_abs_log_ratio": 0.509576991527296,
+        "lower_error_than_ungated_avg": true
+      },
+      {
+        "held_out_plant": "Pryagraj(Bara)",
+        "selected_hit_days_min": 9,
+        "selected_wind_diff_max": 54.0,
+        "training_gate_sd": 0.5438834769615276,
+        "training_gate_n": 6,
+        "held_out_passed_gate": true,
+        "held_out_log_ratio": 0.6292255541371667,
+        "held_out_abs_log_ratio": 0.6292255541371667,
+        "lower_error_than_ungated_avg": true
+      },
+      {
+        "held_out_plant": "RGundem",
+        "selected_hit_days_min": 9,
+        "selected_wind_diff_max": 54.0,
+        "training_gate_sd": 0.5541013647005543,
+        "training_gate_n": 7,
+        "held_out_passed_gate": false,
+        "held_out_log_ratio": -2.034257927595688,
+        "held_out_abs_log_ratio": 2.034257927595688,
+        "lower_error_than_ungated_avg": false
+      },
+      {
+        "held_out_plant": "Raichur",
+        "selected_hit_days_min": 9,
+        "selected_wind_diff_max": 54.0,
+        "training_gate_sd": 0.5541013647005543,
+        "training_gate_n": 7,
+        "held_out_passed_gate": false,
+        "held_out_log_ratio": -0.4257083511630226,
+        "held_out_abs_log_ratio": 0.4257083511630226,
+        "lower_error_than_ungated_avg": true
+      },
+      {
+        "held_out_plant": "RayalSeema",
+        "selected_hit_days_min": 9,
+        "selected_wind_diff_max": 54.0,
+        "training_gate_sd": 0.5541013647005543,
+        "training_gate_n": 7,
+        "held_out_passed_gate": false,
+        "held_out_log_ratio": 0.9886390495643745,
+        "held_out_abs_log_ratio": 0.9886390495643745,
+        "lower_error_than_ungated_avg": true
+      },
+      {
+        "held_out_plant": "Rihand",
+        "selected_hit_days_min": 9,
+        "selected_wind_diff_max": 54.0,
+        "training_gate_sd": 0.5541013647005543,
+        "training_gate_n": 7,
+        "held_out_passed_gate": false,
+        "held_out_log_ratio": 0.8524637675518628,
+        "held_out_abs_log_ratio": 0.8524637675518628,
+        "lower_error_than_ungated_avg": true
+      },
+      {
+        "held_out_plant": "Sagardighi",
+        "selected_hit_days_min": 9,
+        "selected_wind_diff_max": 54.0,
+        "training_gate_sd": 0.5541013647005543,
+        "training_gate_n": 7,
+        "held_out_passed_gate": false,
+        "held_out_log_ratio": -1.6991110105504301,
+        "held_out_abs_log_ratio": 1.6991110105504301,
+        "lower_error_than_ungated_avg": false
+      },
+      {
+        "held_out_plant": "Sasan",
+        "selected_hit_days_min": 9,
+        "selected_wind_diff_max": 33.0,
+        "training_gate_sd": 0.5948639157846056,
+        "training_gate_n": 6,
+        "held_out_passed_gate": false,
+        "held_out_log_ratio": 0.3212221520389835,
+        "held_out_abs_log_ratio": 0.3212221520389835,
+        "lower_error_than_ungated_avg": true
+      },
+      {
+        "held_out_plant": "ShriSingajiMalwa",
+        "selected_hit_days_min": 9,
+        "selected_wind_diff_max": 54.0,
+        "training_gate_sd": 0.5541013647005543,
+        "training_gate_n": 7,
+        "held_out_passed_gate": false,
+        "held_out_log_ratio": -0.453137070438226,
+        "held_out_abs_log_ratio": 0.453137070438226,
+        "lower_error_than_ungated_avg": true
+      },
+      {
+        "held_out_plant": "Talcher",
+        "selected_hit_days_min": 12,
+        "selected_wind_diff_max": 54.0,
+        "training_gate_sd": 0.2617582029629714,
+        "training_gate_n": 5,
+        "held_out_passed_gate": true,
+        "held_out_log_ratio": -1.0527232396881643,
+        "held_out_abs_log_ratio": 1.0527232396881643,
+        "lower_error_than_ungated_avg": true
+      },
+      {
+        "held_out_plant": "TalwandiSabo",
+        "selected_hit_days_min": 9,
+        "selected_wind_diff_max": 54.0,
+        "training_gate_sd": 0.5541013647005543,
+        "training_gate_n": 7,
+        "held_out_passed_gate": false,
+        "held_out_log_ratio": -1.384503916160593,
+        "held_out_abs_log_ratio": 1.384503916160593,
+        "lower_error_than_ungated_avg": false
+      },
+      {
+        "held_out_plant": "Tamnar",
+        "selected_hit_days_min": 9,
+        "selected_wind_diff_max": 54.0,
+        "training_gate_sd": 0.5541013647005543,
+        "training_gate_n": 7,
+        "held_out_passed_gate": false,
+        "held_out_log_ratio": -0.8563425290684734,
+        "held_out_abs_log_ratio": 0.8563425290684734,
+        "lower_error_than_ungated_avg": true
+      },
+      {
+        "held_out_plant": "Tirora",
+        "selected_hit_days_min": 9,
+        "selected_wind_diff_max": 54.0,
+        "training_gate_sd": 0.5541013647005543,
+        "training_gate_n": 7,
+        "held_out_passed_gate": false,
+        "held_out_log_ratio": -3.8787833993583147,
+        "held_out_abs_log_ratio": 3.8787833993583147,
+        "lower_error_than_ungated_avg": false
+      },
+      {
+        "held_out_plant": "Vindhyachal",
+        "selected_hit_days_min": 9,
+        "selected_wind_diff_max": 54.0,
+        "training_gate_sd": 0.6068197756808593,
+        "training_gate_n": 6,
+        "held_out_passed_gate": true,
+        "held_out_log_ratio": 0.10087863155965873,
+        "held_out_abs_log_ratio": 0.10087863155965873,
+        "lower_error_than_ungated_avg": true
+      }
+    ],
+    "gated_stats": {
+      "n": 6,
+      "bias": 1.0301245938729509,
+      "sd_log_ratio": 0.5948639157846056,
+      "within_2x": 5,
+      "within_2x_frac": 0.8333333333333334
+    },
+    "ungated_stats": {
+      "n": 18,
+      "bias": 0.6040720357658252,
+      "sd_log_ratio": 1.4857904481215434,
+      "within_2x": 5,
+      "within_2x_frac": 0.2777777777777778
+    },
+    "ungated_avg_abs_log_ratio": 1.2255026563719125
+  },
+  "threshold_stability": {
+    "published_gate": {
+      "hit_days_min": 10,
+      "wind_diff_max": 60
+    },
+    "n_folds": 24,
+    "exact_matches_to_published_gate": 0,
+    "exact_match_frac": 0.0,
+    "distribution": {
+      "9,54.0": 22,
+      "9,33.0": 1,
+      "12,54.0": 1
+    }
+  },
+  "permutation_test": {
+    "n_permutations": 1000,
+    "seed": 42,
+    "real_grid_search_optimal_gate": {
+      "hit_days_min": 9,
+      "wind_diff_max": 54.0,
+      "sd_log_ratio": 0.5541013647005543,
+      "n": 7,
+      "plants": [
+        "Farakka",
+        "KGudemNew",
+        "Mouda",
+        "Pryagraj(Bara)",
+        "Sasan",
+        "Talcher",
+        "Vindhyachal"
+      ]
+    },
+    "shuffled_best_sd_mean": 0.7684850085809272,
+    "shuffled_best_sd_min": 0.1484201882369154,
+    "shuffled_best_sd_max": 1.328287899150822,
+    "shuffles_as_good_or_better_than_real": 234,
+    "p_value": 0.23476523476523475
+  },
+  "verdict": "GATE IS SELECTION BIAS",
+  "verdict_reasoning": "Permutation test: p = 0.235 (234/1000 shuffles matched or beat the real grid-search-optimal gate's sd of 0.554). This is NOT below 0.05 -- random label-scrambled data finds an equally good gate about as often as the real data does, which is the signature of selection bias. LOO out-of-fold: gated held-out plants (n=6) sd(log_ratio)=0.595, within-2x 5/6; ungated held-out plants (n=18) sd(log_ratio)=1.486, within-2x 5/18. Gated plants show real out-of-fold improvement over ungated. Threshold stability: the LOO-selected gate matched the published (10, 60) gate exactly in 0/24 folds (0%)."
+}
