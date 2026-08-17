@@ -241,6 +241,102 @@
       "our_q_year": 2020,
       "ratio_ours_over_ct": 0.171884670762027,
       "bracketed_by_our_interval": false
+    },
+    {
+      "plant": "Lalitpur",
+      "climate_trace_name": "Lalitpur power project",
+      "climate_trace_id": 25454391,
+      "climate_trace_year": 2021,
+      "climate_trace_co2_t": 9395900,
+      "match_dist_deg": 0.0014317821063305016
+    },
+    {
+      "plant": "Akaltara",
+      "climate_trace_name": "KSK Mahanadi Power Project",
+      "climate_trace_id": 25453958,
+      "climate_trace_year": 2021,
+      "climate_trace_co2_t": 8541500,
+      "match_dist_deg": 0.0
+    },
+    {
+      "plant": "Bellary",
+      "climate_trace_name": "Bellary Thermal Power Station",
+      "climate_trace_id": 25453120,
+      "climate_trace_year": 2021,
+      "climate_trace_co2_t": 6572800,
+      "match_dist_deg": 0.0
+    },
+    {
+      "plant": "Dadri(Nctpp)",
+      "climate_trace_name": "Dadri Combined Cycle power plant",
+      "climate_trace_id": 448679,
+      "climate_trace_year": 2021,
+      "climate_trace_co2_t": 7584300,
+      "match_dist_deg": 0.0,
+      "our_q_t_per_year": 28053252.862678,
+      "our_q_year": 2020,
+      "ratio_ours_over_ct": 3.6988585449781786,
+      "bracketed_by_our_interval": false
+    },
+    {
+      "plant": "KGudemNew",
+      "climate_trace_name": "Kothagudem Thermal Power Station",
+      "climate_trace_id": 25450209,
+      "climate_trace_year": 2021,
+      "climate_trace_co2_t": 6810900,
+      "match_dist_deg": 0.0,
+      "our_q_t_per_year": 10015237.187780112,
+      "our_q_year": 2020,
+      "ratio_ours_over_ct": 1.470471918216405,
+      "bracketed_by_our_interval": true
+    },
+    {
+      "plant": "Pryagraj(Bara)",
+      "climate_trace_name": "Bara Thermal Power Project",
+      "climate_trace_id": 25454115,
+      "climate_trace_year": 2021,
+      "climate_trace_co2_t": 8991200,
+      "match_dist_deg": 0.0009486832980516732,
+      "our_q_t_per_year": 17230587.274904367,
+      "our_q_year": 2020,
+      "ratio_ours_over_ct": 1.9163834944061267,
+      "bracketed_by_our_interval": true
+    },
+    {
+      "plant": "Raichur",
+      "climate_trace_name": "Raichur Thermal Power Station",
+      "climate_trace_id": 25451195,
+      "climate_trace_year": 2021,
+      "climate_trace_co2_t": 6066800,
+      "match_dist_deg": 0.0,
+      "our_q_t_per_year": 2182262.4301783713,
+      "our_q_year": 2020,
+      "ratio_ours_over_ct": 0.3597056817726596,
+      "bracketed_by_our_interval": false
+    },
+    {
+      "plant": "RayalSeema",
+      "climate_trace_name": "Rayalaseema Thermal Power Project",
+      "climate_trace_id": 25450212,
+      "climate_trace_year": 2021,
+      "climate_trace_co2_t": 6071200,
+      "match_dist_deg": 0.0,
+      "our_q_t_per_year": 5540350.248113102,
+      "our_q_year": 2020,
+      "ratio_ours_over_ct": 0.9125626314588717,
+      "bracketed_by_our_interval": true
+    },
+    {
+      "plant": "Sagardighi",
+      "climate_trace_name": "Sagardighi Thermal Power Station",
+      "climate_trace_id": 25453084,
+      "climate_trace_year": 2021,
+      "climate_trace_co2_t": 7422000,
+      "match_dist_deg": 0.0010000000000019327,
+      "our_q_t_per_year": 1624271.487077673,
+      "our_q_year": 2020,
+      "ratio_ours_over_ct": 0.21884552507109578,
+      "bracketed_by_our_interval": false
     }
   ]
 }
