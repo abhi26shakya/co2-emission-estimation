@@ -35,29 +35,48 @@ Filtered to hit_days >= 10 AND wind_co2_diff_deg <= 60 ("quality gate"):
   -0.152 IME-ungated vs -0.242 IME-gated-N=7); combining the two doesn't
   beat capacity alone either.
 
-Week 13 overpass-density experiment (overpass_density_experiment.py):
-  subsampled Vindhyachal/Rihand/Sasan (16-19 overpass days each) down to
-  as few as 3 days, 200 repeats/step, to test whether OCO-3 revisit
-  frequency explains the plant-to-plant spread.
-  Vindhyachal and Sasan: error and spread degrade smoothly and
-  monotonically as days drop — density is a real factor for them.
-  Rihand: already +134% off at its BEST available coverage (15 usable
-  days) — more days never fixed it, ruling out day count as its cause.
-  VERDICT: density matters but does not fully explain the failure
-  pattern — some facilities (Rihand) have a bad underlying signal
-  independent of coverage. A conservative n_days>=6 threshold clears
-  17/24 plants, a looser filter than the Week 11 quality gate. See
-  WEEK13_LOG.txt for the full breakdown, including a self-caught bug in
-  the first threshold definition (ascending scan was fooled by a noisy
-  lucky draw at low n_days; fixed to require an unbroken stable run down
-  from full coverage).
+Week 13 — four experiments, each testing one candidate explanation for
+why some facilities (esp. Rihand) fail badly despite good inputs. All
+four were tested as both (a) a predictor of |log_ratio| across the N=24
+feature table, and (b) a specific check of whether it explains Rihand:
+
+  exp 1 overpass_density_experiment.py: subsampled Vindhyachal/Rihand/
+    Sasan (16-19 days) down to 3 days, 200 repeats/step. Vindhyachal and
+    Sasan degrade smoothly as days drop (density is real for them), but
+    Rihand is already +134% off at its BEST coverage (15 days) — day
+    count is NOT its cause. n_days>=6 clears 17/24 plants.
+  exp 2 snr_all_plants.py: signal-to-noise (near-plant mean minus
+    background, over background std) for all 30. Rihand's SNR=1.27 is
+    ABOVE the 30-plant median (0.36) — not a weak-signal problem either.
+  exp 3 bg_sensitivity_all_plants.py: IME's swing across 5
+    background-annulus definitions, for all 30. Rihand's swing = 4.3%,
+    confirmed identical to the original 2-plant Week 10 check, far below
+    Talcher's known-bad 20.2% reference — not a background-definition
+    problem.
+  exp 4 wind_match_quality_all_plants.py: real (unthresholded)
+    per-overpass wind-match rate, for all 30 — required a small additive
+    fix to physics_gaussian.py (n_wind_days_raw_matched,
+    wind_days_matched_speeds; behavior-preserving, verified). Rihand's
+    rate = 25% (4/16 days), 71st percentile — ABOVE median, not a
+    wind-matching problem either.
+
+  Predictor strength, ranked by |r| vs |log_ratio| (N=24): wind_match_rate
+  -0.328 > hit_days -0.310 (Week 12) > SNR +0.269 > bg swing% +0.161.
+  wind_match_rate is nominally the best of the four, but the margin over
+  hit_days is small and none of the four explains >11% of the variance.
 
 ## The current research question
-Density alone doesn't explain the spread — what does, for facilities like
-Rihand that fail even at their best achievable coverage? Candidates not
-yet tested: background-annulus definition, wind-day matching quality,
-plume geometry/plant layout, real emission variability year-to-year vs.
-the FY2020-21 CEA baseline.
+Four independent single-cause hypotheses for Rihand's error (overpass
+density, signal-to-noise, background definition, wind-matching quality)
+have all been tested and REJECTED — Rihand scores average-to-good on
+every one of them despite a +134% Q error. What's left untested: plume
+geometry/plant layout, a genuine FY2020-21-CEA-vs-2020-satellite
+emissions-year mismatch specific to Rihand, or an interaction between
+factors rather than any single one. See WEEK13_LOG.txt for full
+per-experiment detail, including a self-caught methodology bug in
+experiment 1 (an ascending threshold scan was fooled by a noisy lucky
+draw at low n_days; fixed to require an unbroken stable run down from
+full coverage).
 
 ## Hard rules
 - Never use Climate TRACE as a training label. Benchmark only.
