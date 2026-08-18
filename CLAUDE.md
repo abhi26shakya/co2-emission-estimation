@@ -66,15 +66,22 @@ feature table, and (b) a specific check of whether it explains Rihand:
   hit_days is small and none of the four explains >11% of the variance.
 
 ## The current research question
-Four independent single-cause hypotheses for Rihand's error (overpass
-density, signal-to-noise, background definition, wind-matching quality)
-have all been tested and REJECTED — Rihand scores average-to-good on
-every one of them despite a +134% Q error. What's left untested: plume
-geometry/plant layout, a genuine FY2020-21-CEA-vs-2020-satellite
-emissions-year mismatch specific to Rihand, or an interaction between
-factors rather than any single one. See WEEK13_LOG.txt for full
-per-experiment detail, including a self-caught methodology bug in
-experiment 1 (an ascending threshold scan was fooled by a noisy lucky
+Week 13 synthesis ("four explanations tested, none sufficient",
+WEEK13_LOG.txt): overpass density, signal-to-noise, background
+definition, and wind-matching quality have ALL been tested and
+REJECTED as Rihand's specific problem — it scores average-or-better on
+every one despite a +134% Q error, and none of the four explains more
+than ~11% of |log_ratio| variance across the 30-plant dataset. This is
+not one signal buried under noise from the others; all four are
+individually weak.
+
+The single-cause hunt on Rihand is PAUSED here, by explicit direction —
+not resolved. Future work, not yet started: plume geometry/plant layout,
+nearby confounding CO2 sources near Rihand's near-plant/background
+zones, and a genuine FY2020-21-CEA-vs-2020-satellite emissions-year
+mismatch specific to Rihand. See WEEK13_LOG.txt for full per-experiment
+detail and the synthesis table, including a self-caught methodology bug
+in experiment 1 (an ascending threshold scan was fooled by a noisy lucky
 draw at low n_days; fixed to require an unbroken stable run down from
 full coverage).
 
