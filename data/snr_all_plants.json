@@ -1,0 +1,234 @@
+{
+  "n_plants": 24,
+  "plants": [
+    {
+      "plant": "Sagardighi",
+      "n_soundings": 430,
+      "hit_days": 7,
+      "near_n": 6,
+      "bg_n": 320,
+      "signal_to_noise": -0.8623954653739929,
+      "frac_near_above_bg": 0.3333333333333333
+    },
+    {
+      "plant": "TalwandiSabo",
+      "n_soundings": 387,
+      "hit_days": 4,
+      "near_n": 37,
+      "bg_n": 166,
+      "signal_to_noise": -0.6327097415924072,
+      "frac_near_above_bg": 0.0
+    },
+    {
+      "plant": "ShriSingajiMalwa",
+      "n_soundings": 228,
+      "hit_days": 5,
+      "near_n": 59,
+      "bg_n": 120,
+      "signal_to_noise": -0.5555291771888733,
+      "frac_near_above_bg": 0.06779661016949153
+    },
+    {
+      "plant": "RayalSeema",
+      "n_soundings": 591,
+      "hit_days": 9,
+      "near_n": 96,
+      "bg_n": 320,
+      "signal_to_noise": -0.28990066051483154,
+      "frac_near_above_bg": 0.28125
+    },
+    {
+      "plant": "Tamnar",
+      "n_soundings": 842,
+      "hit_days": 7,
+      "near_n": 221,
+      "bg_n": 314,
+      "signal_to_noise": -0.10326224565505981,
+      "frac_near_above_bg": 0.416289592760181
+    },
+    {
+      "plant": "Koradi",
+      "n_soundings": 3672,
+      "hit_days": 25,
+      "near_n": 496,
+      "bg_n": 1731,
+      "signal_to_noise": -0.07648668438196182,
+      "frac_near_above_bg": 0.5080645161290323
+    },
+    {
+      "plant": "Dadri(Nctpp)",
+      "n_soundings": 4989,
+      "hit_days": 20,
+      "near_n": 1458,
+      "bg_n": 2120,
+      "signal_to_noise": -0.06206327676773071,
+      "frac_near_above_bg": 0.5061728395061729
+    },
+    {
+      "plant": "Pryagraj(Bara)",
+      "n_soundings": 2519,
+      "hit_days": 15,
+      "near_n": 694,
+      "bg_n": 1001,
+      "signal_to_noise": 0.17445382475852966,
+      "frac_near_above_bg": 0.6412103746397695
+    },
+    {
+      "plant": "Talcher",
+      "n_soundings": 2165,
+      "hit_days": 21,
+      "near_n": 252,
+      "bg_n": 1352,
+      "signal_to_noise": 0.17608977854251862,
+      "frac_near_above_bg": 0.5158730158730159
+    },
+    {
+      "plant": "Kudgi",
+      "n_soundings": 338,
+      "hit_days": 4,
+      "near_n": 126,
+      "bg_n": 140,
+      "signal_to_noise": 0.2479453980922699,
+      "frac_near_above_bg": 0.6666666666666666
+    },
+    {
+      "plant": "Farakka",
+      "n_soundings": 1504,
+      "hit_days": 12,
+      "near_n": 406,
+      "bg_n": 695,
+      "signal_to_noise": 0.2897328734397888,
+      "frac_near_above_bg": 0.6551724137931034
+    },
+    {
+      "plant": "ChandrapurCoal",
+      "n_soundings": 1136,
+      "hit_days": 14,
+      "near_n": 80,
+      "bg_n": 799,
+      "signal_to_noise": 0.3284987211227417,
+      "frac_near_above_bg": 0.35
+    },
+    {
+      "plant": "Korba",
+      "n_soundings": 384,
+      "hit_days": 5,
+      "near_n": 88,
+      "bg_n": 258,
+      "signal_to_noise": 0.38321036100387573,
+      "frac_near_above_bg": 0.7272727272727273
+    },
+    {
+      "plant": "Sasan",
+      "n_soundings": 7379,
+      "hit_days": 19,
+      "near_n": 1936,
+      "bg_n": 2858,
+      "signal_to_noise": 0.4027442932128906,
+      "frac_near_above_bg": 0.5371900826446281
+    },
+    {
+      "plant": "Mouda",
+      "n_soundings": 2883,
+      "hit_days": 19,
+      "near_n": 603,
+      "bg_n": 1347,
+      "signal_to_noise": 0.4546550512313843,
+      "frac_near_above_bg": 0.8258706467661692
+    },
+    {
+      "plant": "Vindhyachal",
+      "n_soundings": 7114,
+      "hit_days": 17,
+      "near_n": 1843,
+      "bg_n": 2605,
+      "signal_to_noise": 0.5399930477142334,
+      "frac_near_above_bg": 0.599023331524688
+    },
+    {
+      "plant": "KGudemNew",
+      "n_soundings": 956,
+      "hit_days": 10,
+      "near_n": 290,
+      "bg_n": 433,
+      "signal_to_noise": 0.7126432657241821,
+      "frac_near_above_bg": 0.9793103448275862
+    },
+    {
+      "plant": "RGundem",
+      "n_soundings": 172,
+      "hit_days": 5,
+      "near_n": 7,
+      "bg_n": 80,
+      "signal_to_noise": 0.7233371138572693,
+      "frac_near_above_bg": 0.7142857142857143
+    },
+    {
+      "plant": "Anpara",
+      "n_soundings": 5768,
+      "hit_days": 16,
+      "near_n": 1299,
+      "bg_n": 2327,
+      "signal_to_noise": 0.72796630859375,
+      "frac_near_above_bg": 0.6605080831408776
+    },
+    {
+      "plant": "Raichur",
+      "n_soundings": 328,
+      "hit_days": 5,
+      "near_n": 22,
+      "bg_n": 157,
+      "signal_to_noise": 0.9553387761116028,
+      "frac_near_above_bg": 0.9090909090909091
+    },
+    {
+      "plant": "Rihand",
+      "n_soundings": 6072,
+      "hit_days": 16,
+      "near_n": 1543,
+      "bg_n": 2463,
+      "signal_to_noise": 1.2738813161849976,
+      "frac_near_above_bg": 0.7556707712248866
+    },
+    {
+      "plant": "Tirora",
+      "n_soundings": 671,
+      "hit_days": 5,
+      "near_n": 12,
+      "bg_n": 524,
+      "signal_to_noise": 1.4411208629608154,
+      "frac_near_above_bg": 1.0
+    },
+    {
+      "plant": "Kahalgaon",
+      "n_soundings": 1038,
+      "hit_days": 14,
+      "near_n": 77,
+      "bg_n": 654,
+      "signal_to_noise": 1.4559012651443481,
+      "frac_near_above_bg": 0.8051948051948052
+    },
+    {
+      "plant": "Chhabra",
+      "n_soundings": 874,
+      "hit_days": 9,
+      "near_n": 92,
+      "bg_n": 579,
+      "signal_to_noise": 1.6813490390777588,
+      "frac_near_above_bg": 1.0
+    }
+  ],
+  "q1_snr_vs_hit_days": {
+    "n_matched": 24,
+    "r_snr_abs_log_ratio": 0.26917338815612457,
+    "r_hit_days_abs_log_ratio": -0.30971260219321334,
+    "stronger_predictor": "hit_days"
+  },
+  "q2_rihand": {
+    "rihand_snr": 1.2738813161849976,
+    "rihand_hit_days": 16,
+    "median_snr_all_plants": 0.3558545410633087,
+    "talcher_snr": 0.17608977854251862,
+    "rihand_below_median": false
+  }
+}

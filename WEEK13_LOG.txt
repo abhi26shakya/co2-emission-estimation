@@ -77,3 +77,49 @@ overpass_density_experiment.py (new), data/overpass_density_results.json
 data/{Vindhyachal,Rihand,Sasan}_wind_series_cache.json (new, full-year
 ERA5 daily wind speed per plant, cached to avoid re-hitting Earth Engine
 on reruns).
+
+WEEK 13 — experiment 2: signal-to-noise across all 30 plants (negative
+                         result on both questions asked)
+
+- diagnose_talcher.py (Week 10) computed signal-to-noise -- (near-plant
+  mean - background mean) / background std -- for exactly two plants:
+  Talcher (0.18, a known-bad case) and Rihand (1.27, used there as the
+  "robust" comparison plant). Two open questions from Week 12/13 exp 1
+  motivated generalizing it to all 30: (1) is SNR a better predictor of
+  |log_ratio| than hit_days (r=-0.31, Week 12)? (2) does Rihand's Week 13
+  exp-1 failure (bad Q even at full coverage) trace to a low SNR that
+  day-count alone couldn't see?
+
+- snr_all_plants.py (new): reuses diagnose_talcher.near_bg_stats()
+  unchanged across all 30 plants (6 skipped for too few near/bg
+  soundings: Akaltara, Bellary, Lalitpur, Mundra, Simhadri, Sipat).
+  Matched to the N=24 feature table (plants with both a Q estimate and
+  CEA truth) for the correlation test.
+
+- Q1 answer: NO, SNR is not a better predictor -- and its sign is the
+  wrong direction. r(SNR, |log_ratio|) = +0.27 vs r(hit_days,
+  |log_ratio|) = -0.31 (Week 12, reproduced exactly here). hit_days wins
+  on magnitude, and SNR's positive sign is backwards from the physical
+  expectation (higher SNR should mean a cleaner signal and lower error,
+  not higher). Scatter (data/snr_vs_log_ratio_plot.png) shows no visible
+  relationship -- points span the full |log_ratio| range at every SNR
+  level.
+
+- Q2 answer: NO. Rihand's SNR = 1.27, well ABOVE the 30-plant median
+  (0.36) and Talcher's 0.18 -- Rihand has one of the cleanest raw signals
+  in the dataset, not a marginal one. Its Week 13 exp-1 failure (+134%
+  vs CEA at full coverage) is NOT a signal-to-noise problem. Ruling this
+  out narrows the real cause further: not day count (exp 1), not signal
+  strength (exp 2). Remaining untested candidates: background-annulus
+  definition sensitivity, wind-day matching quality, plume
+  geometry/plant layout, or a genuine CEA-vs-2020-satellite-year
+  emissions mismatch specific to Rihand.
+
+- VERDICT: two negative results. SNR does not explain the quality-gate
+  pattern better than hit_days already did, and it does not explain
+  Rihand specifically. Consistent with this repo's convention of
+  reporting negative results in full, not just the ones that pan out.
+
+Files changed (experiment 2): snr_all_plants.py (new),
+data/snr_all_plants.json (new), data/snr_vs_log_ratio_plot.png (new). No
+existing files modified.
