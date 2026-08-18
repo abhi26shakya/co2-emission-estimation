@@ -228,3 +228,51 @@ wind_match_quality_all_plants.py (new),
 data/wind_match_quality_all_plants.json (new),
 data/<plant>_wind_series_cache.json (new, for the ~21 plants not already
 cached from experiment 1).
+
+Week 13 synthesis: four explanations tested, none sufficient
+==============================================================
+
+Four experiments this week each tested one candidate explanation for why
+some facilities -- Rihand chief among them -- produce a bad Q estimate
+despite reasonable inputs. Each was scored two ways: as a predictor of
+|log_ratio| across the N=24 feature table, and as a specific check of
+whether it explains Rihand.
+
+  predictor          r vs |log_ratio|   explains Rihand?
+  ------------------ ------------------ --------------------------------
+  wind_match_rate     -0.328 (exp 4)     NO -- 25% (4/16 days), 71st
+                                          percentile, ABOVE median
+  hit_days             -0.310 (Week 12)  NO -- 16 days, among the best
+                                          coverage in the dataset
+  SNR                  +0.269 (exp 2)    NO -- 1.27, ABOVE the 30-plant
+                                          median (0.36)
+  bg swing%             +0.161 (exp 3)    NO -- 4.3%, far below Talcher's
+                                          known-bad 20.2% reference
+
+Rihand scored average-or-better on all four tested factors and remains
+UNEXPLAINED. No single factor tested this week explains more than ~11%
+of the variance in |log_ratio| across the 30-plant dataset (the largest
+|r|, wind_match_rate's -0.328, corresponds to r^2 ~= 0.11). This is not
+a case of one strong signal being buried under noise from the other
+three -- all four are weak, and none of them singles out Rihand as an
+outlier in the direction that would explain its error. Whatever is wrong
+with Rihand's Q estimate is not visible to any of the four single-variable
+lenses this week applied.
+
+Explicitly NOT investigated this week (future work, not started):
+  - Plume geometry / plant layout -- Rihand's physical site configuration,
+    stack placement, or terrain could shape its plume in a way the
+    isotropic near/background annulus model doesn't capture.
+  - Nearby confounding CO2 sources -- other combustion sources, industry,
+    or urban activity within Rihand's near-plant or background zones
+    that could bias the near-vs-background comparison independent of
+    Rihand's own emissions.
+  - A genuine satellite-year vs CEA-fiscal-year mismatch specific to
+    Rihand -- our Q estimate uses 2020 OCO-3 soundings; CEA ground truth
+    is FY2020-21. A real year-over-year change in Rihand's own output
+    (unlike the four tested factors, which are all measurement/method
+    artifacts) would not show up in any of this week's diagnostics.
+
+Pausing the single-cause hunt here, per direction -- the four negative
+results above are the deliverable for this line of investigation, not a
+resolved explanation for Rihand.
