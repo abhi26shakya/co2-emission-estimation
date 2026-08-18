@@ -212,7 +212,20 @@ def estimate_emission_rate(plant_row, wind_series):
     lat, lon, xco2 = d["lat"], d["lon"], d["xco2"]
     has_days = "day" in d.files
     day = d["day"] if has_days else None
+    return estimate_emission_rate_from_arrays(name, lat, lon, xco2, day, plant_row, wind_series)
 
+
+def estimate_emission_rate_from_arrays(name, lat, lon, xco2, day, plant_row, wind_series):
+    """
+    Same IME math as estimate_emission_rate(), factored out so callers can
+    rerun the estimate on an in-memory (e.g. subsampled) set of soundings
+    without touching data/<plant>_soundings.npz -- see
+    overpass_density_experiment.py, which subsamples overpass days to test
+    whether Q accuracy depends on day count. `day` may be None (no
+    per-sounding dates), matching estimate_emission_rate()'s has_days
+    fallback path.
+    """
+    has_days = day is not None
     plat, plon = plant_row["lat"], plant_row["lon"]
     dist = np.sqrt((lat - plat) ** 2 + (lon - plon) ** 2)
 

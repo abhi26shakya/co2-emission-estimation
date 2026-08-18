@@ -1,0 +1,79 @@
+WEEK 13 — experiment 1: overpass-density subsampling (mixed result --
+                         density matters, but is not the whole story)
+
+- Question from Week 12's close: is the limiting factor on satellite-only
+  Q estimation simply OCO-3 revisit frequency? Vindhyachal (17 overpass
+  days, our best-covered facility) gives the best result in the N=24
+  table (Q 36.7 Mt vs CEA 33.2 Mt, +11%); most other plants have 4-7 days
+  and fail badly. Hypothesis: day count alone explains the spread.
+
+- overpass_density_experiment.py (new): for Vindhyachal, Rihand, and
+  Sasan (the three best-covered facilities, 16-19 overpass days each),
+  randomly subsampled down to n_days in [17,15,12,10,8,6,5,4,3], 200
+  repeats per (plant, n_days), seed 42. Each repeat restricts BOTH the
+  near-plant and background sounding pools to only the sampled days
+  (matching what actually having fewer overpasses would look like), then
+  reruns the existing IME estimator unchanged --
+  physics_gaussian.estimate_emission_rate_from_arrays(), a new function
+  factored out of estimate_emission_rate() so the math is reused exactly,
+  not reimplemented. Verified the refactor is behavior-preserving before
+  running anything: full-coverage output for all three plants reproduced
+  data/emission_estimates.json's Q to 6 significant figures.
+
+- Result, Vindhyachal (full coverage +11% vs CEA):
+  n_days:        17    15    12    10    8     6     5     4     3
+  error vs CEA: +11%  +10%   +3%  -17%  -25%  -42%  -47%  -49%  -56%
+  spread(std):   0%   16%   28%   38%   49%   67%   79%   81%   84%
+  Smooth, monotonic degradation in both bias and spread as days drop.
+  This plant supports the hypothesis cleanly.
+
+- Result, Sasan (full coverage +37% vs CEA):
+  n_days:        17    15    12    10    8     6     5     4     3
+  error vs CEA: +37%  +33%  +14%  -19%  -31%  -41%  -54%  -61%  -64%
+  Same monotonic pattern, just centered on a worse full-coverage bias.
+
+- Result, Rihand (full coverage +134% vs CEA) -- the negative finding:
+  n_days:        15    12    10    8     6     5     4     3
+  error vs CEA: +134% +122% +137% +69%  +38%  +30%  +5%   -10%
+  Rihand's estimate is already 2.3x too high at its BEST available
+  coverage (16 days -> 15 usable after month-stratification). More days
+  did not fix it; it only ever oscillated around a bad number. Its
+  apparent "improvement" at n_days=4-5 is noise, not a real trend -- see
+  below.
+
+- Applied a threshold definition and caught it being fooled by that
+  noise: the first version scanned ascending n_days and returned the
+  smallest n_days where |error|<=50% -- this reported Rihand as "stable"
+  at n_days=4 (+5% error, a lucky draw) despite n_days=5 and 6 failing
+  the same test on either side of it. Fixed to a descending scan that
+  requires an UNBROKEN stable run down from full coverage, stopping at
+  the first failure. Re-run with the fix: Rihand's threshold is None (its
+  own full-coverage point never clears 50% error), Vindhyachal=4,
+  Sasan=6. This kind of self-caught methodology bug is exactly the thing
+  worth logging, per this repo's honesty convention.
+
+- VERDICT: overpass density is A real factor (Vindhyachal and Sasan both
+  degrade smoothly and predictably as days are removed) but NOT THE ONLY
+  factor and not sufficient to explain the pattern across facilities --
+  Rihand fails at its best achievable coverage, meaning something else
+  (background definition, wind matching, plume geometry, real emission
+  variability) dominates its error independent of day count. Day count
+  can turn a good facility bad (more noise, no signal to lose) but cannot
+  turn a facility with a bad underlying signal good.
+
+  Practical read: adopting the (conservative, max-across-plants) n_days>=6
+  threshold, 17 of the 24 plants with both a Q estimate and CEA truth
+  clear it (data/q_correction_model_results.json). That is NOT the same
+  17 that pass the Week 11 quality gate (hit_days>=10 AND
+  wind_co2_diff_deg<=60, N=7) -- density alone is a looser, weaker filter
+  than the existing gate, consistent with Week 12's finding that the gate
+  is doing *something* even though it didn't survive permutation testing.
+
+Files changed: physics_gaussian.py (estimate_emission_rate() split into a
+loader + new estimate_emission_rate_from_arrays(), behavior-preserving,
+verified against data/emission_estimates.json before use),
+overpass_density_experiment.py (new), data/overpass_density_results.json
+(new), data/overpass_density_plot.png (new),
+data/{Vindhyachal,Rihand,Sasan}_wind_series_cache.json (new, full-year
+ERA5 daily wind speed per plant, cached to avoid re-hitting Earth Engine
+on reruns).

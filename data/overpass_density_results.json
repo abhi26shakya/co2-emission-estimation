@@ -1,0 +1,306 @@
+{
+  "seed": 42,
+  "n_repeats": 200,
+  "n_days_list": [
+    17,
+    15,
+    12,
+    10,
+    8,
+    6,
+    5,
+    4,
+    3
+  ],
+  "stable_error_tol": 0.5,
+  "stable_min_valid_frac": 0.9,
+  "plants": [
+    {
+      "plant": "Vindhyachal",
+      "n_days_available": 17,
+      "cea_truth_t_per_year": 33212767.71488738,
+      "full_coverage_q_t_per_year": 36738050.02086989,
+      "by_n_days": [
+        {
+          "n_days": 17,
+          "n_valid_runs": 200,
+          "n_failed_runs": 0,
+          "median_q_t_per_year": 36738050.02086989,
+          "std_q_t_per_year": 7.469277189926587e-09,
+          "p10_q_t_per_year": 36738050.02086989,
+          "p90_q_t_per_year": 36738050.02086989,
+          "error_vs_cea": 0.10614238284038957
+        },
+        {
+          "n_days": 15,
+          "n_valid_runs": 200,
+          "n_failed_runs": 0,
+          "median_q_t_per_year": 36409868.31560496,
+          "std_q_t_per_year": 5666614.305315755,
+          "p10_q_t_per_year": 23475650.32333101,
+          "p90_q_t_per_year": 38938435.72077593,
+          "error_vs_cea": 0.09626119172490721
+        },
+        {
+          "n_days": 12,
+          "n_valid_runs": 200,
+          "n_failed_runs": 0,
+          "median_q_t_per_year": 34368973.91810539,
+          "std_q_t_per_year": 9599651.604951737,
+          "p10_q_t_per_year": 18147110.1687655,
+          "p90_q_t_per_year": 43927053.00078799,
+          "error_vs_cea": 0.03481210036885152
+        },
+        {
+          "n_days": 10,
+          "n_valid_runs": 200,
+          "n_failed_runs": 0,
+          "median_q_t_per_year": 27694415.283249997,
+          "std_q_t_per_year": 10618575.650028698,
+          "p10_q_t_per_year": 14574118.385548593,
+          "p90_q_t_per_year": 42834301.75848324,
+          "error_vs_cea": -0.16615153783657188
+        },
+        {
+          "n_days": 8,
+          "n_valid_runs": 200,
+          "n_failed_runs": 0,
+          "median_q_t_per_year": 24962042.76090514,
+          "std_q_t_per_year": 12195949.889236987,
+          "p10_q_t_per_year": 11897169.680398129,
+          "p90_q_t_per_year": 42942658.92387998,
+          "error_vs_cea": -0.2484202769492142
+        },
+        {
+          "n_days": 6,
+          "n_valid_runs": 200,
+          "n_failed_runs": 0,
+          "median_q_t_per_year": 19150812.53135927,
+          "std_q_t_per_year": 12923153.675754799,
+          "p10_q_t_per_year": 8604679.89854231,
+          "p90_q_t_per_year": 42931429.4843609,
+          "error_vs_cea": -0.4233900439807352
+        },
+        {
+          "n_days": 5,
+          "n_valid_runs": 199,
+          "n_failed_runs": 1,
+          "median_q_t_per_year": 17689438.070970997,
+          "std_q_t_per_year": 14056842.989533873,
+          "p10_q_t_per_year": 6982689.442998778,
+          "p90_q_t_per_year": 43168009.8245851,
+          "error_vs_cea": -0.4673904257897231
+        },
+        {
+          "n_days": 4,
+          "n_valid_runs": 200,
+          "n_failed_runs": 0,
+          "median_q_t_per_year": 16895497.252708085,
+          "std_q_t_per_year": 13762334.728083914,
+          "p10_q_t_per_year": 5577662.444323748,
+          "p90_q_t_per_year": 42658010.92672707,
+          "error_vs_cea": -0.4912951128389459
+        },
+        {
+          "n_days": 3,
+          "n_valid_runs": 190,
+          "n_failed_runs": 10,
+          "median_q_t_per_year": 14674266.387846481,
+          "std_q_t_per_year": 12363178.837653082,
+          "p10_q_t_per_year": 4976798.886798954,
+          "p90_q_t_per_year": 39301492.57611835,
+          "error_vs_cea": -0.5581739373900825
+        }
+      ]
+    },
+    {
+      "plant": "Rihand",
+      "n_days_available": 16,
+      "cea_truth_t_per_year": 20613491.507199902,
+      "full_coverage_q_t_per_year": 48347260.30604745,
+      "by_n_days": [
+        {
+          "n_days": 15,
+          "n_valid_runs": 200,
+          "n_failed_runs": 0,
+          "median_q_t_per_year": 48295228.51257133,
+          "std_q_t_per_year": 5993741.911619749,
+          "p10_q_t_per_year": 42907222.472573645,
+          "p90_q_t_per_year": 52064736.04659015,
+          "error_vs_cea": 1.3428941426881864
+        },
+        {
+          "n_days": 12,
+          "n_valid_runs": 200,
+          "n_failed_runs": 0,
+          "median_q_t_per_year": 45815246.75987968,
+          "std_q_t_per_year": 11402763.540793,
+          "p10_q_t_per_year": 27377394.32476997,
+          "p90_q_t_per_year": 55788248.08247031,
+          "error_vs_cea": 1.2225854724260214
+        },
+        {
+          "n_days": 10,
+          "n_valid_runs": 200,
+          "n_failed_runs": 0,
+          "median_q_t_per_year": 48823085.6655626,
+          "std_q_t_per_year": 11819092.611482054,
+          "p10_q_t_per_year": 26396765.030739445,
+          "p90_q_t_per_year": 55526701.03060419,
+          "error_vs_cea": 1.3685015053616523
+        },
+        {
+          "n_days": 8,
+          "n_valid_runs": 200,
+          "n_failed_runs": 0,
+          "median_q_t_per_year": 34829250.52611454,
+          "std_q_t_per_year": 13557970.030253064,
+          "p10_q_t_per_year": 18137261.741293047,
+          "p90_q_t_per_year": 54346747.51114897,
+          "error_vs_cea": 0.689633729150122
+        },
+        {
+          "n_days": 6,
+          "n_valid_runs": 200,
+          "n_failed_runs": 0,
+          "median_q_t_per_year": 28451685.544846572,
+          "std_q_t_per_year": 13607496.95037018,
+          "p10_q_t_per_year": 15842791.299661668,
+          "p90_q_t_per_year": 52011947.572965056,
+          "error_vs_cea": 0.38024582273745033
+        },
+        {
+          "n_days": 5,
+          "n_valid_runs": 199,
+          "n_failed_runs": 1,
+          "median_q_t_per_year": 26872011.86364997,
+          "std_q_t_per_year": 14216973.236526623,
+          "p10_q_t_per_year": 14603440.55949236,
+          "p90_q_t_per_year": 52854561.97052534,
+          "error_vs_cea": 0.30361282339113127
+        },
+        {
+          "n_days": 4,
+          "n_valid_runs": 198,
+          "n_failed_runs": 2,
+          "median_q_t_per_year": 21697985.769977074,
+          "std_q_t_per_year": 13862705.401047112,
+          "p10_q_t_per_year": 11631794.411651645,
+          "p90_q_t_per_year": 49346135.593830176,
+          "error_vs_cea": 0.05261089623746562
+        },
+        {
+          "n_days": 3,
+          "n_valid_runs": 191,
+          "n_failed_runs": 9,
+          "median_q_t_per_year": 18459506.905447878,
+          "std_q_t_per_year": 14479022.239694871,
+          "p10_q_t_per_year": 7580915.968415208,
+          "p90_q_t_per_year": 47532765.38206892,
+          "error_vs_cea": -0.10449392336080854
+        }
+      ]
+    },
+    {
+      "plant": "Sasan",
+      "n_days_available": 19,
+      "cea_truth_t_per_year": 28487432.95134419,
+      "full_coverage_q_t_per_year": 39278810.20737811,
+      "by_n_days": [
+        {
+          "n_days": 17,
+          "n_valid_runs": 200,
+          "n_failed_runs": 0,
+          "median_q_t_per_year": 39141360.290334195,
+          "std_q_t_per_year": 6186706.36800535,
+          "p10_q_t_per_year": 23420072.871712774,
+          "p90_q_t_per_year": 40893084.633800395,
+          "error_vs_cea": 0.3739869210815394
+        },
+        {
+          "n_days": 15,
+          "n_valid_runs": 200,
+          "n_failed_runs": 0,
+          "median_q_t_per_year": 37980769.3728884,
+          "std_q_t_per_year": 7683475.066572262,
+          "p10_q_t_per_year": 22633398.825924616,
+          "p90_q_t_per_year": 42638977.532447726,
+          "error_vs_cea": 0.3332464682851062
+        },
+        {
+          "n_days": 12,
+          "n_valid_runs": 200,
+          "n_failed_runs": 0,
+          "median_q_t_per_year": 32520528.75680825,
+          "std_q_t_per_year": 10198590.678974615,
+          "p10_q_t_per_year": 16168874.52550929,
+          "p90_q_t_per_year": 41580509.58887195,
+          "error_vs_cea": 0.14157456069672847
+        },
+        {
+          "n_days": 10,
+          "n_valid_runs": 200,
+          "n_failed_runs": 0,
+          "median_q_t_per_year": 23165148.391756598,
+          "std_q_t_per_year": 11224926.304105166,
+          "p10_q_t_per_year": 12785238.182223385,
+          "p90_q_t_per_year": 41350746.20188377,
+          "error_vs_cea": -0.186829208819128
+        },
+        {
+          "n_days": 8,
+          "n_valid_runs": 200,
+          "n_failed_runs": 0,
+          "median_q_t_per_year": 19538771.65400196,
+          "std_q_t_per_year": 11488791.739079945,
+          "p10_q_t_per_year": 10302176.105870549,
+          "p90_q_t_per_year": 40046144.27708226,
+          "error_vs_cea": -0.3141266295431503
+        },
+        {
+          "n_days": 6,
+          "n_valid_runs": 200,
+          "n_failed_runs": 0,
+          "median_q_t_per_year": 16934730.643183284,
+          "std_q_t_per_year": 12955466.67063311,
+          "p10_q_t_per_year": 6561417.40516084,
+          "p90_q_t_per_year": 40357448.93908113,
+          "error_vs_cea": -0.40553679680063226
+        },
+        {
+          "n_days": 5,
+          "n_valid_runs": 200,
+          "n_failed_runs": 0,
+          "median_q_t_per_year": 13029350.271642879,
+          "std_q_t_per_year": 12657814.569704443,
+          "p10_q_t_per_year": 4899828.029452243,
+          "p90_q_t_per_year": 40182698.361817054,
+          "error_vs_cea": -0.5426281373300053
+        },
+        {
+          "n_days": 4,
+          "n_valid_runs": 199,
+          "n_failed_runs": 1,
+          "median_q_t_per_year": 11078123.592526834,
+          "std_q_t_per_year": 12025515.566835342,
+          "p10_q_t_per_year": 4281473.241874638,
+          "p90_q_t_per_year": 38408311.54137583,
+          "error_vs_cea": -0.6111224338308057
+        },
+        {
+          "n_days": 3,
+          "n_valid_runs": 188,
+          "n_failed_runs": 12,
+          "median_q_t_per_year": 10297762.446752144,
+          "std_q_t_per_year": 11199251.890658414,
+          "p10_q_t_per_year": 3424333.8514747377,
+          "p90_q_t_per_year": 31890735.59981708,
+          "error_vs_cea": -0.6385156056588019
+        }
+      ]
+    }
+  ],
+  "threshold_days": 6,
+  "n_plants_clearing_threshold": 17,
+  "n_plants_total": 24
+}
