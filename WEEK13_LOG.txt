@@ -123,3 +123,48 @@ WEEK 13 — experiment 2: signal-to-noise across all 30 plants (negative
 Files changed (experiment 2): snr_all_plants.py (new),
 data/snr_all_plants.json (new), data/snr_vs_log_ratio_plot.png (new). No
 existing files modified.
+
+WEEK 13 — experiment 3: background-definition sensitivity across all 30
+                         plants (Rihand ruled out a third time)
+
+- Week 10's diagnose_talcher.py tested this for exactly two plants:
+  Talcher's IME estimate swung 20.2% across 5 reasonable
+  background-annulus definitions, Rihand's only 4.3%. Generalized to all
+  30 plants to (a) confirm Rihand's swing is still small once tested
+  against the full dataset, not just the original 2-plant comparison,
+  and (b) check whether swing% predicts |log_ratio| better than hit_days
+  (r=-0.31) or SNR (r=+0.27, experiment 2).
+
+- bg_sensitivity_all_plants.py (new): calls
+  diagnose_talcher.bg_definition_sensitivity() UNMODIFIED for all 30
+  plants (4 skipped for too few background soundings in any definition:
+  Bellary, Lalitpur; 5 more report swing=n/a because their default-
+  definition IME proxy is exactly 0 -- Akaltara, Mundra, Simhadri, Sipat,
+  TalwandiSabo -- an existing, already-documented behavior of the reused
+  function, not something this script had to handle specially).
+
+- Rihand check: swing = 4.3% in this 30-plant run, EXACTLY matching
+  Week 10's 4.3% (same computation, same inputs -- expected, but worth
+  confirming nothing shifted). Still far below Talcher's 20.2%
+  known-bad reference.
+
+- Predictor comparison (N=23, matched to the feature table, excluding
+  n/a swings): r(swing%, |log_ratio|) = +0.16, weaker than both hit_days
+  (-0.31) and SNR (+0.27, experiment 2). Ranked by |r|: hit_days (0.31)
+  > SNR (0.27) > swing% (0.16). A third predictor, a third negative
+  result -- none of hit_days, SNR, or background-definition swing is a
+  strong standalone predictor of |log_ratio| across the dataset.
+
+- VERDICT: background-annulus definition is RULED OUT as Rihand's
+  specific problem, same as overpass coverage (exp 1) and
+  signal-to-noise (exp 2) were. Three independent explanations have now
+  been tested and rejected for Rihand's error. What's left untested:
+  wind-day matching quality (Rihand's per-overpass wind match rate was
+  low -- 4-5 of 16 days in data/emission_estimates.json) and plume
+  geometry/plant layout. Also noted in passing, not investigated further
+  this week: Sagardighi's swing is a 866% outlier, the largest in the
+  dataset by a wide margin -- a candidate for its own diagnose_*.py-style
+  deep dive later, same pattern as Talcher's Week 10 investigation.
+
+Files changed (experiment 3): bg_sensitivity_all_plants.py (new),
+data/bg_sensitivity_all_plants.json (new). No existing files modified.

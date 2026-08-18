@@ -1,0 +1,227 @@
+{
+  "n_plants": 28,
+  "plants": [
+    {
+      "plant": "Rihand",
+      "definitions_tested": 5,
+      "ime_proxy_min": 3304.4716796875,
+      "ime_proxy_max": 3449.43994140625,
+      "ime_proxy_range_pct_of_default": 4.2945295537750985
+    },
+    {
+      "plant": "KGudemNew",
+      "definitions_tested": 5,
+      "ime_proxy_min": 453.2492980957031,
+      "ime_proxy_max": 486.0278625488281,
+      "ime_proxy_range_pct_of_default": 6.744173941227895
+    },
+    {
+      "plant": "Dadri(Nctpp)",
+      "definitions_tested": 5,
+      "ime_proxy_min": 818.0192260742188,
+      "ime_proxy_max": 887.6141357421875,
+      "ime_proxy_range_pct_of_default": 7.978208459464785
+    },
+    {
+      "plant": "Kahalgaon",
+      "definitions_tested": 5,
+      "ime_proxy_min": 313.9852600097656,
+      "ime_proxy_max": 344.562255859375,
+      "ime_proxy_range_pct_of_default": 8.90295250672244
+    },
+    {
+      "plant": "Anpara",
+      "definitions_tested": 5,
+      "ime_proxy_min": 1821.510498046875,
+      "ime_proxy_max": 2015.099853515625,
+      "ime_proxy_range_pct_of_default": 9.606936109444213
+    },
+    {
+      "plant": "Chhabra",
+      "definitions_tested": 5,
+      "ime_proxy_min": 196.62469482421875,
+      "ime_proxy_max": 224.78228759765625,
+      "ime_proxy_range_pct_of_default": 12.526606555333897
+    },
+    {
+      "plant": "Vindhyachal",
+      "definitions_tested": 5,
+      "ime_proxy_min": 2504.901123046875,
+      "ime_proxy_max": 2857.1494140625,
+      "ime_proxy_range_pct_of_default": 13.368073925321225
+    },
+    {
+      "plant": "ChandrapurCoal",
+      "definitions_tested": 5,
+      "ime_proxy_min": 97.80508422851562,
+      "ime_proxy_max": 111.61688232421875,
+      "ime_proxy_range_pct_of_default": 13.845952402731715
+    },
+    {
+      "plant": "Raichur",
+      "definitions_tested": 5,
+      "ime_proxy_min": 18.167205810546875,
+      "ime_proxy_max": 21.574188232421875,
+      "ime_proxy_range_pct_of_default": 15.791937963881105
+    },
+    {
+      "plant": "Sasan",
+      "definitions_tested": 5,
+      "ime_proxy_min": 2559.241943359375,
+      "ime_proxy_max": 2992.21923828125,
+      "ime_proxy_range_pct_of_default": 16.422714689392407
+    },
+    {
+      "plant": "Koradi",
+      "definitions_tested": 5,
+      "ime_proxy_min": 232.87149047851562,
+      "ime_proxy_max": 282.0262451171875,
+      "ime_proxy_range_pct_of_default": 18.69642286918692
+    },
+    {
+      "plant": "Talcher",
+      "definitions_tested": 5,
+      "ime_proxy_min": 122.72686767578125,
+      "ime_proxy_max": 147.900390625,
+      "ime_proxy_range_pct_of_default": 20.246730069371203
+    },
+    {
+      "plant": "Farakka",
+      "definitions_tested": 5,
+      "ime_proxy_min": 321.35382080078125,
+      "ime_proxy_max": 401.18206787109375,
+      "ime_proxy_range_pct_of_default": 20.9854668406596
+    },
+    {
+      "plant": "Pryagraj(Bara)",
+      "definitions_tested": 5,
+      "ime_proxy_min": 497.1241149902344,
+      "ime_proxy_max": 639.3917846679688,
+      "ime_proxy_range_pct_of_default": 22.820891161946616
+    },
+    {
+      "plant": "Tirora",
+      "definitions_tested": 5,
+      "ime_proxy_min": 16.657440185546875,
+      "ime_proxy_max": 22.082122802734375,
+      "ime_proxy_range_pct_of_default": 26.215417832371518
+    },
+    {
+      "plant": "Mouda",
+      "definitions_tested": 5,
+      "ime_proxy_min": 399.3876647949219,
+      "ime_proxy_max": 565.5951538085938,
+      "ime_proxy_range_pct_of_default": 29.386300058348642
+    },
+    {
+      "plant": "RGundem",
+      "definitions_tested": 5,
+      "ime_proxy_min": 3.9923095703125,
+      "ime_proxy_max": 5.71990966796875,
+      "ime_proxy_range_pct_of_default": 32.11095039564367
+    },
+    {
+      "plant": "Tamnar",
+      "definitions_tested": 5,
+      "ime_proxy_min": 64.44662475585938,
+      "ime_proxy_max": 89.56521606445312,
+      "ime_proxy_range_pct_of_default": 36.57764961384171
+    },
+    {
+      "plant": "ShriSingajiMalwa",
+      "definitions_tested": 5,
+      "ime_proxy_min": 1.179168701171875,
+      "ime_proxy_max": 2.112335205078125,
+      "ime_proxy_range_pct_of_default": 44.58409273164686
+    },
+    {
+      "plant": "RayalSeema",
+      "definitions_tested": 5,
+      "ime_proxy_min": 10.483154296875,
+      "ime_proxy_max": 21.60968017578125,
+      "ime_proxy_range_pct_of_default": 54.25449437282648
+    },
+    {
+      "plant": "Korba",
+      "definitions_tested": 5,
+      "ime_proxy_min": 15.86322021484375,
+      "ime_proxy_max": 49.578826904296875,
+      "ime_proxy_range_pct_of_default": 75.62744894019589
+    },
+    {
+      "plant": "Kudgi",
+      "definitions_tested": 5,
+      "ime_proxy_min": 50.44000244140625,
+      "ime_proxy_max": 100.9586181640625,
+      "ime_proxy_range_pct_of_default": 92.18075601412842
+    },
+    {
+      "plant": "Sagardighi",
+      "definitions_tested": 5,
+      "ime_proxy_min": 0.0,
+      "ime_proxy_max": 0.763916015625,
+      "ime_proxy_range_pct_of_default": 866.159169550173
+    },
+    {
+      "plant": "Akaltara",
+      "definitions_tested": 5,
+      "ime_proxy_min": 0.0,
+      "ime_proxy_max": 0.0,
+      "ime_proxy_range_pct_of_default": null
+    },
+    {
+      "plant": "Mundra",
+      "definitions_tested": 5,
+      "ime_proxy_min": 0.0,
+      "ime_proxy_max": 0.0,
+      "ime_proxy_range_pct_of_default": null
+    },
+    {
+      "plant": "Simhadri",
+      "definitions_tested": 5,
+      "ime_proxy_min": 0.0,
+      "ime_proxy_max": 0.0,
+      "ime_proxy_range_pct_of_default": null
+    },
+    {
+      "plant": "Sipat",
+      "definitions_tested": 5,
+      "ime_proxy_min": 0.0,
+      "ime_proxy_max": 0.0,
+      "ime_proxy_range_pct_of_default": null
+    },
+    {
+      "plant": "TalwandiSabo",
+      "definitions_tested": 5,
+      "ime_proxy_min": 0.0,
+      "ime_proxy_max": 0.0,
+      "ime_proxy_range_pct_of_default": null
+    }
+  ],
+  "rihand_check": {
+    "week10_swing_pct": 4.2945295537750985,
+    "this_run_swing_pct": 4.2945295537750985,
+    "still_small_vs_talcher_reference": true
+  },
+  "predictor_comparison": {
+    "n_matched": 23,
+    "r_swing_pct_abs_log_ratio": 0.16086558923299432,
+    "r_hit_days_abs_log_ratio": -0.30971260219321334,
+    "r_snr_abs_log_ratio": 0.26917338815612457,
+    "ranked_by_abs_r": [
+      {
+        "predictor": "hit_days",
+        "abs_r": 0.30971260219321334
+      },
+      {
+        "predictor": "SNR",
+        "abs_r": 0.26917338815612457
+      },
+      {
+        "predictor": "swing%",
+        "abs_r": 0.16086558923299432
+      }
+    ]
+  },
+  "conclusion": "Background-annulus definition is RULED OUT as Rihand's specific problem, same as overpass coverage (exp 1) and signal-to-noise (exp 2): its swing stayed small (4.3%, well below Talcher's known-bad 20.2%) under the full 30-plant run, not just the original 2-plant comparison. Narrows the open question to wind-day matching quality or plume geometry/plant layout."
+}
