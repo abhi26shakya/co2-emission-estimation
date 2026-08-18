@@ -311,6 +311,16 @@ def estimate_emission_rate_from_arrays(name, lat, lon, xco2, day, plant_row, win
         "wind_speed_std_ms": wind_speed_std,
         "wind_mode": wind_mode,
         "n_wind_days_matched": n_wind_matched,
+        # unthresholded versions of the above -- n_wind_matched/wind_mode are
+        # gated by MIN_WIND_DAYS_MATCHED, so a plant with 1-2 real per-overpass
+        # matches still reports n_wind_days_matched=0 in fallback mode. These
+        # two keep the actual matched.size and the per-day speeds it found,
+        # for callers that need to see what was discarded (e.g.
+        # wind_match_quality_all_plants.py, which measures how often a real
+        # per-overpass match exists at all, and how far the annual-mean
+        # fallback would have been from those real values).
+        "n_wind_days_raw_matched": int(matched.size),
+        "wind_days_matched_speeds": matched.tolist(),
         "u_eff_ms": u_eff,
         "wind_rel_std": wind_rel_std,
         "ime_rel_std": ime_rel_std,

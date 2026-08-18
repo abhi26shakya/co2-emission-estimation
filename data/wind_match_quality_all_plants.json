@@ -1,0 +1,280 @@
+{
+  "n_plants": 24,
+  "plants": [
+    {
+      "plant": "Korba",
+      "hit_days": 5,
+      "wind_mode": "annual-mean (fallback)",
+      "n_wind_days_reported_matched": 0,
+      "n_wind_days_raw_matched": 0,
+      "wind_match_rate": 0.0,
+      "annual_mean_error_pct_where_checkable": null,
+      "n_checkable_fallback_days": 0
+    },
+    {
+      "plant": "Raichur",
+      "hit_days": 5,
+      "wind_mode": "annual-mean (fallback)",
+      "n_wind_days_reported_matched": 0,
+      "n_wind_days_raw_matched": 0,
+      "wind_match_rate": 0.0,
+      "annual_mean_error_pct_where_checkable": null,
+      "n_checkable_fallback_days": 0
+    },
+    {
+      "plant": "Tamnar",
+      "hit_days": 7,
+      "wind_mode": "annual-mean (fallback)",
+      "n_wind_days_reported_matched": 0,
+      "n_wind_days_raw_matched": 0,
+      "wind_match_rate": 0.0,
+      "annual_mean_error_pct_where_checkable": null,
+      "n_checkable_fallback_days": 0
+    },
+    {
+      "plant": "Dadri(Nctpp)",
+      "hit_days": 20,
+      "wind_mode": "annual-mean (fallback)",
+      "n_wind_days_reported_matched": 0,
+      "n_wind_days_raw_matched": 1,
+      "wind_match_rate": 0.05,
+      "annual_mean_error_pct_where_checkable": 58.218557576726084,
+      "n_checkable_fallback_days": 1
+    },
+    {
+      "plant": "ChandrapurCoal",
+      "hit_days": 14,
+      "wind_mode": "annual-mean (fallback)",
+      "n_wind_days_reported_matched": 0,
+      "n_wind_days_raw_matched": 1,
+      "wind_match_rate": 0.07142857142857142,
+      "annual_mean_error_pct_where_checkable": 21.885338944111076,
+      "n_checkable_fallback_days": 1
+    },
+    {
+      "plant": "Chhabra",
+      "hit_days": 9,
+      "wind_mode": "annual-mean (fallback)",
+      "n_wind_days_reported_matched": 0,
+      "n_wind_days_raw_matched": 1,
+      "wind_match_rate": 0.1111111111111111,
+      "annual_mean_error_pct_where_checkable": 24.139710532846944,
+      "n_checkable_fallback_days": 1
+    },
+    {
+      "plant": "Pryagraj(Bara)",
+      "hit_days": 15,
+      "wind_mode": "annual-mean (fallback)",
+      "n_wind_days_reported_matched": 0,
+      "n_wind_days_raw_matched": 2,
+      "wind_match_rate": 0.13333333333333333,
+      "annual_mean_error_pct_where_checkable": 33.2504669732852,
+      "n_checkable_fallback_days": 2
+    },
+    {
+      "plant": "Kahalgaon",
+      "hit_days": 14,
+      "wind_mode": "annual-mean (fallback)",
+      "n_wind_days_reported_matched": 0,
+      "n_wind_days_raw_matched": 2,
+      "wind_match_rate": 0.14285714285714285,
+      "annual_mean_error_pct_where_checkable": 54.881576164346846,
+      "n_checkable_fallback_days": 2
+    },
+    {
+      "plant": "Sagardighi",
+      "hit_days": 7,
+      "wind_mode": "annual-mean (fallback)",
+      "n_wind_days_reported_matched": 0,
+      "n_wind_days_raw_matched": 1,
+      "wind_match_rate": 0.14285714285714285,
+      "annual_mean_error_pct_where_checkable": 1.5252429786482598,
+      "n_checkable_fallback_days": 1
+    },
+    {
+      "plant": "Mouda",
+      "hit_days": 19,
+      "wind_mode": "per-overpass",
+      "n_wind_days_reported_matched": 3,
+      "n_wind_days_raw_matched": 3,
+      "wind_match_rate": 0.15789473684210525,
+      "annual_mean_error_pct_where_checkable": null,
+      "n_checkable_fallback_days": 0
+    },
+    {
+      "plant": "RGundem",
+      "hit_days": 5,
+      "wind_mode": "annual-mean (fallback)",
+      "n_wind_days_reported_matched": 0,
+      "n_wind_days_raw_matched": 1,
+      "wind_match_rate": 0.2,
+      "annual_mean_error_pct_where_checkable": 58.59877154172987,
+      "n_checkable_fallback_days": 1
+    },
+    {
+      "plant": "ShriSingajiMalwa",
+      "hit_days": 5,
+      "wind_mode": "annual-mean (fallback)",
+      "n_wind_days_reported_matched": 0,
+      "n_wind_days_raw_matched": 1,
+      "wind_match_rate": 0.2,
+      "annual_mean_error_pct_where_checkable": 57.85659922761066,
+      "n_checkable_fallback_days": 1
+    },
+    {
+      "plant": "Tirora",
+      "hit_days": 5,
+      "wind_mode": "annual-mean (fallback)",
+      "n_wind_days_reported_matched": 0,
+      "n_wind_days_raw_matched": 1,
+      "wind_match_rate": 0.2,
+      "annual_mean_error_pct_where_checkable": 21.253867395459547,
+      "n_checkable_fallback_days": 1
+    },
+    {
+      "plant": "RayalSeema",
+      "hit_days": 9,
+      "wind_mode": "annual-mean (fallback)",
+      "n_wind_days_reported_matched": 0,
+      "n_wind_days_raw_matched": 2,
+      "wind_match_rate": 0.2222222222222222,
+      "annual_mean_error_pct_where_checkable": 44.74647551505925,
+      "n_checkable_fallback_days": 2
+    },
+    {
+      "plant": "Talcher",
+      "hit_days": 21,
+      "wind_mode": "per-overpass",
+      "n_wind_days_reported_matched": 5,
+      "n_wind_days_raw_matched": 5,
+      "wind_match_rate": 0.23809523809523808,
+      "annual_mean_error_pct_where_checkable": null,
+      "n_checkable_fallback_days": 0
+    },
+    {
+      "plant": "Koradi",
+      "hit_days": 25,
+      "wind_mode": "per-overpass",
+      "n_wind_days_reported_matched": 6,
+      "n_wind_days_raw_matched": 6,
+      "wind_match_rate": 0.24,
+      "annual_mean_error_pct_where_checkable": null,
+      "n_checkable_fallback_days": 0
+    },
+    {
+      "plant": "Rihand",
+      "hit_days": 16,
+      "wind_mode": "per-overpass",
+      "n_wind_days_reported_matched": 4,
+      "n_wind_days_raw_matched": 4,
+      "wind_match_rate": 0.25,
+      "annual_mean_error_pct_where_checkable": null,
+      "n_checkable_fallback_days": 0
+    },
+    {
+      "plant": "TalwandiSabo",
+      "hit_days": 4,
+      "wind_mode": "annual-mean (fallback)",
+      "n_wind_days_reported_matched": 0,
+      "n_wind_days_raw_matched": 1,
+      "wind_match_rate": 0.25,
+      "annual_mean_error_pct_where_checkable": 6.608923935021409,
+      "n_checkable_fallback_days": 1
+    },
+    {
+      "plant": "Sasan",
+      "hit_days": 19,
+      "wind_mode": "per-overpass",
+      "n_wind_days_reported_matched": 5,
+      "n_wind_days_raw_matched": 5,
+      "wind_match_rate": 0.2631578947368421,
+      "annual_mean_error_pct_where_checkable": null,
+      "n_checkable_fallback_days": 0
+    },
+    {
+      "plant": "Vindhyachal",
+      "hit_days": 17,
+      "wind_mode": "per-overpass",
+      "n_wind_days_reported_matched": 5,
+      "n_wind_days_raw_matched": 5,
+      "wind_match_rate": 0.29411764705882354,
+      "annual_mean_error_pct_where_checkable": null,
+      "n_checkable_fallback_days": 0
+    },
+    {
+      "plant": "KGudemNew",
+      "hit_days": 10,
+      "wind_mode": "per-overpass",
+      "n_wind_days_reported_matched": 3,
+      "n_wind_days_raw_matched": 3,
+      "wind_match_rate": 0.3,
+      "annual_mean_error_pct_where_checkable": null,
+      "n_checkable_fallback_days": 0
+    },
+    {
+      "plant": "Anpara",
+      "hit_days": 16,
+      "wind_mode": "per-overpass",
+      "n_wind_days_reported_matched": 5,
+      "n_wind_days_raw_matched": 5,
+      "wind_match_rate": 0.3125,
+      "annual_mean_error_pct_where_checkable": null,
+      "n_checkable_fallback_days": 0
+    },
+    {
+      "plant": "Farakka",
+      "hit_days": 12,
+      "wind_mode": "per-overpass",
+      "n_wind_days_reported_matched": 4,
+      "n_wind_days_raw_matched": 4,
+      "wind_match_rate": 0.3333333333333333,
+      "annual_mean_error_pct_where_checkable": null,
+      "n_checkable_fallback_days": 0
+    },
+    {
+      "plant": "Kudgi",
+      "hit_days": 4,
+      "wind_mode": "annual-mean (fallback)",
+      "n_wind_days_reported_matched": 0,
+      "n_wind_days_raw_matched": 2,
+      "wind_match_rate": 0.5,
+      "annual_mean_error_pct_where_checkable": 55.84854655886238,
+      "n_checkable_fallback_days": 2
+    }
+  ],
+  "rihand_check": {
+    "wind_match_rate": 0.25,
+    "n_wind_days_raw_matched": 4,
+    "hit_days": 16,
+    "rank": 17,
+    "n_total": 24,
+    "percentile": 70.83333333333334,
+    "is_low_outlier_bottom_quartile": false
+  },
+  "predictor_comparison": {
+    "n_matched": 24,
+    "r_wind_match_rate_abs_log_ratio": -0.3279552445393443,
+    "r_hit_days_abs_log_ratio": -0.30971260219321334,
+    "r_snr_abs_log_ratio": 0.26917338815612457,
+    "r_bg_swing_pct_abs_log_ratio": 0.16086558923299432,
+    "ranked_by_abs_r": [
+      {
+        "predictor": "wind_match_rate",
+        "abs_r": 0.3279552445393443
+      },
+      {
+        "predictor": "hit_days",
+        "abs_r": 0.30971260219321334
+      },
+      {
+        "predictor": "SNR",
+        "abs_r": 0.26917338815612457
+      },
+      {
+        "predictor": "bg swing%",
+        "abs_r": 0.16086558923299432
+      }
+    ],
+    "wind_match_rate_is_strongest": true
+  }
+}

@@ -168,3 +168,63 @@ WEEK 13 — experiment 3: background-definition sensitivity across all 30
 
 Files changed (experiment 3): bg_sensitivity_all_plants.py (new),
 data/bg_sensitivity_all_plants.json (new). No existing files modified.
+
+WEEK 13 — experiment 4: wind-matching quality across all 30 plants
+                         (strongest predictor found, but still doesn't
+                         explain Rihand)
+
+- physics_gaussian.py's n_wind_days_matched is threshold-gated: a plant
+  with 1-2 real per-overpass wind matches (below MIN_WIND_DAYS_MATCHED=3)
+  still reports n_wind_days_matched=0, since the code falls back to the
+  annual-mean speed for the whole plant. That flattens 15 of 24 plants
+  to an artificial 0, masking real variation. Added two purely additive
+  fields to estimate_emission_rate_from_arrays() -- n_wind_days_raw_matched
+  (the true, unthresholded count) and wind_days_matched_speeds (the
+  actual per-day speeds found, even below threshold) -- verified
+  behavior-preserving against data/emission_estimates.json before use
+  (no existing keys changed).
+
+- wind_match_quality_all_plants.py (new): recomputes wind_match_rate =
+  n_wind_days_raw_matched / hit_days for all 30 plants (6 skipped as in
+  prior experiments for too few near/bg soundings: Akaltara, Bellary,
+  Lalitpur, Simhadri, Sipat; Mundra additionally has no per-sounding day
+  field at all). For the 15 fallback-mode plants, also computed how far
+  the annual-mean speed actually used deviates from the real per-day
+  speeds that were found but discarded by the threshold -- median swing
+  in the 20-60% range per plant, confirming the fallback approximation
+  really is a meaningful source of error where it applies, independent
+  of what explains Rihand specifically.
+
+- Rihand check: wind_match_rate = 25.0% (4/16 days), confirming
+  experiment 3's ~25-31% estimate exactly. Rank 17th of 24 computable
+  plants, 71st percentile -- ABOVE MEDIAN, not a low outlier. Rihand's
+  wind matching is better than most of the dataset.
+
+- Predictor comparison (N=24): r(wind_match_rate, |log_ratio|) = -0.328,
+  the strongest of the four tested so far -- edging out hit_days (-0.310),
+  SNR (+0.269, exp 2), and bg swing% (+0.161, exp 3). But "strongest"
+  here means barely: -0.328 vs -0.310 is a marginal difference, and
+  |r|=0.33 still only explains ~11% of the variance in |log_ratio|. None
+  of the four predictors tested this week is strong in an absolute sense.
+
+- VERDICT: wind-matching quality is technically the best single predictor
+  found across all four Week 13 experiments, but it does NOT explain
+  Rihand -- Rihand sits in the upper-mid range on this metric (71st
+  percentile) despite one of the worst Q errors in the dataset (+134%).
+  Four independent candidate explanations for Rihand specifically have
+  now been tested and rejected: overpass density (exp 1), signal-to-noise
+  (exp 2), background definition (exp 3), and wind-matching quality
+  (exp 4). None of the four single-cause hypotheses explains it. Whatever
+  is wrong with Rihand is either a genuine plume-geometry/plant-layout
+  effect, a real FY2020-21-CEA-vs-2020-satellite emissions mismatch
+  specific to that plant, or an interaction between factors rather than
+  any one of them alone -- none of which this week's four
+  single-variable experiments were designed to catch.
+
+Files changed (experiment 4): physics_gaussian.py (two additive result
+keys, n_wind_days_raw_matched and wind_days_matched_speeds; behavior
+otherwise unchanged, re-verified against data/emission_estimates.json),
+wind_match_quality_all_plants.py (new),
+data/wind_match_quality_all_plants.json (new),
+data/<plant>_wind_series_cache.json (new, for the ~21 plants not already
+cached from experiment 1).
