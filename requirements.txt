@@ -34,3 +34,11 @@ openpyxl==3.1.5
 # not replace any existing dependency above).
 shap==0.51.0
 scikit-learn==1.9.0
+
+# Added for app.py (Streamlit demo: 30-plant map + Week 13 diagnostics).
+streamlit==1.61.1
+plotly==6.8.0
+
+# Added for app.py's per-plant sounding density view (deck.gl heatmap/grid
+# layers over OCO-3 lat/lon/xco2 point clouds).
+pydeck==0.9.3
