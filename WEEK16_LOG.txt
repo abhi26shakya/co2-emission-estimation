@@ -1,0 +1,56 @@
+WEEK 16 — regional XCO2 context map (descriptive, not a model; closes the
+                        blueprint's mapping-track item)
+
+- Question: closes a named gap from the project blueprint's mapping
+  track (same descriptive spirit as the regional-XCO2-context literature
+  surveyed there, e.g. STEL, DNN-CAMS): what does background CO2 look
+  like across the study region, using data already collected rather than
+  a new download? Explicitly not a prediction model -- no fitting, no
+  per-plant emission estimate, just a spatial coverage-and-value picture
+  for the paper's Methods/Data section.
+
+- regional_xco2_map.py (new): pools every OCO-3 sounding already
+  downloaded across all 30 plants (data/*_soundings.npz, no new Earth
+  Engine call) into one dataset -- 52,898 soundings total, verified by
+  direct sum across all 30 files. Bins into a 0.5-degree grid (per
+  explicit spec, not tuned) over a bounding box built from the 30
+  plants' own lat/lon extent (14.70-29.92 N, 69.55-88.10 E) plus a
+  1.0-degree margin, rounded outward to the nearest 0.5-degree line:
+  13.5-31.0 N, 68.5-89.5 E (35 x 42 = 1,470 possible cells).
+
+- Per-cell statistic: mean XCO2 (ppm), reported only for cells with at
+  least 3 soundings (MIN_SOUNDINGS_PER_CELL=3, per explicit direction --
+  1-2 soundings isn't enough to trust a per-cell mean). Cells below that
+  floor are masked as NaN, identically to empty cells -- "no data" must
+  not read as "low CO2." The floor itself is recorded directly in the
+  output JSON's n_soundings_min_required field, not left as a silent
+  default.
+
+- Result: 130 of 1,470 cells (8.8%) have enough coverage to report a
+  value. 9 cells masked as too-sparse (1-2 soundings), 1,331 cells
+  entirely empty. The real finding here is coverage sparsity itself, not
+  any particular XCO2 value: most of the study region has no usable
+  OCO-3 data at this resolution, and what coverage exists is
+  concentrated almost entirely around the 30 plants' own near-plant/
+  background sampling zones -- the same sparsity story §5.2.1's
+  per-facility sounding counts already told (1 to over 7,000 per plant),
+  now shown to be a spatial property of the dataset too, not just a
+  per-facility one. Where cells do have enough coverage, mean XCO2 ranges
+  roughly 410-419 ppm regionally, consistent with ordinary background
+  dry-air XCO2 variation rather than any per-cell anomaly.
+
+- Output: data/regional_xco2_map.png (heatmap, masked NaNs, with the 30
+  plant locations overlaid, sized and colored by CEA absolute emissions
+  for context) and data/regional_xco2_grid.json (metadata plus the 130
+  non-masked cells: lat_bin_center, lon_bin_center, mean_xco2_ppm,
+  n_soundings each).
+
+- VERDICT: descriptive success, not a research finding to argue over --
+  the map does what it was asked to do (show background CO2 context) and
+  honestly shows how little of the region is actually observed, which is
+  itself useful context for reading every Track B number in this paper.
+  Written into RESEARCH_PAPER.md as new section 3.1 (Data Sources),
+  cross-referenced from §5.2.1.
+
+Files changed: regional_xco2_map.py (new), data/regional_xco2_map.png
+(new), data/regional_xco2_grid.json (new).
