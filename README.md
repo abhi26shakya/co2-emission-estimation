@@ -65,9 +65,12 @@ q_correction_model.py          # the actual Q-correcting model, validated agains
 
 diagnose_talcher.py / diagnose_negative_enhancement.py / diagnose_shrisingajimalwa.py   # targeted uncertainty/anomaly diagnoses
 summary_co2_figure.py          # cross-plant summary figure
+
+baseline_capacity.py                     # headline comparison: capacity_mw alone vs IME Q vs both, LOO against CEA (reads data/q_correction_model_results.json only, no network access needed)
+physics_gaussian_crosssection.py         # alternate Q estimator (Gaussian cross-sectional flux), benchmarked against IME on the same soundings (reads data/*_soundings.npz + plant_results.json/cea_ground_truth_2020_21.json/emission_estimates.json, no network access needed)
 ```
 
-Full facility-level results are in `data/plant_results.json`, `data/emission_estimates.json`, `data/climate_trace_comparison.json`, `data/cea_ground_truth_2020_21.json`, and `data/q_correction_model_results.json`.
+Full facility-level results are in `data/plant_results.json`, `data/emission_estimates.json`, `data/climate_trace_comparison.json`, `data/cea_ground_truth_2020_21.json`, `data/q_correction_model_results.json`, `data/baseline_capacity_results.json`, and `data/gaussian_crosssection_results.json`.
 
 ## Requirements
 
@@ -93,7 +96,7 @@ OCO-3 sounding download additionally requires a NASA Earthdata login (`earthacce
 
 ## Testing
 
-A basic test suite exists (`tests/`, 37 stdlib-`unittest` tests, no extra dependency) covering the pipeline's most bug-prone deterministic logic — `physics_ime.py`'s IME math and month-stratification, `build_3channel.py`'s tile pairing, `lofo_track_a.py`'s facility fold-splitting, and `plume_model.py`'s Gaussian-plume physics. Run with:
+A basic test suite exists (`tests/`, 46 stdlib-`unittest` tests) covering the pipeline's most bug-prone deterministic logic — `physics_ime.py`'s IME math and month-stratification, `build_3channel.py`'s tile pairing, `lofo_track_a.py`'s facility fold-splitting, `plume_model.py`'s Gaussian-plume physics, and `validate_quality_gate.py`'s LOO-split/permutation-shuffle mechanics. Run with:
 
 ```
 python -m unittest discover -s tests -v

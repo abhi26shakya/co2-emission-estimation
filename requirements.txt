@@ -42,3 +42,12 @@ plotly==6.8.0
 # Added for app.py's per-plant sounding density view (deck.gl heatmap/grid
 # layers over OCO-3 lat/lon/xco2 point clouds).
 pydeck==0.9.3
+
+# Added for tests/ (Week 19 fresh-clone audit: previously undocumented --
+# present in environment.yml but missing here, so `pip install -r
+# requirements.txt` alone left tests/test_validate_quality_gate.py unable
+# to import). Version matches environment.yml's pin. That file has since
+# been converted to stdlib unittest.TestCase style, so `python -m
+# unittest discover -s tests` now collects and runs its tests directly;
+# this pin remains here mainly so `pytest tests/` still works too.
+pytest==9.1.1

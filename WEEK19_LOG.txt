@@ -1,0 +1,161 @@
+WEEK 19, Day 1 — fresh-clone reproducibility test (README audit, not a
+                  research result)
+
+- Question: can a stranger clone this repo, follow only README.md, and
+  regenerate the headline capacity-vs-IME-vs-Gaussian comparison table
+  (data/baseline_capacity_results.json, data/gaussian_crosssection_results.json)
+  with no manual fixes, missing files, undocumented steps, or stale paths?
+
+- Method: `git clone` into a scratch directory outside the working repo
+  (no reuse of anything from the checked-out tree), from origin
+  (github.com/abhi26shakya/co2-emission-estimation), at the current
+  pushed HEAD (f1d93ef -- note this is BEHIND the working tree's
+  uncommitted Week 18 task-2 files and DEFENSE_SHEET.md, which is
+  correct: those aren't pushed yet, so a fresh clone can't and shouldn't
+  see them). Followed README.md's "Requirements" and "Run order"
+  sections verbatim, then ran the two scripts that produce the headline
+  table's inputs.
+
+- Result: SUBSTANTIALLY WORKED. No code required a fix. One documentation
+  gap found and fixed (in README.md, not code), plus one host-machine
+  constraint that is not this project's bug.
+
+  1. Environment: requirements.txt is accurate. Verified the pre-existing
+     /opt/miniconda3/envs/co2 (Python 3.11.15) imports every package
+     requirements.txt lists (numpy, pandas, torch, matplotlib, requests,
+     earthaccess, ee, geemap, xarray, openpyxl, shap, sklearn, streamlit,
+     plotly, pydeck) with zero ImportErrors. A genuinely-fresh
+     `pip install -r requirements.txt` into a brand-new conda env was
+     first ATTEMPTED but failed with "No space left on device" -- the
+     host machine's disk was at 95%+ capacity (761 MB free on a 228 GB
+     volume) at that time. CONFIRMED Day 2: re-ran the identical install
+     into a brand-new `repro_test_w19b` conda env (python=3.11.15, no
+     packages pre-installed) after disk space was freed (5.9 GB free) --
+     `pip install -r requirements.txt` completed with exit code 0, no
+     dependency-resolution or version-conflict errors, every one of the
+     ~140 packages (direct + transitive) installed at a concrete pinned
+     version, and a follow-up `import` of every top-level requirements.txt
+     package succeeded with zero ImportErrors. This confirms the earlier
+     failure was purely this laptop's disk-space state, not a defect in
+     requirements.txt or a problem someone else cloning this repo on a
+     normal machine would hit. Test env deleted after verification
+     (`conda env remove -n repro_test_w19b`).
+
+  2. Data files: all 30 data/*_soundings.npz files, plus
+     data/plant_results.json, data/cea_ground_truth_2020_21.json,
+     data/emission_estimates.json, and data/q_correction_model_results.json
+     are git-tracked (not gitignored) and present immediately after
+     clone -- no missing-file surprises. Confirmed by grep of .gitignore
+     (only *_scan_checkpoint.npz and *.lock are excluded, not the per-
+     plant sounding files).
+
+  3. baseline_capacity.py: ran with zero modification, zero manual
+     intervention, against the fresh clone's committed
+     data/q_correction_model_results.json. Reproduced every headline
+     number in CLAUDE.md and RESEARCH_PAPER.md Sec 5.2.1b exactly:
+     capacity-only LOO R^2=0.527 (MAE 0.398, within-2x 20/24) vs IME
+     ungated R^2=-0.152 (MAE 0.596, within-2x 15/24) vs IME gated N=7
+     R^2=-0.242. Output JSON differs from the working tree's committed
+     copy only at float64 noise level (~1e-14, e.g. 0.39750468188964483
+     vs 0.3975046818896463) -- ordinary numpy/BLAS run-to-run float
+     jitter, not a reproducibility failure; every reported summary
+     statistic is identical to the digits that matter.
+
+  4. physics_gaussian_crosssection.py: also ran with zero modification.
+     Reproduced the paper's exact fit-rate (10/30 plants fit, 20
+     skipped) and LOO comparison (Gaussian R^2=-0.966 vs IME R^2=-0.111
+     on the shared N=10 subset; Rihand Gaussian 42.9M vs IME 48.3M vs
+     CEA 20.6M t/yr). Output JSON byte-for-byte identical to the working
+     tree's committed copy.
+
+  5. tests/: `python -m unittest discover -s tests -v` -- all 37 tests
+     pass under the pre-existing co2 env (Day 1). Under the genuinely-
+     fresh Day 2 env this SURFACED A SEPARATE, PREVIOUSLY-HIDDEN GAP:
+     tests/test_validate_quality_gate.py does `import pytest` and uses
+     pytest-style bare classes/asserts, not stdlib unittest.TestCase --
+     pytest is listed in environment.yml (pytest==9.1.1, part of the
+     project's full working-env export) but is NOT in requirements.txt,
+     the file README.md tells users to install from. Under the co2 env
+     (which happens to have pytest installed from unrelated prior work)
+     this file imports fine but silently contributes ZERO tests to the
+     suite, because unittest's discovery only collects TestCase
+     subclasses -- so its tests were never actually being run under the
+     documented `python -m unittest discover` invocation even when
+     pytest was present; the "37 tests" README quotes already excluded
+     this file's tests in every prior report. Under a truly fresh env
+     (pytest absent) the same file produces a visible ImportError,
+     surfacing as "Ran 38 tests ... FAILED (errors=1)" -- the 38th
+     "test" is unittest's synthetic placeholder for the failed module
+     import, not a real test. README.md's "37 stdlib-unittest tests, no
+     extra dependency" claim was therefore not accurate: one test file
+     depends on pytest and, under the stdlib unittest runner, never ran
+     as intended regardless of whether pytest is installed. DAY 3:
+     ImportError half fixed -- pytest==9.1.1 added to requirements.txt
+     (see item 6 below and the Day 3 verdict). DAY 4: the deeper
+     collection gap CLOSED -- test_validate_quality_gate.py rewritten in
+     stdlib unittest.TestCase style (pytest-style bare classes/asserts ->
+     TestCase subclasses/self.assert*, pytest.approx -> math.isclose),
+     matching every other file in tests/. `python -m unittest discover -s
+     tests -v` now genuinely collects and passes all 9 of this file's
+     tests (46 total, up from the 37 that were actually running before --
+     the true prior count, not the file's nominal 37+9=46 that README
+     had never actually achieved). Cross-checked with `pytest
+     tests/test_validate_quality_gate.py` too: still 9/9 passing, since
+     pytest also collects unittest.TestCase subclasses natively -- no
+     regression for anyone still using pytest directly. README.md's
+     Testing section count updated 37->46 and the now-obsolete
+     "not collected by unittest discover" caveat (added Day 3) removed,
+     since it's no longer true.
+
+  6. THE ONE REAL GAP (fixed): README.md's Track B "Run order" list and
+     its "Full facility-level results are in ..." sentence never
+     mentioned baseline_capacity.py or physics_gaussian_crosssection.py
+     at all, despite both being needed to regenerate this project's own
+     headline comparison table and both being fully self-contained
+     (no Earth Engine / OCO-3 / network access required -- confirmed by
+     reading each script's data-loading code before running it). A
+     reader following only the README's documented run order would not
+     know these two scripts, or their two output files
+     (data/baseline_capacity_results.json,
+     data/gaussian_crosssection_results.json), exist. Fixed by adding
+     both to the Track B run-order block and the results-file sentence,
+     with a one-line note on each confirming no network dependency --
+     this is a README fix, not a code fix, since neither script itself
+     was broken.
+
+- What was explicitly NOT re-tested this pass, and why: process_plant.py,
+  the Earth Engine tile-export scripts, and anything touching live
+  earthaccess/EE network calls -- these require live credentials
+  (`earthengine authenticate`, NASA Earthdata login) that a disk-
+  constrained scratch environment on this machine cannot exercise
+  end-to-end without risking real API calls against someone's project
+  ID. The README's own "Earth Engine setup" section already flags that
+  a fresh user must supply their own project ID and credentials; that
+  claim was not independently re-verified here and remains an open item
+  for a future pass with a clean, fully-provisioned environment.
+
+- Verdict: the two headline-table scripts, their data dependencies, and
+  the full requirements.txt install are genuinely reproducible from a
+  fresh clone with README instructions alone on a normal machine --
+  Day 1's install failure was confirmed (Day 2) to be purely local disk
+  pressure on this laptop, not a repo defect. Two real gaps found, both
+  now fixed: (1, Day 1) two scripts missing from the README's documented
+  run order -- README.md fix, code was fine. (2, Day 3+4) the test
+  suite's "37 tests, no extra dependency" claim was inaccurate on two
+  counts, both now closed -- pytest==9.1.1 added to requirements.txt
+  (matches environment.yml's existing pin exactly), and
+  test_validate_quality_gate.py rewritten from pytest-style bare
+  classes/asserts to unittest.TestCase/self.assert*, matching the rest
+  of tests/. `python -m unittest discover -s tests -v` now genuinely
+  collects and passes all 46 tests (confirmed by direct run), and
+  `pytest tests/test_validate_quality_gate.py` still passes its 9
+  independently (no regression for pytest-style invocation).
+  README.md's Testing section updated: count corrected 37->46, and the
+  temporary "not collected by unittest discover" caveat added Day 3 was
+  removed now that it's no longer true. This whole line of investigation
+  started as a disk-space question and ended with the test suite
+  actually matching what the README claims about it -- worth noting
+  since the original ask was narrower each time (confirm disk space,
+  then just the requirements.txt line, then the file itself) and each
+  answer surfaced the next real gap rather than stopping at "good
+  enough."
