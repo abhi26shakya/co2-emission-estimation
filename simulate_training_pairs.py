@@ -88,7 +88,13 @@ CLOUD_GAP_FRAC_RANGE = (0.15, 0.55)
 
 # --- Sampling ranges, drawn from this project's own real data (see module
 #     docstring for BUG 2 on the wind floor) ---
-Q_T_PER_YEAR_RANGE = (3.4e5, 4.9e7)   # data/emission_estimates.json min/max
+# Q range: CEA ground-truth abs_emissions_t_co2 min/max (data/cea_ground_truth_2020_21.json,
+# N=30), NOT the raw IME q_t_per_year range used in the first Week 20 attempt.
+# Week 20 diagnosed IME's Q distribution as ~2.2x more right-skewed than CEA's
+# (P95/median: IME 5.55 vs CEA 2.58 on the matched N=24) -- a real shape
+# difference, not just a scale difference -- so this is a genuine, motivated
+# retest, not a repeat of the same range under another name.
+Q_T_PER_YEAR_RANGE = (2.061468660722863e6, 3.3212767714887384e7)  # CEA min (RayalSeema) / max (Vindhyachal)
 WIND_SPEED_RANGE = (1.2, 4.0)         # m/s; floor justified, not arbitrary
 STACK_HEIGHT_RANGE = (150.0, 275.0)   # m; matches plume_model.py's own ablation range
 STABILITY_CLASSES = ["A", "B", "C"]

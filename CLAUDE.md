@@ -150,7 +150,27 @@ Q-accuracy limitations (Week 12-13: median bias 0.69x, Rihand +134%),
 not a simulator bug — Rihand's real (Q, wind) pair is itself close to
 the synthetic "worst case." The U-Net was NOT started this session per
 explicit instruction: Task 2 was not genuinely verified as producing a
-realistic full distribution. See WEEK20_LOG.txt.
+realistic full distribution.
+
+Follow-up, same session: tested whether the Q SOURCE itself (IME vs
+CEA) explains the gap, since IME's own Q distribution is ~2.2x more
+right-skewed than CEA's (P95/median 5.55 vs 2.58, matched N=24) — a
+real shape difference worth testing before assuming recalibration is
+futile. Capped Q sampling to CEA's real ground-truth range (2.06e6 to
+3.32e7 t/yr) instead of IME's raw range and reran: the gap did NOT
+close, it got WORSE (median 4.65 → 9.84 ppm, tiles-within-real-range
+44.7% → 16.3%), because CEA's floor is ~6x higher than IME's, so even
+CEA's smallest real facility still drives excessive near-field
+concentration in this forward model. This rules out Q source as the
+fixable variable and points to a deeper mismatch: physics_ime.py's
+mass-balance IME (spatially-integrated near-plant-zone excess vs. a
+background annulus, under real matched winds) and this script's forward
+Gaussian model (point-source dispersion near the stack, under sampled
+winds) are likely two different formulations of "Q" that are not
+mathematical inverses — no Q choice would be expected to reproduce
+realistic near-field ppm under this forward model. Reported as an open,
+paused negative result, not resolved — the U-Net remains not started.
+See WEEK20_LOG.txt (Task 3).
 
 ## Hard rules
 - Never use Climate TRACE as a training label. Benchmark only.

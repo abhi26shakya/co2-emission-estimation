@@ -162,3 +162,87 @@ by CEA ground truth rather than raw IME estimates (would directly test
 whether Q-accuracy, not simulation mechanics, is the real constraint),
 (c) revisit whether a near-field exclusion larger than 3*stack-height is
 physically justified given how IME's Q is actually defined.
+
+TASK 3 (follow-up, same session): CEA-sourced Q retest -- tail gap
+PERSISTS, and gets WORSE, ruling out Q source as the fixable variable
+========================================================================
+
+Before touching the simulator again, compared CEA's Q distribution SHAPE
+to IME's, since if the shapes are similar, recalibrating which Q source
+feeds the simulator can't close a shape-driven gap (any median-preserving
+rescale is still the same shape). P95/median ratio, matched N=24
+facilities (data/cea_ground_truth_2020_21.json vs
+data/emission_estimates.json):
+
+  CEA (matched N=24):  P95/median = 2.576   (P5/median 0.320, max/median 3.133)
+  IME (matched N=24):  P95/median = 5.549   (P5/median 0.155, max/median 6.896)
+
+IME's distribution is ~2.2x more right-skewed than CEA's -- a genuine
+shape difference, not just scale. This made testing CEA-sourced Q a
+legitimate next step, not a repeat of the same range under another name.
+
+Changed Q_T_PER_YEAR_RANGE from the raw IME q_t_per_year range
+(3.4e5, 4.9e7) to the CEA ground-truth abs_emissions_t_co2 range
+(2.061e6, 3.321e7 -- RayalSeema min, Vindhyachal max, N=30 facilities)
+and reran with area-averaging (N=5) unchanged. Full distribution, 600
+positive tiles, same seed=42:
+
+                    min    p10    median   mean    p90     p99     max
+  IME-range (Task2): 0.245  0.659   4.654   13.292  39.129   80.888  130.739
+  CEA-range (Task3): 1.375  2.908   9.838   14.821  33.968   62.866   98.633
+
+Real reference range (data/plant_results.json co2_enhancement_ppm, N=24):
+  -1.277 to 3.698 ppm.
+
+Result: the tail gap did NOT close -- it got WORSE at the median and low
+end. Median more than doubled (4.65 -> 9.84 ppm, now ~2.7x the real
+observed max), and the fraction of positive tiles landing within the
+real range DROPPED from 44.7% to 16.3%. Cause, verified analytically:
+peak enhancement scales ~linearly with the log-uniform-sampled Q's
+geometric mean (sqrt(min*max)). CEA's range floor (2.06e6 t/yr) is ~6x
+higher than IME's floor (3.4e5 t/yr) -- even CEA's SMALLEST facility is
+still a large point source -- so CEA's narrower, less-skewed range has a
+HIGHER typical (geometric-mean) Q than IME's wider range did, and this
+forward near-field simulator produces a correspondingly higher typical
+ppm. The P90/p99/max did drop somewhat (consistent with CEA's smaller
+top-end skew), but not enough to offset the worse median, and the
+distribution as a whole is not closer to real observations by any
+reasonable measure.
+
+This directly answers the standing question: capping Q to real,
+independently-sourced (non-IME) ground truth did not fix the tail --
+it made the bulk of the distribution worse. That rules out "Q source"
+(IME vs CEA, or any single-range recalibration) as the fixable variable,
+and points at the deeper structural issue flagged as a possibility in
+this task's own framing: physics_ime.py's IME (mass-balance: integrate
+XCO2 excess over a wide near-plant zone vs. a background annulus, at
+whatever real per-overpass wind existed) and this script's forward
+Gaussian model (ground-level point-source dispersion at near-field
+range, under an assumed boundary-layer height) are two different
+physical formulations of "Q" that are not mathematical inverses of each
+other. IME's Q is calibrated to reproduce a spatially-INTEGRATED mass
+excess over a multi-km zone under real, varied wind conditions; this
+script's forward model evaluates a point-source Gaussian plume at a
+937.5m pixel close to the stack, under sampled (not matched-to-any-real-
+day) wind conditions. There is no reason to expect ANY choice of "true"
+Q -- IME's own estimate, CEA's ground truth, or anything in between --
+to reproduce a realistic near-field ppm under this forward model, because
+the mismatch is in the FORWARD FORMULATION, not the input.
+
+VERDICT: this is reported as an open, paused negative result, following
+the same diminishing-returns discipline as WEEK13_LOG.txt's Rihand
+investigation. Two genuinely different Q sources were tested (IME's own
+range, then CEA ground truth) and the second, more independently-
+grounded choice made the realism gap WORSE, not better -- continuing to
+patch the Q range further is not expected to help and is not attempted.
+The forward-simulator/inverse-IME formulation mismatch is the leading
+candidate explanation but has NOT been independently confirmed (e.g. by
+building a genuine second forward model that integrates over a
+near-plant zone the way IME does, and checking whether THAT reproduces
+realistic ppm) -- that would be the next real test, not a Q-range patch.
+The U-Net (blueprint Paper 2 stage 1) remains NOT STARTED. This is
+explicitly left open/paused, not resolved, pending either that
+independent confirmation or a different methodological approach to
+generating training labels (e.g. training the U-Net on tiles labeled by
+a mass-balance-style forward model consistent with how IME itself
+defines Q, rather than a stack-top Gaussian dispersion model).
