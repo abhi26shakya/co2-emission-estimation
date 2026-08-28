@@ -9,7 +9,7 @@ Two tracks:
 Ground truth: CEA CO₂ Baseline Database v17.0 (FY2020-21), 30/30 plants matched.
 NOT Climate TRACE — that is satellite-derived and circular. Benchmark only.
 
-## Current state (Week 13 complete)
+## Current state (Week 15 complete)
 - 30 plants processed: data/*_soundings.npz
 - Q estimates: data/emission_estimates.json
 - CEA truth: data/cea_ground_truth_2020_21.json
@@ -84,6 +84,26 @@ detail and the synthesis table, including a self-caught methodology bug
 in experiment 1 (an ascending threshold scan was fooled by a noisy lucky
 draw at low n_days; fixed to require an unbroken stable run down from
 full coverage).
+
+## Week 15: Gaussian cross-section vs IME (negative result)
+Tested an alternate Q estimator (physics_gaussian_crosssection.py) against
+IME across all 30 plants, per direct request rather than the Rihand hunt
+above. Fit succeeded for only 10/30 plants (20 skipped: too few downwind
+soundings, or a degenerate curve fit — first run produced sigma in the
+tens of thousands of km for 7 plants before a physical cap was added).
+On the 10 common plants, IME beats Gaussian cross-section on LOO R² vs
+CEA (-0.111 vs -0.966) — worse, not better. Rihand's Gaussian estimate
+landed closer to CEA than IME's (42.9M vs 48.3M vs CEA's 20.6M) but is
+still ~2x off, not a resolution. CAVEAT: this run used each plant's
+ANNUAL-MEAN wind direction (available for all 30) rather than
+per-overpass direction (cached for only 18/30) — a coarser choice than
+physics_gaussian.py's own per-overpass wind SPEED matching, and not
+disentangled from the method's other weaknesses this week. VERDICT: IME
+remains the better-justified physics method for this dataset, now with
+direct comparative evidence rather than default choice. See
+WEEK15_LOG.txt. Future work, not started: rerun the 18 plants with
+per-overpass wind direction available to check whether that specifically
+improves fit quality, independent of OCO-3's sparse sampling.
 
 ## Hard rules
 - Never use Climate TRACE as a training label. Benchmark only.

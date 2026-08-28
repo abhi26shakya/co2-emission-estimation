@@ -1,0 +1,124 @@
+WEEK 15 — Gaussian cross-sectional-flux Q estimator, tested against IME
+                         across all 30 plants (negative result -- IME stays
+                         the better-justified method)
+
+- Question: IME (physics_gaussian.py) is the only Q estimator this repo
+  has ever run, chosen by default rather than compared against an
+  alternative. A single-plant look at Vindhyachal with a Gaussian
+  cross-sectional-flux fit looked "reasonable" (same order of magnitude
+  as IME and CEA). Hypothesis under test: does that hold up once run
+  across the full 30-plant dataset, and does either method's error
+  actually correlate with anything meaningful, or is Vindhyachal just a
+  lucky draw the way Week 13 found it to be for IME itself?
+
+- physics_gaussian_crosssection.py (new): for each plant, rotates
+  near-plant soundings (dist < NEAR, same zone as IME) into a
+  downwind(x)/crosswind(y) frame using the plant's ANNUAL-MEAN wind
+  direction (plant_results.json's wind_deg field), keeps only the
+  downwind half, and fits a Gaussian to the crosswind excess-mass
+  profile: excess_mass_per_area(y) = A * exp(-y^2/(2*sigma^2)).
+  Integrating that Gaussian analytically gives the plume's line density
+  at the cross-section; multiplying by U_eff (same ALPHA=0.5 literature
+  factor IME uses) gives flux directly: Q = U_eff * A * sigma * sqrt(2pi).
+  This is the "cross-sectional flux" method referenced alongside IME in
+  the point-source literature (e.g. Varon et al. 2018 for CH4) --
+  conceptually different from IME in that it uses the plume's actual
+  spatial shape and only downwind soundings, instead of a
+  direction-agnostic near-plant disk. Background, physical constants, and
+  wind-series caching are reused unchanged from physics_gaussian.py, not
+  reimplemented, per CLAUDE.md.
+
+- CAVEAT, stated plainly, not as a footnote: wind DIRECTION here is the
+  plant's ANNUAL mean (process_plant.py's single yearly value), applied
+  uniformly to every sounding regardless of its actual overpass date.
+  Per-overpass wind direction data (data/daily_wind/) exists for only
+  18 of 30 plants -- using it would have silently restricted this run to
+  a smaller, different plant set than IME's own 24, so the annual mean
+  was used across all 30 for a fair like-for-like comparison. This is a
+  materially coarser choice than physics_gaussian.py's own per-overpass
+  wind SPEED matching (added specifically because Week 6 found the
+  annual-scalar approach understated uncertainty), and it directly limits
+  how good this method's fits can be: a plume's crosswind axis rotated by
+  the wrong day's actual wind direction smears real signal into
+  something that looks more like noise. This was not fixed this week.
+
+- First run produced physically impossible results for 7 plants: fitted
+  sigma in the tens of thousands of km (larger than Earth), because an
+  unbounded curve_fit on noisy, largely flat downwind data drove sigma
+  to its unconstrained limit while A -> 0, keeping the residual flat but
+  making the A*sigma product (and therefore Q) meaningless -- Anpara,
+  ChandrapurCoal, Dadri(Nctpp), Koradi, Raichur, RayalSeema, and Tamnar
+  all did this. Fixed by capping sigma at 3x the near-plant disk radius
+  (a plume can't be resolved as wider than several times the disk it's
+  sampled from) and treating a fit pinned at that cap as degenerate,
+  not a real result. This kind of self-caught methodology bug is exactly
+  the thing worth logging, per this repo's honesty convention (Week 13
+  logged an equivalent catch for the overpass-density experiment).
+
+- Result: fit succeeded for 10/30 plants. The other 20 skipped --
+  13 for too few downwind soundings (or no soundings above background)
+  after restricting to the downwind half of the near-plant zone, 7 for
+  the degenerate/capped-sigma fit above. Only a third of the dataset
+  produces a fit at all, which is itself a strike against the method as
+  currently implemented on this sparse OCO-3 sampling.
+
+  On the 10 plants where both methods produced a Q:
+    r(log IME_Q, log Gaussian_Q) = 0.640
+  A real positive relationship -- the two methods are not uncorrelated --
+  but the per-plant ratios still swing widely (IME/Gaussian from 0.13 to
+  1.33 across the 10; full table in
+  data/gaussian_crosssection_results.json's ime_vs_gaussian.ime_over_
+  gaussian_ratio).
+
+- LOO R^2 vs CEA, same metric as Week 12's baseline_capacity.py, on the
+  identical N=10 common subset:
+    IME:      R^2 = -0.111   MAE(log) = 0.590   within_2x = 6/10
+    Gaussian: R^2 = -0.966   MAE(log) = 0.800   within_2x = 5/10
+  Gaussian cross-section is WORSE than IME on this dataset, plainly. Its
+  per-plant fit R^2 (the quality of the Gaussian shape assumption itself,
+  not the Q-vs-CEA comparison) is also low across the board -- mostly
+  0.01-0.25, only Talcher and Mouda clearing 0.2 -- meaning the assumed
+  Gaussian crosswind shape is a poor description of the actual sparse,
+  noisy scatter for most plants, independent of the wind-direction
+  caveat above.
+
+- Rihand check: Gaussian Q = 42.9M t/yr vs CEA 20.6M t/yr (|log ratio|
+  0.733), versus IME's 48.3M t/yr (|log ratio| 0.852). Gaussian is
+  CLOSER to CEA than IME here, but only marginally -- still off by
+  roughly 2x. Not a resolution of Week 13's unexplained Rihand error,
+  just a smaller version of the same problem under a different method.
+
+- VERDICT: IME remains the better-justified physics method for this
+  dataset. This is no longer the default-by-absence-of-comparison
+  status it held before this week -- it is now backed by direct
+  comparative evidence: cross-sectional flux fits for only a third of
+  the 30 plants, and on exactly those plants it predicts CEA worse than
+  IME does (LOO R^2 -0.966 vs -0.111). The one point in its favor
+  (Rihand landing closer to CEA) is real but small and doesn't change
+  the aggregate picture. Gaussian cross-section, AS IMPLEMENTED HERE, is
+  not a replacement or an improvement -- it is a weaker method on this
+  dataset, most likely because of two compounding weaknesses: (1) the
+  annual-mean wind-direction caveat above, which this week's run does
+  not disentangle from the method's own limitations, and (2) OCO-3's
+  sparse per-overpass sampling, which gives a real cross-sectional-flux
+  fit (designed for dense airborne imaging in the literature it's drawn
+  from) too few points per plant to resolve a genuine Gaussian shape.
+
+- Future work, not started this week: rerun the 10 successfully-fit
+  plants (and ideally more, if the wind-direction fix itself unlocks
+  fits that currently skip for lack of downwind signal) using
+  per-overpass wind direction for the 18 plants where data/daily_wind/
+  already has it, to check whether the coarse annual-mean direction is
+  specifically what's suppressing fit quality, independent of the
+  sparse-sampling problem. If per-overpass direction meaningfully
+  improves the 10 plants' fit R^2 or their Q accuracy against CEA, that
+  would isolate wind-direction resolution as the fixable half of this
+  week's negative result, rather than an inherent limit of the method on
+  this satellite's sampling density.
+
+Files changed: physics_gaussian_crosssection.py (new),
+data/gaussian_crosssection_results.json (new),
+data/gaussian_crosssection_vs_ime.png (new),
+data/Mundra_wind_series_cache.json (new, fetched incidentally while
+looping over all 30 plants -- Mundra itself was skipped for too few
+near/bg soundings before wind data was even used).
