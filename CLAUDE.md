@@ -9,7 +9,7 @@ Two tracks:
 Ground truth: CEA CO₂ Baseline Database v17.0 (FY2020-21), 30/30 plants matched.
 NOT Climate TRACE — that is satellite-derived and circular. Benchmark only.
 
-## Current state (Week 15 complete)
+## Current state (Week 18 complete)
 - 30 plants processed: data/*_soundings.npz
 - Q estimates: data/emission_estimates.json
 - CEA truth: data/cea_ground_truth_2020_21.json
@@ -94,16 +94,36 @@ tens of thousands of km for 7 plants before a physical cap was added).
 On the 10 common plants, IME beats Gaussian cross-section on LOO R² vs
 CEA (-0.111 vs -0.966) — worse, not better. Rihand's Gaussian estimate
 landed closer to CEA than IME's (42.9M vs 48.3M vs CEA's 20.6M) but is
-still ~2x off, not a resolution. CAVEAT: this run used each plant's
-ANNUAL-MEAN wind direction (available for all 30) rather than
-per-overpass direction (cached for only 18/30) — a coarser choice than
-physics_ime.py's own per-overpass wind SPEED matching, and not
-disentangled from the method's other weaknesses this week. VERDICT: IME
-remains the better-justified physics method for this dataset, now with
-direct comparative evidence rather than default choice. See
-WEEK15_LOG.txt. Future work, not started: rerun the 18 plants with
-per-overpass wind direction available to check whether that specifically
-improves fit quality, independent of OCO-3's sparse sampling.
+still ~2x off, not a resolution. CAVEAT (tested and closed, Week 18 —
+see below): this run used each plant's ANNUAL-MEAN wind direction
+(available for all 30) rather than per-overpass direction (cached for
+only 18/30) — a coarser choice than physics_ime.py's own per-overpass
+wind SPEED matching. VERDICT: IME remains the better-justified physics
+method for this dataset, now with direct comparative evidence rather
+than default choice. See WEEK15_LOG.txt.
+
+## Week 18: physics_gaussian.py renamed to physics_ime.py; per-overpass
+## wind direction tested for the Gaussian cross-section method (closed, no improvement)
+Task 1: physics_gaussian.py was mislabeled since Week 6 — it implements
+IME, not a Gaussian plume fit. Renamed to physics_ime.py, added a
+docstring pointer to physics_gaussian_crosssection.py (the real Gaussian
+method), and updated every reference repo-wide. 46/46 tests pass.
+
+Task 2: closed Week 15's named-but-untested limitation. Reran the 18
+plants with cached per-overpass wind direction
+(physics_gaussian_crosssection_perOverpassWind.py), rotating each
+sounding by its own overpass day's direction instead of one annual
+angle. Result: no improvement. Fit rate churned (9/18 vs 8/18) rather
+than improved; of 6 plants fit both ways, only 1 (Kudgi) moved closer to
+CEA — Sasan moved from |log ratio| 0.131 to 1.226. LOO R² on the shared
+6-plant subset got WORSE (-0.212 → -0.447), and IME still wins on the
+full per-overpass set (+0.115 vs -0.447). Likely cause: per-sounding
+rotation collapses n_overpass_days_used to 3-5 days per plant (only
+days whose actual wind pointed that sounding downwind count), fragmenting
+the sample rather than sharpening it. VERDICT: wind-direction resolution
+was not the fixable half of §5.2.8's negative result — the weakness is
+more fundamental, most likely OCO-3's sparse sampling itself. See
+WEEK18_LOG.txt.
 
 ## Hard rules
 - Never use Climate TRACE as a training label. Benchmark only.

@@ -1,0 +1,131 @@
+WEEK 18 — task 1: physics_gaussian.py renamed to physics_ime.py (a real
+                  naming bug, not a cosmetic one); task 2: per-overpass
+                  wind direction tested against the Gaussian cross-section
+                  method's named limitation (negative result, closes it)
+
+TASK 1: physics_gaussian.py -> physics_ime.py
+================================================
+
+- Problem: physics_gaussian.py has implemented IME (Integrated Mass
+  Enhancement) since Week 6 -- never a classic Gaussian plume fit. The
+  actual Gaussian cross-section method, physics_gaussian_crosssection.py,
+  was added in Week 15. The two names next to each other read backwards:
+  the file that says "gaussian" is the mass-balance method, and the file
+  that says "gaussian_crosssection" is the one that actually fits a
+  Gaussian. This has confused every discussion of the two methods in this
+  repo since Week 15, including this project's own session notes.
+
+- Fix: renamed physics_gaussian.py -> physics_ime.py. Added a one-line
+  docstring clarification pointing to physics_gaussian_crosssection.py
+  for the real Gaussian method. Updated every reference across the repo
+  -- imports, docstrings, comments, RESEARCH_PAPER.md, WEEKn_LOG.txt
+  files, CLAUDE.md -- via a placeholder-protected find/replace so
+  "physics_gaussian_crosssection" (a real, different filename) was never
+  accidentally mangled into "physics_ime_crosssection". Also renamed the
+  paired test file (tests/test_physics_gaussian.py ->
+  tests/test_physics_ime.py) and run_physics_gaussian_new9.py ->
+  run_physics_ime_new9.py (RESEARCH_PAPER.md cites this filename
+  directly; leaving it stale would have pointed at a file that no longer
+  existed under that name).
+
+- Verification: full-repo grep for bare "physics_gaussian" (excluding
+  "_crosssection") returns zero hits. Full test suite passes, 46/46.
+  Caught and reverted one self-inflicted mistake during verification:
+  smoke-testing the renamed imports executed reliability_model.py's
+  top-level code (not __main__-guarded) and silently overwrote
+  data/reliability_model_results.json with an unreviewed live N=24
+  rerun, contradicting RESEARCH_PAPER.md's own N=17 citation for that
+  model. Reverted via git checkout before anything was committed.
+
+TASK 2: per-overpass wind direction for the Gaussian cross-section method
+===========================================================================
+
+- Question: §5.2.8's Gaussian cross-sectional-flux estimator (Week 15)
+  used each plant's ANNUAL-MEAN wind direction uniformly across all 30
+  plants, because per-overpass direction was cached for only 18 of them
+  -- a named, explicitly untested limitation, not a fixed one. Does
+  per-overpass direction specifically improve fit quality or accuracy,
+  independent of OCO-3's separately-suspected sparse-sampling problem?
+
+- physics_gaussian_crosssection_perOverpassWind.py (new): reruns ONLY
+  the 18 plants with a data/daily_wind/<Plant>_daily_wind.json cache.
+  Replaces the original script's single per-plant rotation angle with a
+  PER-SOUNDING one -- each near-plant sounding is rotated using its own
+  overpass day's cached direction, not the plant's annual mean. Soundings
+  whose day has no cached direction are dropped, not fallback-rotated
+  (a fallback would silently reintroduce the annual mean and defeat the
+  test). Background computation, the sigma cap, MIN_DOWNWIND, and wind-
+  SPEED matching are all reused unchanged from
+  physics_gaussian_crosssection.py, so this isolates direction alone.
+  Does not touch data/gaussian_crosssection_results.json or its PNG --
+  writes only data/gaussian_crosssection_perOverpassWind_results.json.
+
+- Hit a corrupted data/daily_wind/ChandrapurCoal_daily_wind.json mid-run
+  (stray "done " text appended after the JSON's closing brace, present
+  in the repo since before this session -- flagged earlier, never fixed
+  until it actually blocked something). Stripped the trailing garbage,
+  verified valid JSON, 555 entries, matching the other 17 plants' cache
+  size. Fixed as part of this task since it directly blocked it.
+
+- Result 1, fit success rate: 9/18 fit with per-overpass direction vs.
+  8/18 among these same 18 plants under the annual mean. Looks like a
+  wash but is CHURN, not improvement: 3 newly fit (Anpara, ChandrapurCoal,
+  Koradi), 2 newly failed (Farakka, Korba).
+
+- Result 2, direct comparison (N=6 fit both ways): only 1/6 (Kudgi)
+  moved closer to CEA truth. The other 5 moved further -- most sharply
+  Sasan, from this project's best-performing Gaussian estimate (|log
+  ratio| 0.131, essentially spot-on) to one of its worst (1.226) under
+  per-overpass direction. Full table:
+    plant             |log ratio| annual   |log ratio| per-overpass
+    Kudgi              1.653                1.408   (closer)
+    Mouda              1.169                1.343   (further)
+    Rihand             0.733                0.847   (further)
+    Sasan              0.131                1.226   (further, sharply)
+    Talcher            0.168                0.600   (further)
+    Vindhyachal        0.532                0.741   (further)
+
+- Result 3, LOO R^2 vs CEA (baseline_capacity.py methodology, same
+  N restricted across methods for a fair comparison):
+    Gaussian, per-overpass direction (N=9):         R^2 = -0.447
+    IME, same N=9 plants:                            R^2 = +0.115
+    Gaussian, annual-mean direction, shared N=6:     R^2 = -0.212
+    IME, same shared N=6 plants:                     R^2 = +0.053
+  Per-overpass direction made the Gaussian method's own fit WORSE on the
+  shared subset (-0.212 -> -0.447), not better, and IME still wins
+  decisively on the full per-overpass-eligible set.
+
+- Likely mechanism, visible directly in the per-plant output:
+  n_overpass_days_used collapsed to 3-5 days per plant under per-sounding
+  rotation, even where n_soundings_with_direction_match was large (e.g.
+  Vindhyachal: 552 soundings had a cached direction, but only 4 distinct
+  days ended up in the downwind half). This is because per-sounding
+  rotation only counts a sounding as "downwind" if THAT DAY's actual wind
+  happened to point it into its own downwind half -- unlike the annual-
+  mean version, which by construction always defines a consistent
+  downwind half across all near-plant soundings regardless of day. Real
+  day-to-day wind variability therefore fragments the usable sample
+  rather than sharpening the fit.
+
+- VERDICT: wind-direction resolution was NOT the fixable half of
+  §5.2.8's negative result. This is now a closed question, not an open
+  one: per-overpass direction was specifically hypothesized and
+  specifically tested, and it does not improve fit rate, does not move
+  estimates closer to CEA on average, and makes the method's own LOO R^2
+  worse on the one directly comparable subset. The Gaussian cross-section
+  method's weakness looks more fundamental than the annual-mean
+  simplification -- most likely OCO-3's inherently sparse per-overpass
+  sampling itself, exactly as first suspected when §5.2.8 was written.
+  IME remains the better-justified physics method for this dataset, with
+  one fewer open question standing between "we haven't tried harder" and
+  "we tried the obvious fix and it didn't work."
+
+Files changed: physics_ime.py (renamed from physics_gaussian.py, +1
+docstring line), tests/test_physics_ime.py (renamed from
+tests/test_physics_gaussian.py), run_physics_ime_new9.py (renamed from
+run_physics_gaussian_new9.py), 33 files with content-only
+physics_gaussian->physics_ime reference updates,
+physics_gaussian_crosssection_perOverpassWind.py (new),
+data/gaussian_crosssection_perOverpassWind_results.json (new),
+data/daily_wind/ChandrapurCoal_daily_wind.json (corruption fixed,
+pre-existing, unrelated to the rename).
