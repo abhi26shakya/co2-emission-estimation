@@ -6,7 +6,7 @@ WEEK 8 — DONE (per-overpass wind conditioning + uncertainty for Track B)
   and this project's own WEEK6_LOG.txt had already flagged the annual-mean
   scalar as a fragility. This week implements that fix.
 
-- physics_gaussian.py changes:
+- physics_ime.py changes:
   * per-overpass wind matching: each near-plant OCO-3 sounding is now
     matched to its own overpass day's ERA5 daily wind speed (via a new
     `day` field per sounding, YYYYMMDD, derived from sounding_id in
@@ -41,7 +41,7 @@ WEEK 8 — DONE (per-overpass wind conditioning + uncertainty for Track B)
 
 - Bug found + fixed during this week's own code review (ecc:python-review
   agent, run against the diff before committing):
-  * physics_gaussian.py: the per-overpass wind match was built from
+  * physics_ime.py: the per-overpass wind match was built from
     near_day[used], which has one entry per sounding, not per day -- a
     single overpass contributes many near-plant soundings on the same
     day, so the unfixed version both mis-gated MIN_WIND_DAYS_MATCHED (a
@@ -62,7 +62,7 @@ WEEK 8 — DONE (per-overpass wind conditioning + uncertainty for Track B)
     was untouched by the failed write and resumed cleanly once fixed.
 
 RESULT: MEASURED. All three plants re-processed for the `day` field and
-re-run through physics_gaussian.py. Before -> after (point estimate only
+re-run through physics_ime.py. Before -> after (point estimate only
 before, Q +/- sigma after):
 
   Sasan        before: 37,242,645 t/yr (no uncertainty)
@@ -103,7 +103,7 @@ expansion to 10-20 Indian coal plants with usable OCO-3 coverage, then
 leave-one-facility-out CV, then fusing Track A's activity signal into
 Track B's residual as originally scoped.
 
-Files changed: physics_gaussian.py, process_plant.py,
+Files changed: physics_ime.py, process_plant.py,
 data/emission_estimates.json, data/plant_results.json,
 data/Sasan_soundings.npz, data/Tirora_soundings.npz,
 data/Vindhyachal_soundings.npz (added `day` field to all three).

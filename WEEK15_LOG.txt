@@ -2,7 +2,7 @@ WEEK 15 — Gaussian cross-sectional-flux Q estimator, tested against IME
                          across all 30 plants (negative result -- IME stays
                          the better-justified method)
 
-- Question: IME (physics_gaussian.py) is the only Q estimator this repo
+- Question: IME (physics_ime.py) is the only Q estimator this repo
   has ever run, chosen by default rather than compared against an
   alternative. A single-plant look at Vindhyachal with a Gaussian
   cross-sectional-flux fit looked "reasonable" (same order of magnitude
@@ -25,7 +25,7 @@ WEEK 15 — Gaussian cross-sectional-flux Q estimator, tested against IME
   conceptually different from IME in that it uses the plume's actual
   spatial shape and only downwind soundings, instead of a
   direction-agnostic near-plant disk. Background, physical constants, and
-  wind-series caching are reused unchanged from physics_gaussian.py, not
+  wind-series caching are reused unchanged from physics_ime.py, not
   reimplemented, per CLAUDE.md.
 
 - CAVEAT, stated plainly, not as a footnote: wind DIRECTION here is the
@@ -35,7 +35,7 @@ WEEK 15 — Gaussian cross-sectional-flux Q estimator, tested against IME
   18 of 30 plants -- using it would have silently restricted this run to
   a smaller, different plant set than IME's own 24, so the annual mean
   was used across all 30 for a fair like-for-like comparison. This is a
-  materially coarser choice than physics_gaussian.py's own per-overpass
+  materially coarser choice than physics_ime.py's own per-overpass
   wind SPEED matching (added specifically because Week 6 found the
   annual-scalar approach understated uncertainty), and it directly limits
   how good this method's fits can be: a plume's crosswind axis rotated by

@@ -5,7 +5,7 @@ regional-XCO2-context papers surveyed there). Answers "what does
 background CO2 look like across the study region," for the paper's
 Methods/Data section -- NOT a new prediction model, no fitting, no
 per-plant emission estimate. Every plant's own Q estimate still comes
-from physics_gaussian.py (IME) or physics_gaussian_crosssection.py; this
+from physics_ime.py (IME) or physics_gaussian_crosssection.py; this
 script only visualizes the raw pooled XCO2 field those estimates are
 drawn from.
 

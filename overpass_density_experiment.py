@@ -10,10 +10,10 @@ fewer overpass days, and see how the estimate degrades.
 Method: for each plant and each n_days in N_DAYS_LIST, draw N_REPEATS
 random subsets (without replacement) of that many overpass days, restrict
 ALL soundings (near-plant and background) to those days, and rerun the
-existing IME estimate (physics_gaussian.estimate_emission_rate_from_arrays)
+existing IME estimate (physics_ime.estimate_emission_rate_from_arrays)
 on the subsample. Record the distribution of Q across repeats.
 
-Reuses physics_gaussian.py's IME math directly rather than reimplementing
+Reuses physics_ime.py's IME math directly rather than reimplementing
 it -- see that module's estimate_emission_rate_from_arrays(), factored out
 for exactly this purpose.
 """
@@ -25,7 +25,7 @@ matplotlib.use("Agg")
 import matplotlib.pyplot as plt
 import numpy as np
 
-import physics_gaussian as pg
+import physics_ime as pg
 
 SEED = 42
 N_REPEATS = 200

@@ -1,6 +1,6 @@
 WEEK 6 — DONE (Gaussian-plume emission-rate estimate)
 
-- Implemented physics_gaussian.py, previously an empty placeholder file
+- Implemented physics_ime.py, previously an empty placeholder file
   flagged in README's Known Limitations. This closes the gap between the
   CO2-enhancement track (near-plant vs. background XCO2, ppm) and an
   actual quantitative emission-rate number (t CO2/yr), which is what the
@@ -55,9 +55,9 @@ explanation: much thinner OCO-3 coverage than Vindhyachal (5 hit-days /
 IME sum and the L_eff footprint term. Flagged as a data-coverage
 limitation of this plant's estimate, not a resolved finding.
 
-CAVEATS (documented in physics_gaussian.py's header):
+CAVEATS (documented in physics_ime.py's header):
   - standard surface pressure assumed (no local met pressure per plant/day)
   - annual-mean wind speed used, not per-overpass wind
   - fixed, approximate footprint area per OCO-3 sounding
 
-Artifacts: physics_gaussian.py, data/emission_estimates.json
+Artifacts: physics_ime.py, data/emission_estimates.json

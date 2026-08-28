@@ -22,7 +22,7 @@ different months can land in both train and test, which is a leakage risk relati
 literature validates this kind of model (see §3).
 
 **Track B — CO2 emission-rate estimate** (`process_plant.py` → `co2_enhancement.py` /
-`co2_no2_colocation.py` / `wind_check.py` → `physics_gaussian.py`): physics-only Integrated
+`co2_no2_colocation.py` / `wind_check.py` → `physics_ime.py`): physics-only Integrated
 Mass Enhancement (IME) mass balance, `Q = U_eff · IME / L_eff`, on OCO-3 XCO2 soundings
 (`OCO3_L2_Lite_FP` v11r via `earthaccess`), cross-checked against NO2 co-location and
 ERA5 wind direction. 4 plants processed (`data/plant_results.json`,
@@ -202,7 +202,7 @@ the project's stated constraints.
 
 ```
 OCO-3 soundings ─────────────┐
-                              ├─► IME mass balance (existing physics_gaussian.py logic)
+                              ├─► IME mass balance (existing physics_ime.py logic)
 Per-overpass ERA5 wind ──────┘        │
                                        ▼
                               Q_physics ± σ_wind  (NEW: per-overpass wind, propagated uncertainty)
@@ -287,7 +287,7 @@ An Uncertainty-Aware, Facility-Generalizing Study of Indian Coal Power Plants"**
 
 ## 14. Implementation roadmap (high level; sequencing only, not started)
 
-1. Per-overpass wind matching + uncertainty propagation into `physics_gaussian.py` (extends
+1. Per-overpass wind matching + uncertainty propagation into `physics_ime.py` (extends
    existing file; addresses the project's own documented bug/limitation).
 2. Facility-set expansion: identify 10–20 candidate Indian coal plants with usable OCO-3
    coverage (reuse `pick_plants.py`), check coverage before large pulls.
@@ -305,7 +305,7 @@ An Uncertainty-Aware, Facility-Generalizing Study of Indian Coal Power Plants"**
 - Do not modify `train_detector.py`/`train_2channel.py`/`train_3channel.py` yet — the existing
   CNN is reused as-is for its activity signal (step 3 above), not retrained from scratch as
   step 1.
-- First code change, when approved: extend `physics_gaussian.py` (or a new sibling script) to
+- First code change, when approved: extend `physics_ime.py` (or a new sibling script) to
   accept per-overpass wind and emit `Q ± σ` instead of a point estimate, tested first on the
   existing 4 plants before any facility-set expansion — this is the smallest, most
   self-contained change that directly targets the literature-confirmed dominant error source

@@ -34,7 +34,7 @@ WEEK 10 — DONE (activity signal, reliability check, Climate TRACE benchmark,
   RESEARCH_PLAN.md Sec 7 says it must not be used as a training label
   regardless. Scoped the question down to something answerable now: does
   the activity signal, wind/CO2 alignment, or facility metadata predict
-  physics_gaussian.py's own self-reported q_rel_std? Not circular --
+  physics_ime.py's own self-reported q_rel_std? Not circular --
   q_rel_std is derived purely from ERA5 wind variance and IME bootstrap
   noise, independent of the candidate features. Result: a real negative
   finding. Best single-feature correlation (activity_prob_std, r=-0.62)
@@ -80,7 +80,7 @@ WEEK 10 — DONE (activity signal, reliability check, Climate TRACE benchmark,
      signal-to-noise ratio 0.18, versus 1.27 for Rihand (a well-bracketed
      comparison plant). Only 51.6% of near-plant soundings exceed the
      background mean at all (a near coin-flip), versus 75.6% for Rihand.
-  4. Directly measured what physics_gaussian.py's docstring already warns
+  4. Directly measured what physics_ime.py's docstring already warns
      about but doesn't quantify: sensitivity to the background-annulus
      definition. Testing 5 reasonable background-radius choices, Talcher's
      IME estimate swings 20% of its default value; Rihand's swings only
@@ -97,7 +97,7 @@ WEEK 10 — DONE (activity signal, reliability check, Climate TRACE benchmark,
   (background cleanly separable from signal) breaks down for a plant with
   a thin OCO-3 CO2 signature, and the uncertainty model's blind spot
   (background-definition structural uncertainty, already documented in
-  physics_gaussian.py's own docstring since Week 8) turns out to matter
+  physics_ime.py's own docstring since Week 8) turns out to matter
   most exactly where it's least visible -- a facility whose OTHER
   diagnostics (uncertainty band, wind alignment) look fine.
 
@@ -105,7 +105,7 @@ NEXT: the background-definition-sensitivity check in diagnose_talcher.py
 is currently a one-off diagnostic, not a per-plant automated flag. Per
 RESEARCH_PLAN.md's priority order (scientific validity first), a natural
 follow-up is running this same sensitivity test across all 9 facilities
-and folding a background-sensitivity term into physics_gaussian.py's
+and folding a background-sensitivity term into physics_ime.py's
 reported uncertainty, rather than leaving it as a manual investigation
 triggered only when a plant looks suspicious after the fact. Facility-set
 expansion (10 candidates remaining from Week 9's shortlist) and

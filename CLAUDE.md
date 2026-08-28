@@ -14,7 +14,7 @@ NOT Climate TRACE — that is satellite-derived and circular. Benchmark only.
 - Q estimates: data/emission_estimates.json
 - CEA truth: data/cea_ground_truth_2020_21.json
 - Feature table (N=24 with both Q and CEA): data/q_correction_model_results.json
-- IME math lives in physics_gaussian.py, split into estimate_emission_rate()
+- IME math lives in physics_ime.py, split into estimate_emission_rate()
   (loads a plant's npz) and estimate_emission_rate_from_arrays() (takes
   sounding arrays directly — reuse this, don't reimplement IME, when a
   script needs to rerun the estimate on modified/subsampled soundings).
@@ -55,7 +55,7 @@ feature table, and (b) a specific check of whether it explains Rihand:
     problem.
   exp 4 wind_match_quality_all_plants.py: real (unthresholded)
     per-overpass wind-match rate, for all 30 — required a small additive
-    fix to physics_gaussian.py (n_wind_days_raw_matched,
+    fix to physics_ime.py (n_wind_days_raw_matched,
     wind_days_matched_speeds; behavior-preserving, verified). Rihand's
     rate = 25% (4/16 days), 71st percentile — ABOVE median, not a
     wind-matching problem either.
@@ -97,7 +97,7 @@ landed closer to CEA than IME's (42.9M vs 48.3M vs CEA's 20.6M) but is
 still ~2x off, not a resolution. CAVEAT: this run used each plant's
 ANNUAL-MEAN wind direction (available for all 30) rather than
 per-overpass direction (cached for only 18/30) — a coarser choice than
-physics_gaussian.py's own per-overpass wind SPEED matching, and not
+physics_ime.py's own per-overpass wind SPEED matching, and not
 disentangled from the method's other weaknesses this week. VERDICT: IME
 remains the better-justified physics method for this dataset, now with
 direct comparative evidence rather than default choice. See

@@ -14,7 +14,7 @@ WEEK 13 — experiment 1: overpass-density subsampling (mixed result --
   near-plant and background sounding pools to only the sampled days
   (matching what actually having fewer overpasses would look like), then
   reruns the existing IME estimator unchanged --
-  physics_gaussian.estimate_emission_rate_from_arrays(), a new function
+  physics_ime.estimate_emission_rate_from_arrays(), a new function
   factored out of estimate_emission_rate() so the math is reused exactly,
   not reimplemented. Verified the refactor is behavior-preserving before
   running anything: full-coverage output for all three plants reproduced
@@ -69,7 +69,7 @@ WEEK 13 — experiment 1: overpass-density subsampling (mixed result --
   than the existing gate, consistent with Week 12's finding that the gate
   is doing *something* even though it didn't survive permutation testing.
 
-Files changed: physics_gaussian.py (estimate_emission_rate() split into a
+Files changed: physics_ime.py (estimate_emission_rate() split into a
 loader + new estimate_emission_rate_from_arrays(), behavior-preserving,
 verified against data/emission_estimates.json before use),
 overpass_density_experiment.py (new), data/overpass_density_results.json
@@ -173,7 +173,7 @@ WEEK 13 — experiment 4: wind-matching quality across all 30 plants
                          (strongest predictor found, but still doesn't
                          explain Rihand)
 
-- physics_gaussian.py's n_wind_days_matched is threshold-gated: a plant
+- physics_ime.py's n_wind_days_matched is threshold-gated: a plant
   with 1-2 real per-overpass wind matches (below MIN_WIND_DAYS_MATCHED=3)
   still reports n_wind_days_matched=0, since the code falls back to the
   annual-mean speed for the whole plant. That flattens 15 of 24 plants
@@ -221,7 +221,7 @@ WEEK 13 — experiment 4: wind-matching quality across all 30 plants
   any one of them alone -- none of which this week's four
   single-variable experiments were designed to catch.
 
-Files changed (experiment 4): physics_gaussian.py (two additive result
+Files changed (experiment 4): physics_ime.py (two additive result
 keys, n_wind_days_raw_matched and wind_days_matched_speeds; behavior
 otherwise unchanged, re-verified against data/emission_estimates.json),
 wind_match_quality_all_plants.py (new),

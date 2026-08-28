@@ -9,7 +9,7 @@
 | Component | What it does | Genuine strength | Genuine limitation |
 |---|---|---|---|
 | **Track A** (`train_3channel.py`, `lofo_track_a.py`) | 3-channel CNN (NO2+SO2+VIIRS) classifies 64×64 tiles as plant/not-plant | Exhaustive LOFO evaluation (69.1% recall) — rare rigor; most tile-classifier papers report only random-split accuracy | **Binary per-tile only.** No spatial localization within the tile, no plume shape, no intensity gradient |
-| **Track B** (`physics_gaussian.py`) | IME mass-balance: `Q = U_eff · IME / L_eff` from OCO-3 XCO2 soundings, near-plant circle vs. background annulus, 3-term uncertainty | Physically grounded, per-overpass wind-conditioned, month-stratified | **Not spatial.** Near/background split is a single scalar circle/annulus test, not a directional plume model. Despite the filename, there is **no actual 2D Gaussian dispersion equation anywhere in this codebase** — this is the single clearest, most honest gap |
+| **Track B** (`physics_ime.py`) | IME mass-balance: `Q = U_eff · IME / L_eff` from OCO-3 XCO2 soundings, near-plant circle vs. background annulus, 3-term uncertainty | Physically grounded, per-overpass wind-conditioned, month-stratified | **Not spatial.** Near/background split is a single scalar circle/annulus test, not a directional plume model. Despite the filename, there is **no actual 2D Gaussian dispersion equation anywhere in this codebase** — this is the single clearest, most honest gap |
 | **CEA ground-truth validation** (`q_correction_model.py`) | Validates Track B against India's real, fuel-consumption-based CO2 database; LOO-CV correction (MAE 1.01→0.902, N=17) | **The project's strongest asset.** Neither Climate TRACE nor (as far as this project's literature scan found) prior India-specific work validates against non-proxy, government-reported ground truth | N=17, single feature, one fiscal year — explicitly flagged as indicative, not production-grade |
 | Grad-CAM (`gradcam.py`) | Spatial attention map for the 1-channel detector | Already gives *some* within-tile spatial signal | Never extended to the 3-channel model, never used downstream |
 
@@ -31,7 +31,7 @@ This is defensible because every piece of it is either (a) standard, citable phy
 
 ### 4.1 What's already used (Track B, unchanged)
 ```
-Q = U_eff · IME / L_eff          (IME mass balance, physics_gaussian.py, unchanged)
+Q = U_eff · IME / L_eff          (IME mass balance, physics_ime.py, unchanged)
 ```
 
 ### 4.2 New: ground-level Gaussian plume equation (Pasquill-Gifford)
@@ -43,7 +43,7 @@ C(x, y, 0) = Q / (π · U · σy(x) · σz(x)) · exp(-y² / (2σy(x)²)) · exp
 ```
 
 - `Q` = emission rate — **taken directly from this project's existing, ground-truth-corrected Track B output** (`data/q_correction_model_results.json`), not re-estimated
-- `U` = wind speed at plant location, from ERA5 (already pulled per-overpass in `physics_gaussian.py`)
+- `U` = wind speed at plant location, from ERA5 (already pulled per-overpass in `physics_ime.py`)
 - `H` = effective stack height (plant-specific; not currently in `candidate_plants.csv` — **a genuine new data requirement**, flagged in §6)
 - `σy(x), σz(x)` = Pasquill-Gifford horizontal/vertical dispersion coefficients, standard lookup tables parameterized by downwind distance and atmospheric stability class (A–F)
 - Stability class estimated from ERA5 wind speed + boundary-layer height (`blh`) via a standard Golder (1972) or Pasquill-Gifford-Turner parameterization — **both already-available ERA5 fields, no new data source needed**
@@ -89,7 +89,7 @@ Ran `build_plume_maps.py` for all three prototype facilities. Full numeric outpu
 
 `validate_plume_spatial_consistency.py`, plus 2 more unit tests in `plume_model.py`'s new `concentration_at_locations()` (point evaluation, factored to share `_rotate_to_plume_frame()` with `plume_grid()` so grid and point evaluation cannot drift apart — full suite now 37 tests, all pass).
 
-**Method**: for each prototype facility, project every real OCO-3 sounding within the plume's 30km extent into the same local (east_km, north_km) frame the plume grid uses, compute each sounding's XCO2 excess using the *same* background definition `physics_gaussian.py` already uses (imported, not reimplemented), evaluate the plume model's predicted concentration at each sounding's exact location, and test two things: (a) Pearson correlation between predicted concentration and observed excess, (b) whether soundings inside the plume's predicted downwind sector (±45°) show significantly higher excess than soundings outside it.
+**Method**: for each prototype facility, project every real OCO-3 sounding within the plume's 30km extent into the same local (east_km, north_km) frame the plume grid uses, compute each sounding's XCO2 excess using the *same* background definition `physics_ime.py` already uses (imported, not reimplemented), evaluate the plume model's predicted concentration at each sounding's exact location, and test two things: (a) Pearson correlation between predicted concentration and observed excess, (b) whether soundings inside the plume's predicted downwind sector (±45°) show significantly higher excess than soundings outside it.
 
 **Results** (`data/plume_maps/spatial_consistency_results.json`):
 
@@ -164,7 +164,7 @@ Full results: `data/q_correction_model_strengthened_results.json`.
 
 ## 12.6 Temporal Q modeling (Phase 4, DONE)
 
-`temporal_q_model.py` splits each facility's already-collected 2020 OCO-3 soundings (all Track B soundings are calendar-year 2020 only, per `process_plant.py`'s hardcoded search range — no new data pull needed) into monthly near/background subsets and reapplies `physics_gaussian.py`'s exact IME formula (imported, not reimplemented) to each month separately, instead of the whole year at once.
+`temporal_q_model.py` splits each facility's already-collected 2020 OCO-3 soundings (all Track B soundings are calendar-year 2020 only, per `process_plant.py`'s hardcoded search range — no new data pull needed) into monthly near/background subsets and reapplies `physics_ime.py`'s exact IME formula (imported, not reimplemented) to each month separately, instead of the whole year at once.
 
 **Coverage is sparse, as expected**: most facilities produce only 1-6 of 12 possible months (the `MIN_NEAR_BG=5` threshold, same as the annual pipeline, excludes months with too few soundings) — a real data-density limitation, not a code defect.
 

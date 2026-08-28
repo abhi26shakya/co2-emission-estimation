@@ -1,5 +1,5 @@
 """
-Unit tests for physics_gaussian.py's pure math and month-stratification
+Unit tests for physics_ime.py's pure math and month-stratification
 logic (the two areas this codebase's own history shows are most likely to
 silently produce a wrong number: the Week 6 wind-averaging bug and the
 ShriSingajiMalwa seasonal-sampling artifact were both bugs in exactly this
@@ -18,7 +18,7 @@ import unittest
 import numpy as np
 
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
-import physics_gaussian as pg
+import physics_ime as pg
 
 
 class TestColumnMassEnhancement(unittest.TestCase):

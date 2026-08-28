@@ -20,7 +20,7 @@ small-N statistical discipline -- no new dependency, no scipy):
   1. For each eligible facility, load its real soundings (lat, lon,
      xco2), restricted to the plume grid's spatial extent (30km).
   2. Compute each sounding's excess over the SAME background definition
-     physics_gaussian.py already uses (NEAR/BG_IN/BG_OUT, imported
+     physics_ime.py already uses (NEAR/BG_IN/BG_OUT, imported
      directly, not reimplemented) -- for consistency with the rest of
      this project's Track B methodology.
   3. Evaluate the plume model's predicted concentration at each
@@ -42,7 +42,7 @@ import json
 import numpy as np
 
 import plume_model as pm
-from physics_gaussian import NEAR, BG_IN, BG_OUT
+from physics_ime import NEAR, BG_IN, BG_OUT
 from build_plume_maps import eligible_facilities
 
 # Same facility list build_plume_maps.py used (every facility with a wind
@@ -64,7 +64,7 @@ def load_and_project_soundings(name, plant_row, extent_km):
     lat, lon, xco2 = d["lat"], d["lon"], d["xco2"]
     plat, plon = plant_row["lat"], plant_row["lon"]
 
-    # Same background definition as physics_gaussian.py, imported not
+    # Same background definition as physics_ime.py, imported not
     # reimplemented, so the "excess" values here are directly comparable
     # to the ones Track B's own IME estimate is built from.
     dist_deg = np.sqrt((lat - plat) ** 2 + (lon - plon) ** 2)
@@ -72,7 +72,7 @@ def load_and_project_soundings(name, plant_row, extent_km):
 
     # Equirectangular local projection -- adequate at this scale (tens of
     # km), consistent with the small-angle approximation implicit in
-    # physics_gaussian.py's degree-based near/background circles.
+    # physics_ime.py's degree-based near/background circles.
     km_per_deg_lon = KM_PER_DEG_LAT * np.cos(np.radians(plat))
     east_km = (lon - plon) * km_per_deg_lon
     north_km = (lat - plat) * KM_PER_DEG_LAT

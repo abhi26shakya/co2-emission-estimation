@@ -7,13 +7,13 @@ experiments 1 (overpass density) and 2 (signal-to-noise) and 3
 (background definition), which were all ruled out as Rihand's specific
 problem. This checks wind-matching quality directly.
 
-physics_gaussian.py's n_wind_days_matched is threshold-gated: a plant
+physics_ime.py's n_wind_days_matched is threshold-gated: a plant
 with 1-2 real per-overpass matches (below MIN_WIND_DAYS_MATCHED=3) still
 reports n_wind_days_matched=0, because the code falls back to the
 annual-mean speed for the whole plant. That masks real variation across
 the 15 (of 24) plants in fallback mode, so this script uses the new
 n_wind_days_raw_matched / wind_days_matched_speeds fields (additive-only
-change to physics_gaussian.py, verified against data/emission_estimates.json
+change to physics_ime.py, verified against data/emission_estimates.json
 before use) to get the real, unthresholded match count and the actual
 per-day speeds those matches found.
 """
@@ -22,7 +22,7 @@ import os
 
 import numpy as np
 
-import physics_gaussian as pg
+import physics_ime as pg
 
 # vindhyachal_soundings.npz is lowercase, unlike every other plant's file
 pg.NPZ_PATHS["Vindhyachal"] = "data/vindhyachal_soundings.npz"

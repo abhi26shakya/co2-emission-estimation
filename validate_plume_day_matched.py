@@ -28,7 +28,7 @@ import numpy as np
 
 from build_plume_maps import eligible_facilities
 from validate_plume_spatial_consistency import sector_significance_check
-from physics_gaussian import NEAR, BG_IN, BG_OUT
+from physics_ime import NEAR, BG_IN, BG_OUT
 
 PLUME_SECTOR_HALF_WIDTH_DEG = 45.0
 KM_PER_DEG_LAT = 111.0

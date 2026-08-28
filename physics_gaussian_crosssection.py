@@ -1,6 +1,6 @@
 """
 Gaussian cross-sectional-flux Q estimator -- an alternate to
-physics_gaussian.py's IME mass-balance method, run on the same OCO-3 XCO2
+physics_ime.py's IME mass-balance method, run on the same OCO-3 XCO2
 soundings. Rather than summing excess mass over a fixed-radius near-plant
 disk and dividing by sqrt(area) (IME's L_eff), this rotates near-plant
 soundings into a downwind(x)/crosswind(y) frame using the plant's
@@ -22,9 +22,9 @@ actual spatial (crosswind) shape and only downwind soundings, instead of a
 direction-agnostic near-plant disk.
 
 Physical constants, background-annulus zones (NEAR/BG_IN/BG_OUT), and
-wind-series caching are reused unchanged from physics_gaussian.py (see
+wind-series caching are reused unchanged from physics_ime.py (see
 CLAUDE.md: never reimplement shared physics). ALPHA (U_eff = ALPHA *
-wind_speed) is kept at the same 0.5 literature value physics_gaussian.py
+wind_speed) is kept at the same 0.5 literature value physics_ime.py
 uses -- the physical justification (10m wind speed vs. deeper
 boundary-layer mixing) applies identically to column data regardless of
 which method computes the flux.
@@ -34,16 +34,16 @@ ANNUAL mean "direction wind blows toward", degrees from north) is used for
 ALL 30 plants uniformly. Per-overpass wind DIRECTION (data/daily_wind/)
 exists for only 18/30 plants, so using it would silently restrict this
 script to a smaller, different plant set than IME's -- the annual mean is
-coarser (physics_gaussian.py's own docstring flags the same coarseness for
+coarser (physics_ime.py's own docstring flags the same coarseness for
 wind SPEED before its per-overpass upgrade) but keeps the comparison over
 all 30 plants directly comparable. Flagged here, not fixed.
 
 Other caveats (kept deliberately simple for a first cut of this method):
   - background is a single unstratified annulus mean, NOT
-    physics_gaussian.py's month-stratified background (_month_stratify_bg)
+    physics_ime.py's month-stratified background (_month_stratify_bg)
   - wind speed uses per-overpass-day matching when >=3 downwind days match
     the cached ERA5 series, else the annual-series mean -- no std/
-    uncertainty term is computed (physics_gaussian.py's three-term sigma is
+    uncertainty term is computed (physics_ime.py's three-term sigma is
     not replicated here)
   - the Gaussian fit pools ALL downwind near-plant soundings for a plant
     into one cross-section, not a true per-overpass or per-downwind-distance
@@ -62,7 +62,7 @@ import numpy as np
 from scipy.optimize import curve_fit
 
 import baseline_capacity as bc
-import physics_gaussian as pg
+import physics_ime as pg
 
 MIN_DOWNWIND = 8             # min downwind soundings to attempt a fit
 M_PER_DEG_LAT = 111320.0
@@ -182,7 +182,7 @@ def fit_plant(name, plant_row, wind_series):
 
     # wind speed: per-overpass mean over the matched downwind days when
     # available (>=3 matches), else the full annual series mean -- same
-    # fallback structure as physics_gaussian.py, without its std term
+    # fallback structure as physics_ime.py, without its std term
     if has_days and wind_series:
         uniq_days = np.unique(day_near[downwind])
         matched = np.array(

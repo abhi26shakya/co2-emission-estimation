@@ -11,7 +11,7 @@ import plotly.express as px
 import pydeck as pdk
 import streamlit as st
 
-from physics_gaussian import NEAR, BG_IN, BG_OUT
+from physics_ime import NEAR, BG_IN, BG_OUT
 
 DATA = "data"
 DEFAULT_HIGHLIGHTS = ["Vindhyachal", "Rihand"]
@@ -92,7 +92,7 @@ def load_data():
 @st.cache_data
 def load_soundings(plant_name):
     """Per-plant OCO-3 lat/lon/xco2 point cloud, classified into the same
-    near-plant / background zones physics_gaussian.py's IME calculation
+    near-plant / background zones physics_ime.py's IME calculation
     uses (NEAR, BG_IN, BG_OUT), so the map matches what the estimate does."""
     try:
         d = np.load(f"{DATA}/{plant_name}_soundings.npz")
@@ -200,7 +200,7 @@ if soundings is None:
 else:
     st.caption(
         f"{len(soundings)} OCO-3 soundings. Near-plant zone (< {NEAR} deg) and background "
-        f"annulus ({BG_IN}-{BG_OUT} deg) are the same zones physics_gaussian.py's IME "
+        f"annulus ({BG_IN}-{BG_OUT} deg) are the same zones physics_ime.py's IME "
         "calculation uses -- this is what the Q estimate is actually computed from."
     )
     layer_choice = st.radio("Layer", ["Heatmap", "Grid"], horizontal=True)

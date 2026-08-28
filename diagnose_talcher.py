@@ -1,5 +1,5 @@
 """
-Diagnose why Talcher's IME emission-rate estimate (physics_gaussian.py,
+Diagnose why Talcher's IME emission-rate estimate (physics_ime.py,
 7.16M +/- 1.65M t/yr) undershoots its Climate TRACE benchmark (14.24M t/yr,
 2021) despite having the tightest, most confident uncertainty band (+/-20%)
 of any plant processed this session -- the "tight interval, but wrong" case
@@ -13,7 +13,7 @@ Reproduces the ad hoc investigation done interactively:
    (signal-to-noise), unlike a well-bracketed plant (Rihand, used as the
    comparison case throughout).
 4. Directly tests sensitivity of the IME estimate to the background-annulus
-   definition -- physics_gaussian.py's docstring already states the
+   definition -- physics_ime.py's docstring already states the
    reported sigma does NOT cover background-subtraction structural
    uncertainty, and this script quantifies how large that gap actually is
    for Talcher vs. a robust plant.
@@ -58,7 +58,7 @@ def near_bg_stats(name, plant_row, bg_in=BG_IN, bg_out=BG_OUT, near_r=NEAR):
 
 def bg_definition_sensitivity(name, plant_row, near_r=NEAR):
     """IME's sensitivity to the background-annulus boundaries -- a proxy
-    for the structural uncertainty physics_gaussian.py's docstring says
+    for the structural uncertainty physics_ime.py's docstring says
     its reported sigma does NOT include."""
     d = np.load(f"data/{name}_soundings.npz")
     lat, lon, xco2 = d["lat"], d["lon"], d["xco2"]
@@ -164,7 +164,7 @@ def main():
             "and only ~half of near-plant soundings exceed background at all -- a "
             "near coin-flip. The IME estimate is correspondingly far more sensitive "
             "to the background-annulus definition than a robust plant's. "
-            "physics_gaussian.py's reported q_rel_std does not include this "
+            "physics_ime.py's reported q_rel_std does not include this "
             "background-definition structural uncertainty, so the tight (+/-20%) "
             "interval understates the real uncertainty for this specific plant. "
             "The 2020-vs-2021 year offset (Climate TRACE has no 2020 asset data) "

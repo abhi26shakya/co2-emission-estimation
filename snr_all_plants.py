@@ -24,7 +24,7 @@ matplotlib.use("Agg")
 import matplotlib.pyplot as plt
 import numpy as np
 
-import physics_gaussian as pg
+import physics_ime as pg
 from diagnose_talcher import near_bg_stats
 
 # vindhyachal_soundings.npz is lowercase, unlike every other plant's file

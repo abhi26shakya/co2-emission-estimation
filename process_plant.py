@@ -103,7 +103,7 @@ for i in range(start_i, len(results)):
         xco2, qf = ds["xco2"].values, ds["xco2_quality_flag"].values
         # sounding_id encodes YYYYMMDDHHMMSSmm; integer-divide down to YYYYMMDD
         # so each sounding can later be matched to that day's ERA5 wind speed
-        # (per-overpass wind conditioning, see physics_gaussian.py).
+        # (per-overpass wind conditioning, see physics_ime.py).
         day = (ds["sounding_id"].values // 10**8).astype(np.int64)
         ds.close(); os.remove(f)
         m = (qf==0)&np.isfinite(xco2)& \

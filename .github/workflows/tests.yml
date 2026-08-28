@@ -5,7 +5,7 @@ name: tests
 # flagged: "A basic test suite ... was also added ... but it has no CI
 # wired up." Deliberately installs only numpy + a CPU-only torch build,
 # not the full requirements.txt -- none of the tested modules
-# (physics_gaussian.py, plume_model.py, build_3channel.py,
+# (physics_ime.py, plume_model.py, build_3channel.py,
 # lofo_track_a.py) import earthaccess/geemap/xarray/earthengine-api at
 # module level (verified by grepping their top-level imports), and those
 # packages are unnecessary weight/fragility for a suite that, per

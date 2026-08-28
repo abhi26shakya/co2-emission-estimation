@@ -4,7 +4,7 @@ plume model that spatially distributes each plant's Track B mass-balance
 emission rate (Q) into a ground-level concentration field -- the spatial
 "hotspot map" capability this project did not previously have (see
 NOVEL_METHODOLOGY_PROPOSAL.md Sec 1 for the gap analysis: despite the
-filename, physics_gaussian.py contains no actual 2D dispersion equation,
+filename, physics_ime.py contains no actual 2D dispersion equation,
 only a scalar near/background mass-balance split).
 
 Standard, citable physics, newly applied in this project:

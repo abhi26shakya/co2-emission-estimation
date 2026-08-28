@@ -12,7 +12,7 @@ These are unit tests for the deterministic, pure-function building blocks
 of Track A/Track B, not end-to-end integration tests — nothing here touches
 Earth Engine, OCO-3 downloads, or the real `data/` directory.
 
-- `test_physics_gaussian.py` — the IME mass-balance math and the
+- `test_physics_ime.py` — the IME mass-balance math and the
   month-stratification logic added to fix the ShriSingajiMalwa
   seasonal-sampling artifact.
 - `test_build_3channel.py` — NO2/SO2/VIIRS tile pairing, gap-filling, and
@@ -26,7 +26,7 @@ Earth Engine, OCO-3 downloads, or the real `data/` directory.
 Anything requiring network access (Earth Engine, `earthaccess`), GPU/CPU
 model training end-to-end, or real satellite data — those are exercised by
 actually running the pipeline scripts, not by this test suite. Run them
-manually before trusting a change to `physics_gaussian.py`,
+manually before trusting a change to `physics_ime.py`,
 `build_3channel.py`, or the LOFO harnesses.
 
 ## CI

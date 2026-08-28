@@ -1,4 +1,8 @@
 """
+This implements IME (Integrated Mass Enhancement), not a classic Gaussian
+plume fit. See physics_gaussian_crosssection.py for Nassar's original
+cross-section Gaussian method.
+
 Emission-rate estimate from OCO-3 column-CO2 enhancement via the Integrated
 Mass Enhancement (IME) method -- the standard way to turn a satellite CO2/CH4
 plume into an emission rate (Varon et al. 2018 for CH4; the same mass-balance

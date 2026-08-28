@@ -7,7 +7,7 @@ pulled until roadmap step 6, and RESEARCH_PLAN.md Sec 7 says it must not be
 used as a training label anyway) to a question we CAN answer with data
 already on hand: does the activity signal (extract_activity_signal.py) or
 the wind/CO2 alignment check (process_plant.py) predict how large physics'
-own self-reported relative uncertainty (q_rel_std, from physics_gaussian.py)
+own self-reported relative uncertainty (q_rel_std, from physics_ime.py)
 turns out to be?
 
 This is not circular: q_rel_std = hypot(wind_rel_std, ime_rel_std) is
@@ -19,7 +19,7 @@ would validate whether wind/CO2 misalignment (already flagged qualitatively
 for ChandrapurCoal/Rihand) is quantitatively informative beyond what
 wind_rel_std alone already captures.
 
-N=17 as of the 20-facility expansion (only plants with a physics_gaussian.py
+N=17 as of the 20-facility expansion (only plants with a physics_ime.py
 estimate; Mundra, Sipat, and Simhadri are excluded, all three skipped for
 having 0 near-plant soundings after the near/bg split -- a genuine OCO-3
 coverage gap, not something re-running fixes). Originally N=7 when this

@@ -1,12 +1,12 @@
 """
-One-off runner: apply physics_gaussian.py's IME emission-rate estimate to
+One-off runner: apply physics_ime.py's IME emission-rate estimate to
 just the 9 newly-added candidate facilities (Lalitpur, Akaltara, Bellary,
 Dadri(Nctpp), KGudemNew, Pryagraj(Bara), Raichur, RayalSeema, Sagardighi),
 merging into the existing data/emission_estimates.json rather than
 recomputing (and re-fetching ERA5 wind for) all 30 candidates.
 """
 import json
-from physics_gaussian import estimate_emission_rate, _fetch_wind_series
+from physics_ime import estimate_emission_rate, _fetch_wind_series
 
 NEW9 = [
     "Lalitpur", "Akaltara", "Bellary", "Dadri(Nctpp)", "KGudemNew",

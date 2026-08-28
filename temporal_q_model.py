@@ -1,12 +1,12 @@
 """
 Phase 4 of NOVEL_METHODOLOGY_PROPOSAL.md: a monthly CO2 emission-rate time
-series per facility, instead of physics_gaussian.py's single annual
+series per facility, instead of physics_ime.py's single annual
 scalar. All Track B OCO-3 soundings are from calendar year 2020 only
 (process_plant.py's search is hardcoded temporal=("2020-01-01",
 "2020-12-31")), so this is a genuine 12-point monthly split of already-
 collected data, not a new pull.
 
-Reuses physics_gaussian.py's exact IME math (_ime_kg, _month_of_day,
+Reuses physics_ime.py's exact IME math (_ime_kg, _month_of_day,
 NEAR/BG_IN/BG_OUT/ALPHA/FOOTPRINT_AREA_M2/SEC_PER_YEAR, imported not
 reimplemented) applied to each calendar month's near/background soundings
 separately, instead of the full year at once.
@@ -22,16 +22,16 @@ Explicit, documented simplifications (not hidden):
     fixed annual wind factor," not as fully independent monthly
     estimates with their own wind conditioning.
   - Uncertainty: only the IME-sampling term (_bootstrap_ime_rel_std) is
-    computed per month, not the full 3-term budget physics_gaussian.py
+    computed per month, not the full 3-term budget physics_ime.py
     uses annually -- background-definition sensitivity and wind
     uncertainty are not recomputed monthly here.
   - Months with fewer than 5 near-plant or 5 background soundings are
-    skipped (same MIN threshold physics_gaussian.py uses annually), which
+    skipped (same MIN threshold physics_ime.py uses annually), which
     is common for smaller facilities -- expect sparse monthly coverage,
     not a full 12-point series, for most facilities.
 
 Cross-check included: does the mean of a facility's available monthly Q
-values roughly track its existing annual Q from physics_gaussian.py? This
+values roughly track its existing annual Q from physics_ime.py? This
 is an internal-consistency sanity check on the monthly code path itself,
 not a validation against independent ground truth.
 
@@ -57,7 +57,7 @@ import json
 import numpy as np
 
 from build_plume_maps import eligible_facilities
-from physics_gaussian import (NEAR, BG_IN, BG_OUT, ALPHA, SEC_PER_YEAR,
+from physics_ime import (NEAR, BG_IN, BG_OUT, ALPHA, SEC_PER_YEAR,
                                FOOTPRINT_AREA_M2, _ime_kg, _bootstrap_ime_rel_std, _month_of_day)
 
 MIN_NEAR_BG = 5

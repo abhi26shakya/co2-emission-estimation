@@ -165,7 +165,7 @@ def main():
         f"seasonal-sampling-imbalance artifact. This resolves the anomaly: it was not a real "
         f"negative CO2 signal, a pipeline bug, or evidence against the plant emitting -- it "
         f"was two systematically different seasons being averaged together and compared as "
-        f"if they were the same background. physics_gaussian.py's IME calculation does not "
+        f"if they were the same background. physics_ime.py's IME calculation does not "
         f"currently stratify near/background comparisons by month, so this failure mode "
         f"could in principle recur for any facility with uneven near/background month "
         f"coverage, not just this one."

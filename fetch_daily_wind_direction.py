@@ -5,7 +5,7 @@ sounding against the actual wind direction on ITS OWN overpass day,
 instead of one annual/overpass-averaged direction applied to every
 sounding regardless of date.
 
-physics_gaussian.py's _fetch_wind_series() already pulls this exact same
+physics_ime.py's _fetch_wind_series() already pulls this exact same
 ERA5 collection (ECMWF/ERA5/DAILY) per day, but only keeps the SPEED
 (hypot(u,v)) -- direction is computed nowhere per-day in this codebase;
 process_plant.py's existing wind_deg is a single ANNUAL mean, not

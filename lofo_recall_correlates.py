@@ -3,7 +3,7 @@ Follow-up to lofo_track_a.py: what distinguishes the facilities Track A's
 detector generalizes to (recall~1.0 when held out) from the ones it
 doesn't (recall~0.0)? Same single-feature-LOO-CV approach as
 reliability_model.py, applied to a different target: per-facility LOFO
-recall instead of physics_gaussian.py's q_rel_std.
+recall instead of physics_ime.py's q_rel_std.
 
 Mundra has two units in data/top5_plants.csv (MUNDRA_TPP, MUNDRA_UMPP) and
 therefore two rows in lofo_track_a.py's per-facility results, but only one
@@ -13,7 +13,7 @@ into a single "Mundra" row before joining features, tile-count-weighted.
 
 N=20 (every Track B facility has a LOFO recall, plant_results.json
 features, and an activity signal -- unlike reliability_model.py's N=17,
-nothing here depends on physics_gaussian.py's OCO-3-derived estimate).
+nothing here depends on physics_ime.py's OCO-3-derived estimate).
 """
 import json
 import numpy as np
@@ -73,7 +73,7 @@ corrs = {}
 for feat in candidate_features:
     x = df[feat].values
     # pairwise deletion: co2_enhancement_ppm is null for 3 facilities
-    # physics_gaussian.py excluded (Mundra, Simhadri, Sipat -- 0 near-plant
+    # physics_ime.py excluded (Mundra, Simhadri, Sipat -- 0 near-plant
     # soundings), which would otherwise propagate to a silent NaN correlation
     valid = ~np.isnan(x)
     n_valid = int(valid.sum())

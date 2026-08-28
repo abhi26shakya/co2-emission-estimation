@@ -37,7 +37,7 @@ WEEK 9 — DONE (facility-set expansion for Track B)
   ~0.002 deg of their old hardcoded values (rounding only, no effective
   change to near/background sounding membership).
 
-- physics_gaussian.py: removed the stale NPZ_PATHS override
+- physics_ime.py: removed the stale NPZ_PATHS override
   ({"Vindhyachal": "data/vindhyachal_soundings.npz"}), a leftover from
   before the estimate loop was generalized to read data/plant_results.json
   directly -- the actual file is data/Vindhyachal_soundings.npz, so the
@@ -67,7 +67,7 @@ WEEK 9 — DONE (facility-set expansion for Track B)
   Sipat      1 hit-day, 63 soundings, NaN enhancement (all 63 soundings
              landed in the near-plant radius, none in the background
              annulus, so bg.mean() was undefined), NO2 peak 55km away,
-             wind/CO2 offset diff 101 deg -> skipped by physics_gaussian.py
+             wind/CO2 offset diff 101 deg -> skipped by physics_ime.py
              (near=0 after the near/bg split used there). Effectively
              unusable, same outcome class as Mundra.
 
@@ -85,7 +85,7 @@ WEEK 9 — DONE (facility-set expansion for Track B)
              17km away, wind/CO2 offset diff 80 deg (moderate) ->
              Q = 31.66M +/- 21.43M t/yr [10.23M, 53.09M]
 
-- Full 9-plant emission_estimates.json after physics_gaussian.py rerun:
+- Full 9-plant emission_estimates.json after physics_ime.py rerun:
   Sasan 39.96M +/- 17.90M, Tirora 3.22M +/- 1.70M, Vindhyachal 36.87M +/-
   21.95M (all three unchanged from Week 8 -- confirms the registry
   generalization didn't perturb the original 4 plants' results), plus the
@@ -142,7 +142,7 @@ extracting an activity signal from the existing trained 3-channel CNN
 (A1-A5 ablation ladder in RESEARCH_PLAN.md Sec 9) that fuses that signal
 into Track B's physics-only estimate -- not started this week.
 
-Files changed: pick_plants.py, process_plant.py, physics_gaussian.py,
+Files changed: pick_plants.py, process_plant.py, physics_ime.py,
 check_coverage.py (new), data/candidate_plants.csv (new),
 data/candidate_coverage.json (new), data/plant_results.json,
 data/emission_estimates.json, data/Talcher_soundings.npz,

@@ -43,7 +43,7 @@ summary_figure.py / evaluation_figures.py   # summary figures
 
 ## Track B: CO2 emission estimation — current state
 
-All 20 committed candidate plants processed; 17–18 produce a usable `physics_gaussian.py` estimate (a few excluded for a genuine 0-near-sounding OCO-3 coverage gap). The IME (Integrated Mass Enhancement) pipeline now uses per-overpass wind conditioning, a three-term uncertainty budget (wind, IME-sampling, background-definition sensitivity), and month-stratifies its near/background comparison (fixing a real seasonal-sampling-bias bug found via a facility with spuriously negative CO2 enhancement).
+All 20 committed candidate plants processed; 17–18 produce a usable `physics_ime.py` estimate (a few excluded for a genuine 0-near-sounding OCO-3 coverage gap). The IME (Integrated Mass Enhancement) pipeline now uses per-overpass wind conditioning, a three-term uncertainty budget (wind, IME-sampling, background-definition sensitivity), and month-stratifies its near/background comparison (fixing a real seasonal-sampling-bias bug found via a facility with spuriously negative CO2 enhancement).
 
 **Benchmarked against two independent references**, which measure different things:
 - **Climate TRACE** (satellite-thermal-proxy inferred, itself unvalidated for India) — 35.3% of estimates fall within their own stated uncertainty interval.
@@ -55,7 +55,7 @@ process_plant.py <PlantName>   # end-to-end: OCO-3 scan, NO2 co-location, wind c
 co2_enhancement.py             # near-plant vs background XCO2 enhancement (single plant, from saved soundings)
 co2_no2_colocation.py          # NO2 heatmap + CO2 soundings overlay
 wind_check.py                  # wind-direction vs high-CO2-offset alignment check
-physics_gaussian.py            # IME mass-balance emission-rate estimate (t CO2/yr), per-overpass wind + 3-term uncertainty + month-stratified background
+physics_ime.py            # IME mass-balance emission-rate estimate (t CO2/yr), per-overpass wind + 3-term uncertainty + month-stratified background
 reliability_model.py           # does activity signal / wind alignment predict physics's own uncertainty?
 track_fusion_model.py          # self-consistency Track A/B fusion attempt (tested negative, kept for the record)
 
@@ -93,7 +93,7 @@ OCO-3 sounding download additionally requires a NASA Earthdata login (`earthacce
 
 ## Testing
 
-A basic test suite exists (`tests/`, 37 stdlib-`unittest` tests, no extra dependency) covering the pipeline's most bug-prone deterministic logic — `physics_gaussian.py`'s IME math and month-stratification, `build_3channel.py`'s tile pairing, `lofo_track_a.py`'s facility fold-splitting, and `plume_model.py`'s Gaussian-plume physics. Run with:
+A basic test suite exists (`tests/`, 37 stdlib-`unittest` tests, no extra dependency) covering the pipeline's most bug-prone deterministic logic — `physics_ime.py`'s IME math and month-stratification, `build_3channel.py`'s tile pairing, `lofo_track_a.py`'s facility fold-splitting, and `plume_model.py`'s Gaussian-plume physics. Run with:
 
 ```
 python -m unittest discover -s tests -v
@@ -140,7 +140,7 @@ All tiles originally covered the 2019–2020 window, for 5 Indian coal plants (`
 
 ### Original results (4 plants, Week 6)
 
-Results across the 4 originally-processed plants (Vindhyachal, Sasan, Mundra, Tirora) are in `data/plant_results.json` (now holds 20). Emission-rate estimates (Week 6, `physics_gaussian.py`) originally in `data/emission_estimates.json`: Vindhyachal 44.6 Mt/yr and Sasan 37.2 Mt/yr landed in the physically expected range for large baseload coal plants, a sanity check on the method's magnitude. Tirora's estimate (3.2 Mt/yr) looked too low relative to its capacity, most likely due to thin OCO-3 coverage (5 hit-days / 671 soundings). Mundra was skipped entirely (only 57 soundings total). See `WEEK6_LOG.txt` for the full original writeup, including a wind-speed bug found and fixed during that work — since further corrected (per-overpass wind, month-stratified background) and validated against real ground truth, per the current-state Track B section above.
+Results across the 4 originally-processed plants (Vindhyachal, Sasan, Mundra, Tirora) are in `data/plant_results.json` (now holds 20). Emission-rate estimates (Week 6, `physics_ime.py`) originally in `data/emission_estimates.json`: Vindhyachal 44.6 Mt/yr and Sasan 37.2 Mt/yr landed in the physically expected range for large baseload coal plants, a sanity check on the method's magnitude. Tirora's estimate (3.2 Mt/yr) looked too low relative to its capacity, most likely due to thin OCO-3 coverage (5 hit-days / 671 soundings). Mundra was skipped entirely (only 57 soundings total). See `WEEK6_LOG.txt` for the full original writeup, including a wind-speed bug found and fixed during that work — since further corrected (per-overpass wind, month-stratified background) and validated against real ground truth, per the current-state Track B section above.
 
 </details>
 

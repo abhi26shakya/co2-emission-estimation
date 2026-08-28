@@ -11,7 +11,7 @@
 # that imports them -- process_plant.py, and any oco_*.py script that
 # touches OCO-3 downloads -- will ImportError under it. Track A/Track B
 # analysis scripts that only need numpy/torch/pandas/ee (e.g.
-# physics_gaussian.py, lofo_track_a.py, track_fusion_model.py) happen to
+# physics_ime.py, lofo_track_a.py, track_fusion_model.py) happen to
 # work under either environment, which is how this went unnoticed. Always
 # run this project with /opt/miniconda3/envs/co2/bin/python (or `conda
 # activate co2` from an interactive shell where conda init has actually
