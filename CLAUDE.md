@@ -125,6 +125,33 @@ was not the fixable half of §5.2.8's negative result — the weakness is
 more fundamental, most likely OCO-3's sparse sampling itself. See
 WEEK18_LOG.txt.
 
+## Week 20: Track B DL architecture, stage 1 — synthetic training-pair
+## generator built; area-averaging fix verified but does not close the
+## realism gap (negative result)
+Built simulate_training_pairs.py: this project's Track B never built the
+blueprint's (4ypblueprint.pdf) recommended U-Net -> CNN DL architecture
+(Paper 2, Dumont Le Brazidec 2024) — Track B is pure physics
+(physics_ime.py / physics_gaussian_crosssection.py). This script
+generates synthetic (XCO2 tile, plume mask, true Q) training pairs for
+that U-Net's stage 1, reusing plume_model.py as the simulation engine
+(no external transport model), on a 60km/64px grid matching Track A's
+export_facility_tiles.py resolution. Real-data-derived sampling ranges,
+a documented H_PBL_M=800m boundary-layer assumption to convert ground
+concentration to column ppm, and per-pixel 5x5 area-averaging (rather
+than point-sampling pixel centers) are all implemented and unit-tested
+(55/55 tests pass).
+VERDICT (negative result): area-averaging is verified correct (converges
+with subgrid density, not a discretization artifact) and measurably
+improves peak-enhancement realism (max cut from 282.7 to 130.7 ppm across
+600 tiles) but does NOT close the gap to the real observed range
+(-1.28 to 3.70 ppm, N=24) — even the median simulated tile (4.65 ppm)
+exceeds the real max. Root cause traced to physics_ime.py's own known
+Q-accuracy limitations (Week 12-13: median bias 0.69x, Rihand +134%),
+not a simulator bug — Rihand's real (Q, wind) pair is itself close to
+the synthetic "worst case." The U-Net was NOT started this session per
+explicit instruction: Task 2 was not genuinely verified as producing a
+realistic full distribution. See WEEK20_LOG.txt.
+
 ## Hard rules
 - Never use Climate TRACE as a training label. Benchmark only.
 - Never split train/test at tile level. Split by facility (see train_3channel.py).

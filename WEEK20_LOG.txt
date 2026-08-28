@@ -1,0 +1,164 @@
+WEEK 20 -- task 1: build simulate_training_pairs.py, the Track B U-Net's
+                   synthetic (XCO2 tile, plume mask, true Q) training-pair
+                   generator (never built -- Track B ended up pure
+                   physics); task 2: implement and verify per-pixel
+                   area-averaging, the fix targeted at last session's
+                   unresolved unrealistic-peak-tail issue (NEGATIVE RESULT:
+                   verified improvement, does not fully close the gap;
+                   deeper root cause diagnosed and reported)
+
+TASK 1: simulate_training_pairs.py
+====================================
+
+Blueprint context: 4ypblueprint.pdf's recommended Track B DL quantification
+architecture (Paper 2, Dumont Le Brazidec 2024 -- U-Net segmentation ->
+CNN regression, MC-dropout uncertainty, physics-guided loss) was never
+built in this project. Track B ended up pure physics (physics_ime.py /
+physics_gaussian_crosssection.py) and Track A's CNN is detection-only.
+Stage 1 of that architecture needs labeled (XCO2 tile, plume mask, true Q)
+training pairs, and no real labeled dataset exists at this project's
+scale -- the same reason SMARTCARB used a transport model instead of real
+labels.
+
+simulate_training_pairs.py generates these synthetically, reusing
+plume_model.py (this project's own validated Briggs/Pasquill-Gifford
+Gaussian plume physics) as the simulation engine -- no external transport
+model imported. Pipeline: sample (Q, wind speed, wind direction, stability
+class, stack height) per tile from ranges drawn from this project's own
+real data (data/emission_estimates.json, data/plant_results.json) ->
+evaluate the plume physics on a 60km/64px grid matching Track A's actual
+export_facility_tiles.py convention (~937.5 m/px, NOT an arbitrary finer
+grid) -> convert ground-level concentration (kg/m^3) to column XCO2
+enhancement (ppm) via an explicit H_PBL_M=800m boundary-layer-height
+assumption, then inverting physics_ime.py's own column_mass_enhancement()
+-> add 415ppm background + 0.8ppm sounding noise (matches plant_results.json's
+real bg_std_ppm scale) -> apply randomized rectangular cloud-gap masking
+(15-55% NaN per tile, a simplification -- real cloud fields aren't
+rectangles, flagged not hidden) -> save both positive (plume) and negative
+(background-only) tiles.
+
+Three known issues, already found and fixed in a prior debugging pass,
+implemented directly here:
+
+  BUG 1 (near-field singularity): plume_model.ground_level_concentration()'s
+  own guard (x_safe = np.where(x_m > 1.0, x_m, 1.0)) only prevents a
+  literal div-by-zero, not the unrealistic spike within the first few tens
+  of meters of the source (sigma_y/sigma_z are still ~0 at x=1m). Fixed by
+  NOT calling plume_model.plume_grid() -- this script recomputes the
+  downwind/crosswind rotation locally (same formula as plume_model.py's
+  own module docstring), clips downwind_x to max(3*H_m, 300) before
+  evaluating concentration, and zeroes true-upwind pixels (downwind_x<=0).
+  This same latent gap likely exists in build_plume_maps.py -- flagged as
+  a possible follow-up, NOT modified here (paper-facing figures, out of
+  scope).
+
+  BUG 2 (wind-speed floor): sampling down to 0.5 m/s produced near-calm
+  1/U-singularity outliers. The real per-overpass wind estimates in
+  data/emission_estimates.json never go below 1.226 m/s across all 24
+  facilities -- WIND_SPEED_RANGE floors at 1.2 m/s, justified by that real
+  data.
+
+  BUG 3 (resolution mismatch): tile pixel size fixed at SIZE_KM=60, PX=64
+  (~937.5m/px) to match export_facility_tiles.py, not a finer arbitrary
+  grid (which would under-sample the spatial averaging real satellite
+  pixels naturally provide).
+
+Verification: 55/55 tests pass (tests/test_simulate_training_pairs.py,
+9 new tests, plus the existing 46). Script runs end-to-end, writes
+data/simulated_train/simulated_tiles.npz (600 positive + 300 negative
+tiles, masks, q_t_per_year) and simulated_tiles_meta.json (per-sample
+params + calibration report).
+
+TASK 2: per-pixel area-averaging -- verified improvement, tail NOT resolved
+==============================================================================
+
+Problem carried over from the prior debugging pass: point-sampling the
+analytic concentration function at each pixel's center produces a
+realistic median tile but an unrealistic high tail (point-sampling misses
+the spatial averaging a real satellite footprint naturally provides).
+Fix implemented: area_averaged_concentration_kg_m3() evaluates each
+pixel on a 5x5 subgrid spanning its own ~937.5m footprint and averages,
+rather than sampling once at the pixel center (Task 2's "real fix").
+
+Step 1 -- confirm it's not a discretization artifact: reran the
+worst-case parameter combo (max real Q=4.9e7 t/yr, min real wind=1.2 m/s,
+stability A, stack=150m) at increasing subgrid density:
+
+  N=1 (point sample):  60.4 ppm
+  N=3:                 87.3 ppm
+  N=5 (used):          92.0 ppm
+  N=9:                 92.8 ppm
+  N=15:                92.8 ppm
+  N=25:                92.8 ppm
+
+Converges cleanly by N=9 -- area-averaging is implemented correctly and is
+NOT itself introducing noise or instability. (Note it converges to a
+HIGHER value than the single-point sample here, not lower -- averaging
+over the pixel picks up more of the near-peak region than the arbitrary
+point-sample location did. Area-averaging is a correctness fix for how a
+satellite footprint is sampled, not a mechanism that is guaranteed to
+suppress peaks.)
+
+Step 2 -- measure the actual effect on the full distribution, point
+sampling (N=1) vs area-averaging (N=5), 600 positive tiles, same seed=42:
+
+                  min    p10    median   mean    p90     p99     max
+  point (N=1):   0.215  0.868   5.741   18.839  53.663  140.907  282.716
+  area-avg (N=5): 0.245  0.659   4.654   13.292  39.129   80.888  130.739
+
+Real reference range (data/plant_results.json co2_enhancement_ppm, N=24):
+  -1.277 to 3.698 ppm.
+
+Area-averaging DOES help substantially and consistently across the whole
+distribution (max cut by more than half, p99 cut by ~43%, mean cut by
+~29%) -- this is a real, verified improvement, not noise. But it does
+NOT fix the tail to the standard set for this task: even the MEDIAN tile
+(4.65 ppm) already exceeds the real observed maximum (3.70 ppm) across
+all 24 facilities, and only 44.7% of positive tiles land within the real
+range at all. Per this project's convention (WEEK13_LOG.txt's Rihand
+investigation), this is reported as an honest partial/negative result
+rather than force-fit with another parameter patch.
+
+Root cause, diagnosed rather than guessed: this is NOT the independent-
+parameter-sampling artifact it might look like (i.e. pairing an
+unrealistically-high Q with an unrealistically-low wind speed that never
+co-occurs in reality). Checked directly against data/emission_estimates.json:
+Rihand -- a REAL facility already flagged in this project's own history
+(Week 13) as a poorly-explained physics outlier -- has Q=4.835e7 t/yr
+(the actual dataset maximum) and wind=1.294 m/s (near the actual dataset
+minimum, 1.226), i.e. almost exactly the "worst case" combination used in
+the Step-1 convergence check above. corr(Q, wind speed) across all 24
+facilities is only -0.34 -- not a co-occurrence artifact.
+
+So the real cause is more fundamental: physics_ime.py's Q is a mass-
+balance estimate, derived by INTEGRATING XCO2 excess over a wide
+near-plant zone (NEAR=0.25 of plume length) against a background annulus
+much farther out -- it represents a total downwind flux, not a
+point-source stack-top emission rate in the sense a forward Gaussian
+plume equation expects at near-field range. Plugging that same Q back
+into plume_model's near-field Gaussian formula (evaluated within ~300m-1km
+of the stack, which is exactly what a 937.5m pixel near the plant
+necessarily samples) reproduces the ORIGINAL problem this project already
+found with the raw IME estimates: they are frequently overestimates
+(Week 12: median bias 0.69x, r(log) 0.236 vs CEA; Rihand specifically at
++134%) -- and a forward near-field simulation using an already-inflated Q
+naturally produces implausibly high near-source concentrations. This is
+consistent with, not independent of, this project's existing Track B
+accuracy findings; it is not a new bug in the simulator.
+
+VERDICT: Task 2's area-averaging fix is implemented correctly and
+verified to meaningfully improve tile realism, but does not close the gap
+to a fully realistic peak-enhancement distribution -- the residual tail
+traces back to physics_ime.py's own known Q-accuracy limitations
+(documented since Week 12-13), not to a fixable simulator artifact.
+Per the explicit instruction for this task, the U-Net (stage 1 of the
+blueprint's Paper 2 architecture) is NOT started this session -- Task 2
+is not "genuinely verified" as producing a realistic full distribution,
+only genuinely verified as an improvement with a diagnosed, reported
+limitation. Candidate next steps for a future session (not started):
+(a) train the U-Net on this data anyway but explicitly note the label
+distribution shift as a caveat, (b) cap simulated Q at a value informed
+by CEA ground truth rather than raw IME estimates (would directly test
+whether Q-accuracy, not simulation mechanics, is the real constraint),
+(c) revisit whether a near-field exclusion larger than 3*stack-height is
+physically justified given how IME's Q is actually defined.
