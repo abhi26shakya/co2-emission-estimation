@@ -1,0 +1,802 @@
+{
+  "grid_resolution_deg": 0.5,
+  "margin_deg": 1.0,
+  "bounding_box": {
+    "lat_min": 13.5,
+    "lat_max": 31.0,
+    "lon_min": 68.5,
+    "lon_max": 89.5
+  },
+  "n_soundings_min_required": 3,
+  "note": "Cells with fewer than n_soundings_min_required soundings are masked (excluded from `cells` below and shown as NaN/blank in the PNG), identically to empty cells -- a per-cell mean from 1-2 soundings is not trustworthy enough to report. This floor is a deliberate choice, not a silent default.",
+  "n_plants": 30,
+  "n_soundings_pooled": 52898,
+  "n_soundings_used_in_bbox": 52898,
+  "n_soundings_outside_bbox": 0,
+  "n_cells_total": 1470,
+  "n_cells_with_data": 130,
+  "n_cells_masked_sparse_1_to_min_minus_1": 9,
+  "n_cells_empty": 1331,
+  "cells": [
+    {
+      "lat_bin_center": 14.25,
+      "lon_bin_center": 78.25,
+      "mean_xco2_ppm": 411.8618,
+      "n_soundings": 171
+    },
+    {
+      "lat_bin_center": 14.25,
+      "lon_bin_center": 78.75,
+      "mean_xco2_ppm": 413.6087,
+      "n_soundings": 144
+    },
+    {
+      "lat_bin_center": 14.75,
+      "lon_bin_center": 78.25,
+      "mean_xco2_ppm": 411.7718,
+      "n_soundings": 55
+    },
+    {
+      "lat_bin_center": 14.75,
+      "lon_bin_center": 78.75,
+      "mean_xco2_ppm": 413.2185,
+      "n_soundings": 140
+    },
+    {
+      "lat_bin_center": 15.25,
+      "lon_bin_center": 78.25,
+      "mean_xco2_ppm": 414.1844,
+      "n_soundings": 21
+    },
+    {
+      "lat_bin_center": 15.25,
+      "lon_bin_center": 78.75,
+      "mean_xco2_ppm": 412.7599,
+      "n_soundings": 58
+    },
+    {
+      "lat_bin_center": 15.75,
+      "lon_bin_center": 77.25,
+      "mean_xco2_ppm": 412.5765,
+      "n_soundings": 5
+    },
+    {
+      "lat_bin_center": 16.25,
+      "lon_bin_center": 75.75,
+      "mean_xco2_ppm": 415.6004,
+      "n_soundings": 32
+    },
+    {
+      "lat_bin_center": 16.25,
+      "lon_bin_center": 76.25,
+      "mean_xco2_ppm": 415.5169,
+      "n_soundings": 46
+    },
+    {
+      "lat_bin_center": 16.25,
+      "lon_bin_center": 76.75,
+      "mean_xco2_ppm": 411.8846,
+      "n_soundings": 75
+    },
+    {
+      "lat_bin_center": 16.25,
+      "lon_bin_center": 77.25,
+      "mean_xco2_ppm": 412.5654,
+      "n_soundings": 31
+    },
+    {
+      "lat_bin_center": 16.25,
+      "lon_bin_center": 77.75,
+      "mean_xco2_ppm": 413.589,
+      "n_soundings": 107
+    },
+    {
+      "lat_bin_center": 16.75,
+      "lon_bin_center": 75.25,
+      "mean_xco2_ppm": 415.9409,
+      "n_soundings": 52
+    },
+    {
+      "lat_bin_center": 16.75,
+      "lon_bin_center": 75.75,
+      "mean_xco2_ppm": 415.7815,
+      "n_soundings": 194
+    },
+    {
+      "lat_bin_center": 16.75,
+      "lon_bin_center": 76.25,
+      "mean_xco2_ppm": 411.6489,
+      "n_soundings": 14
+    },
+    {
+      "lat_bin_center": 16.75,
+      "lon_bin_center": 77.25,
+      "mean_xco2_ppm": 412.5637,
+      "n_soundings": 84
+    },
+    {
+      "lat_bin_center": 16.75,
+      "lon_bin_center": 77.75,
+      "mean_xco2_ppm": 413.0625,
+      "n_soundings": 26
+    },
+    {
+      "lat_bin_center": 17.25,
+      "lon_bin_center": 80.25,
+      "mean_xco2_ppm": 415.474,
+      "n_soundings": 73
+    },
+    {
+      "lat_bin_center": 17.25,
+      "lon_bin_center": 80.75,
+      "mean_xco2_ppm": 414.119,
+      "n_soundings": 205
+    },
+    {
+      "lat_bin_center": 17.25,
+      "lon_bin_center": 81.25,
+      "mean_xco2_ppm": 414.1448,
+      "n_soundings": 28
+    },
+    {
+      "lat_bin_center": 17.25,
+      "lon_bin_center": 82.75,
+      "mean_xco2_ppm": 414.1587,
+      "n_soundings": 131
+    },
+    {
+      "lat_bin_center": 17.75,
+      "lon_bin_center": 80.25,
+      "mean_xco2_ppm": 414.3271,
+      "n_soundings": 134
+    },
+    {
+      "lat_bin_center": 17.75,
+      "lon_bin_center": 80.75,
+      "mean_xco2_ppm": 415.5863,
+      "n_soundings": 288
+    },
+    {
+      "lat_bin_center": 17.75,
+      "lon_bin_center": 81.25,
+      "mean_xco2_ppm": 411.7982,
+      "n_soundings": 84
+    },
+    {
+      "lat_bin_center": 17.75,
+      "lon_bin_center": 82.75,
+      "mean_xco2_ppm": 413.4179,
+      "n_soundings": 58
+    },
+    {
+      "lat_bin_center": 17.75,
+      "lon_bin_center": 83.25,
+      "mean_xco2_ppm": 414.1583,
+      "n_soundings": 39
+    },
+    {
+      "lat_bin_center": 17.75,
+      "lon_bin_center": 83.75,
+      "mean_xco2_ppm": 414.701,
+      "n_soundings": 33
+    },
+    {
+      "lat_bin_center": 18.25,
+      "lon_bin_center": 79.25,
+      "mean_xco2_ppm": 416.1509,
+      "n_soundings": 3
+    },
+    {
+      "lat_bin_center": 18.25,
+      "lon_bin_center": 79.75,
+      "mean_xco2_ppm": 415.4683,
+      "n_soundings": 14
+    },
+    {
+      "lat_bin_center": 18.25,
+      "lon_bin_center": 80.25,
+      "mean_xco2_ppm": 415.7737,
+      "n_soundings": 31
+    },
+    {
+      "lat_bin_center": 18.25,
+      "lon_bin_center": 80.75,
+      "mean_xco2_ppm": 413.3168,
+      "n_soundings": 31
+    },
+    {
+      "lat_bin_center": 18.25,
+      "lon_bin_center": 81.25,
+      "mean_xco2_ppm": 414.4927,
+      "n_soundings": 82
+    },
+    {
+      "lat_bin_center": 18.75,
+      "lon_bin_center": 79.25,
+      "mean_xco2_ppm": 415.7707,
+      "n_soundings": 11
+    },
+    {
+      "lat_bin_center": 18.75,
+      "lon_bin_center": 79.75,
+      "mean_xco2_ppm": 416.2715,
+      "n_soundings": 53
+    },
+    {
+      "lat_bin_center": 19.25,
+      "lon_bin_center": 79.25,
+      "mean_xco2_ppm": 415.8118,
+      "n_soundings": 19
+    },
+    {
+      "lat_bin_center": 19.25,
+      "lon_bin_center": 79.75,
+      "mean_xco2_ppm": 416.3966,
+      "n_soundings": 72
+    },
+    {
+      "lat_bin_center": 19.75,
+      "lon_bin_center": 78.75,
+      "mean_xco2_ppm": 416.0075,
+      "n_soundings": 38
+    },
+    {
+      "lat_bin_center": 19.75,
+      "lon_bin_center": 79.25,
+      "mean_xco2_ppm": 416.5057,
+      "n_soundings": 59
+    },
+    {
+      "lat_bin_center": 19.75,
+      "lon_bin_center": 79.75,
+      "mean_xco2_ppm": 414.5192,
+      "n_soundings": 117
+    },
+    {
+      "lat_bin_center": 20.25,
+      "lon_bin_center": 78.75,
+      "mean_xco2_ppm": 415.4535,
+      "n_soundings": 129
+    },
+    {
+      "lat_bin_center": 20.25,
+      "lon_bin_center": 79.25,
+      "mean_xco2_ppm": 412.7846,
+      "n_soundings": 300
+    },
+    {
+      "lat_bin_center": 20.25,
+      "lon_bin_center": 79.75,
+      "mean_xco2_ppm": 411.8248,
+      "n_soundings": 477
+    },
+    {
+      "lat_bin_center": 20.75,
+      "lon_bin_center": 78.75,
+      "mean_xco2_ppm": 411.4208,
+      "n_soundings": 285
+    },
+    {
+      "lat_bin_center": 20.75,
+      "lon_bin_center": 79.25,
+      "mean_xco2_ppm": 411.7764,
+      "n_soundings": 1427
+    },
+    {
+      "lat_bin_center": 20.75,
+      "lon_bin_center": 79.75,
+      "mean_xco2_ppm": 413.472,
+      "n_soundings": 565
+    },
+    {
+      "lat_bin_center": 20.75,
+      "lon_bin_center": 84.75,
+      "mean_xco2_ppm": 411.6605,
+      "n_soundings": 251
+    },
+    {
+      "lat_bin_center": 20.75,
+      "lon_bin_center": 85.25,
+      "mean_xco2_ppm": 413.1563,
+      "n_soundings": 314
+    },
+    {
+      "lat_bin_center": 20.75,
+      "lon_bin_center": 85.75,
+      "mean_xco2_ppm": 413.8679,
+      "n_soundings": 27
+    },
+    {
+      "lat_bin_center": 21.25,
+      "lon_bin_center": 78.75,
+      "mean_xco2_ppm": 411.8544,
+      "n_soundings": 1184
+    },
+    {
+      "lat_bin_center": 21.25,
+      "lon_bin_center": 79.25,
+      "mean_xco2_ppm": 412.7706,
+      "n_soundings": 1476
+    },
+    {
+      "lat_bin_center": 21.25,
+      "lon_bin_center": 79.75,
+      "mean_xco2_ppm": 413.775,
+      "n_soundings": 907
+    },
+    {
+      "lat_bin_center": 21.25,
+      "lon_bin_center": 84.75,
+      "mean_xco2_ppm": 413.9691,
+      "n_soundings": 702
+    },
+    {
+      "lat_bin_center": 21.25,
+      "lon_bin_center": 85.25,
+      "mean_xco2_ppm": 414.0873,
+      "n_soundings": 514
+    },
+    {
+      "lat_bin_center": 21.25,
+      "lon_bin_center": 85.75,
+      "mean_xco2_ppm": 413.4658,
+      "n_soundings": 71
+    },
+    {
+      "lat_bin_center": 21.75,
+      "lon_bin_center": 76.25,
+      "mean_xco2_ppm": 412.6019,
+      "n_soundings": 35
+    },
+    {
+      "lat_bin_center": 21.75,
+      "lon_bin_center": 76.75,
+      "mean_xco2_ppm": 412.6911,
+      "n_soundings": 12
+    },
+    {
+      "lat_bin_center": 21.75,
+      "lon_bin_center": 78.75,
+      "mean_xco2_ppm": 412.5163,
+      "n_soundings": 620
+    },
+    {
+      "lat_bin_center": 21.75,
+      "lon_bin_center": 79.25,
+      "mean_xco2_ppm": 412.753,
+      "n_soundings": 716
+    },
+    {
+      "lat_bin_center": 21.75,
+      "lon_bin_center": 80.25,
+      "mean_xco2_ppm": 415.3718,
+      "n_soundings": 60
+    },
+    {
+      "lat_bin_center": 21.75,
+      "lon_bin_center": 83.25,
+      "mean_xco2_ppm": 411.069,
+      "n_soundings": 32
+    },
+    {
+      "lat_bin_center": 21.75,
+      "lon_bin_center": 83.75,
+      "mean_xco2_ppm": 411.8241,
+      "n_soundings": 194
+    },
+    {
+      "lat_bin_center": 21.75,
+      "lon_bin_center": 84.75,
+      "mean_xco2_ppm": 413.9549,
+      "n_soundings": 186
+    },
+    {
+      "lat_bin_center": 21.75,
+      "lon_bin_center": 85.25,
+      "mean_xco2_ppm": 414.2183,
+      "n_soundings": 100
+    },
+    {
+      "lat_bin_center": 22.25,
+      "lon_bin_center": 69.75,
+      "mean_xco2_ppm": 414.3257,
+      "n_soundings": 9
+    },
+    {
+      "lat_bin_center": 22.25,
+      "lon_bin_center": 76.25,
+      "mean_xco2_ppm": 412.1623,
+      "n_soundings": 111
+    },
+    {
+      "lat_bin_center": 22.25,
+      "lon_bin_center": 76.75,
+      "mean_xco2_ppm": 415.6738,
+      "n_soundings": 10
+    },
+    {
+      "lat_bin_center": 22.25,
+      "lon_bin_center": 77.25,
+      "mean_xco2_ppm": 414.332,
+      "n_soundings": 17
+    },
+    {
+      "lat_bin_center": 22.25,
+      "lon_bin_center": 82.75,
+      "mean_xco2_ppm": 411.0826,
+      "n_soundings": 216
+    },
+    {
+      "lat_bin_center": 22.25,
+      "lon_bin_center": 83.25,
+      "mean_xco2_ppm": 411.0648,
+      "n_soundings": 281
+    },
+    {
+      "lat_bin_center": 22.25,
+      "lon_bin_center": 83.75,
+      "mean_xco2_ppm": 411.8412,
+      "n_soundings": 258
+    },
+    {
+      "lat_bin_center": 22.75,
+      "lon_bin_center": 69.25,
+      "mean_xco2_ppm": 416.2993,
+      "n_soundings": 14
+    },
+    {
+      "lat_bin_center": 22.75,
+      "lon_bin_center": 76.75,
+      "mean_xco2_ppm": 414.4485,
+      "n_soundings": 30
+    },
+    {
+      "lat_bin_center": 22.75,
+      "lon_bin_center": 77.25,
+      "mean_xco2_ppm": 415.1325,
+      "n_soundings": 13
+    },
+    {
+      "lat_bin_center": 22.75,
+      "lon_bin_center": 82.25,
+      "mean_xco2_ppm": 410.6931,
+      "n_soundings": 23
+    },
+    {
+      "lat_bin_center": 22.75,
+      "lon_bin_center": 82.75,
+      "mean_xco2_ppm": 410.7494,
+      "n_soundings": 126
+    },
+    {
+      "lat_bin_center": 22.75,
+      "lon_bin_center": 83.25,
+      "mean_xco2_ppm": 411.0002,
+      "n_soundings": 233
+    },
+    {
+      "lat_bin_center": 23.25,
+      "lon_bin_center": 69.25,
+      "mean_xco2_ppm": 415.3715,
+      "n_soundings": 29
+    },
+    {
+      "lat_bin_center": 23.25,
+      "lon_bin_center": 82.25,
+      "mean_xco2_ppm": 412.3388,
+      "n_soundings": 42
+    },
+    {
+      "lat_bin_center": 23.25,
+      "lon_bin_center": 82.75,
+      "mean_xco2_ppm": 412.3798,
+      "n_soundings": 18
+    },
+    {
+      "lat_bin_center": 23.75,
+      "lon_bin_center": 82.25,
+      "mean_xco2_ppm": 413.0512,
+      "n_soundings": 4226
+    },
+    {
+      "lat_bin_center": 23.75,
+      "lon_bin_center": 82.75,
+      "mean_xco2_ppm": 414.205,
+      "n_soundings": 6297
+    },
+    {
+      "lat_bin_center": 23.75,
+      "lon_bin_center": 83.25,
+      "mean_xco2_ppm": 415.2557,
+      "n_soundings": 1002
+    },
+    {
+      "lat_bin_center": 23.75,
+      "lon_bin_center": 87.75,
+      "mean_xco2_ppm": 410.9058,
+      "n_soundings": 46
+    },
+    {
+      "lat_bin_center": 23.75,
+      "lon_bin_center": 88.25,
+      "mean_xco2_ppm": 411.3664,
+      "n_soundings": 20
+    },
+    {
+      "lat_bin_center": 24.25,
+      "lon_bin_center": 76.75,
+      "mean_xco2_ppm": 413.2558,
+      "n_soundings": 587
+    },
+    {
+      "lat_bin_center": 24.25,
+      "lon_bin_center": 77.25,
+      "mean_xco2_ppm": 413.6314,
+      "n_soundings": 23
+    },
+    {
+      "lat_bin_center": 24.25,
+      "lon_bin_center": 82.25,
+      "mean_xco2_ppm": 413.0882,
+      "n_soundings": 6477
+    },
+    {
+      "lat_bin_center": 24.25,
+      "lon_bin_center": 82.75,
+      "mean_xco2_ppm": 414.1726,
+      "n_soundings": 6691
+    },
+    {
+      "lat_bin_center": 24.25,
+      "lon_bin_center": 83.25,
+      "mean_xco2_ppm": 415.4933,
+      "n_soundings": 684
+    },
+    {
+      "lat_bin_center": 24.25,
+      "lon_bin_center": 87.25,
+      "mean_xco2_ppm": 412.8486,
+      "n_soundings": 107
+    },
+    {
+      "lat_bin_center": 24.25,
+      "lon_bin_center": 87.75,
+      "mean_xco2_ppm": 409.9525,
+      "n_soundings": 335
+    },
+    {
+      "lat_bin_center": 24.25,
+      "lon_bin_center": 88.25,
+      "mean_xco2_ppm": 412.1608,
+      "n_soundings": 89
+    },
+    {
+      "lat_bin_center": 24.75,
+      "lon_bin_center": 76.75,
+      "mean_xco2_ppm": 414.921,
+      "n_soundings": 186
+    },
+    {
+      "lat_bin_center": 24.75,
+      "lon_bin_center": 77.25,
+      "mean_xco2_ppm": 415.9629,
+      "n_soundings": 35
+    },
+    {
+      "lat_bin_center": 24.75,
+      "lon_bin_center": 81.25,
+      "mean_xco2_ppm": 412.957,
+      "n_soundings": 114
+    },
+    {
+      "lat_bin_center": 24.75,
+      "lon_bin_center": 81.75,
+      "mean_xco2_ppm": 412.8443,
+      "n_soundings": 576
+    },
+    {
+      "lat_bin_center": 24.75,
+      "lon_bin_center": 82.25,
+      "mean_xco2_ppm": 413.5376,
+      "n_soundings": 830
+    },
+    {
+      "lat_bin_center": 24.75,
+      "lon_bin_center": 82.75,
+      "mean_xco2_ppm": 414.8057,
+      "n_soundings": 307
+    },
+    {
+      "lat_bin_center": 24.75,
+      "lon_bin_center": 86.75,
+      "mean_xco2_ppm": 414.9228,
+      "n_soundings": 155
+    },
+    {
+      "lat_bin_center": 24.75,
+      "lon_bin_center": 87.25,
+      "mean_xco2_ppm": 412.7689,
+      "n_soundings": 396
+    },
+    {
+      "lat_bin_center": 24.75,
+      "lon_bin_center": 87.75,
+      "mean_xco2_ppm": 413.0825,
+      "n_soundings": 1054
+    },
+    {
+      "lat_bin_center": 24.75,
+      "lon_bin_center": 88.25,
+      "mean_xco2_ppm": 414.0024,
+      "n_soundings": 26
+    },
+    {
+      "lat_bin_center": 25.25,
+      "lon_bin_center": 77.25,
+      "mean_xco2_ppm": 416.6968,
+      "n_soundings": 43
+    },
+    {
+      "lat_bin_center": 25.25,
+      "lon_bin_center": 81.25,
+      "mean_xco2_ppm": 412.7274,
+      "n_soundings": 270
+    },
+    {
+      "lat_bin_center": 25.25,
+      "lon_bin_center": 81.75,
+      "mean_xco2_ppm": 413.6555,
+      "n_soundings": 829
+    },
+    {
+      "lat_bin_center": 25.25,
+      "lon_bin_center": 82.25,
+      "mean_xco2_ppm": 412.9316,
+      "n_soundings": 198
+    },
+    {
+      "lat_bin_center": 25.25,
+      "lon_bin_center": 86.75,
+      "mean_xco2_ppm": 410.3776,
+      "n_soundings": 99
+    },
+    {
+      "lat_bin_center": 25.25,
+      "lon_bin_center": 87.25,
+      "mean_xco2_ppm": 415.4369,
+      "n_soundings": 141
+    },
+    {
+      "lat_bin_center": 25.25,
+      "lon_bin_center": 87.75,
+      "mean_xco2_ppm": 414.9491,
+      "n_soundings": 253
+    },
+    {
+      "lat_bin_center": 25.25,
+      "lon_bin_center": 88.25,
+      "mean_xco2_ppm": 413.3604,
+      "n_soundings": 159
+    },
+    {
+      "lat_bin_center": 25.75,
+      "lon_bin_center": 81.25,
+      "mean_xco2_ppm": 413.8241,
+      "n_soundings": 224
+    },
+    {
+      "lat_bin_center": 25.75,
+      "lon_bin_center": 81.75,
+      "mean_xco2_ppm": 410.8933,
+      "n_soundings": 55
+    },
+    {
+      "lat_bin_center": 25.75,
+      "lon_bin_center": 82.25,
+      "mean_xco2_ppm": 414.4249,
+      "n_soundings": 12
+    },
+    {
+      "lat_bin_center": 25.75,
+      "lon_bin_center": 86.75,
+      "mean_xco2_ppm": 411.6355,
+      "n_soundings": 49
+    },
+    {
+      "lat_bin_center": 25.75,
+      "lon_bin_center": 87.25,
+      "mean_xco2_ppm": 411.2336,
+      "n_soundings": 39
+    },
+    {
+      "lat_bin_center": 25.75,
+      "lon_bin_center": 87.75,
+      "mean_xco2_ppm": 418.7328,
+      "n_soundings": 4
+    },
+    {
+      "lat_bin_center": 28.25,
+      "lon_bin_center": 77.25,
+      "mean_xco2_ppm": 414.6326,
+      "n_soundings": 1423
+    },
+    {
+      "lat_bin_center": 28.25,
+      "lon_bin_center": 77.75,
+      "mean_xco2_ppm": 412.9723,
+      "n_soundings": 479
+    },
+    {
+      "lat_bin_center": 28.25,
+      "lon_bin_center": 78.25,
+      "mean_xco2_ppm": 410.9662,
+      "n_soundings": 97
+    },
+    {
+      "lat_bin_center": 28.75,
+      "lon_bin_center": 77.25,
+      "mean_xco2_ppm": 413.9345,
+      "n_soundings": 1947
+    },
+    {
+      "lat_bin_center": 28.75,
+      "lon_bin_center": 77.75,
+      "mean_xco2_ppm": 412.971,
+      "n_soundings": 825
+    },
+    {
+      "lat_bin_center": 28.75,
+      "lon_bin_center": 78.25,
+      "mean_xco2_ppm": 411.2611,
+      "n_soundings": 50
+    },
+    {
+      "lat_bin_center": 29.25,
+      "lon_bin_center": 77.25,
+      "mean_xco2_ppm": 413.0393,
+      "n_soundings": 163
+    },
+    {
+      "lat_bin_center": 29.25,
+      "lon_bin_center": 78.25,
+      "mean_xco2_ppm": 413.9134,
+      "n_soundings": 3
+    },
+    {
+      "lat_bin_center": 29.75,
+      "lon_bin_center": 74.75,
+      "mean_xco2_ppm": 411.9821,
+      "n_soundings": 90
+    },
+    {
+      "lat_bin_center": 29.75,
+      "lon_bin_center": 75.25,
+      "mean_xco2_ppm": 411.5447,
+      "n_soundings": 3
+    },
+    {
+      "lat_bin_center": 29.75,
+      "lon_bin_center": 75.75,
+      "mean_xco2_ppm": 414.5421,
+      "n_soundings": 79
+    },
+    {
+      "lat_bin_center": 30.25,
+      "lon_bin_center": 74.75,
+      "mean_xco2_ppm": 412.0575,
+      "n_soundings": 24
+    },
+    {
+      "lat_bin_center": 30.25,
+      "lon_bin_center": 75.25,
+      "mean_xco2_ppm": 412.1514,
+      "n_soundings": 177
+    },
+    {
+      "lat_bin_center": 30.25,
+      "lon_bin_center": 75.75,
+      "mean_xco2_ppm": 417.2544,
+      "n_soundings": 14
+    }
+  ]
+}
