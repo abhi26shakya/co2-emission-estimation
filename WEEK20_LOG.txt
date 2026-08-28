@@ -246,3 +246,102 @@ independent confirmation or a different methodological approach to
 generating training labels (e.g. training the U-Net on tiles labeled by
 a mass-balance-style forward model consistent with how IME itself
 defines Q, rather than a stack-top Gaussian dispersion model).
+
+TASK 4: IME-consistent Q readout -- confirms the forward/inverse
+formulation mismatch directly, does not close the gap (flips it instead)
+========================================================================
+
+Task 3 left open the possibility that comparing a single hottest-pixel
+readout to a Q value estimated by a completely different method (IME's
+spatial mass-balance) was never a fair realism check in the first place.
+This task tests that directly, WITHOUT changing the underlying physics:
+the 2D concentration field is still genuine Gaussian plume dispersion
+with the BUG 1 near-field guard and Task 2 area-averaging unchanged. Only
+the READOUT changed -- replaced the single peak pixel with
+physics_ime.py's own near-plant/background-annulus geometry (NEAR=0.25
+deg, BG_IN/BG_OUT=0.4/0.9 deg, ~27.75/44.4/99.9 km at the ~111 km/deg
+conversion this project's own comments already use), computing
+mean(near-zone) - mean(background-annulus) -- exactly
+process_plant.py's co2_enhancement_ppm definition. Because that
+background annulus (out to ~100 km) doesn't fit inside Track A's 60km
+training tile, this readout is evaluated on a separate, larger
+calibration-only grid (see SIMULATOR_METHODOLOGY_NOTE.md and the
+module docstring) -- never saved as a training tile.
+
+Full distribution, 600 positive tiles (Q still CEA-range per Task 3),
+same seed=42, vs. the REAL full distribution (not just min/max --
+computed here for the first time this session):
+
+                        min     p10    median   mean    p90     p99    max
+  simulated (IME readout): -0.040  0.003   0.054   0.072   0.163   0.327  0.562
+  real (plant_results.json,
+        co2_enhancement_ppm,
+        N=24):              -1.277 -0.866   0.619   0.620   1.839   3.409  3.698
+
+Negative (no-plume) tiles, sanity check (should be ~0): median 0.002,
+p90 0.033, max 0.071 -- correctly small, confirms the readout mechanism
+itself isn't biased.
+
+Naive result: 100% of positive tiles fall within the real [-1.277, 3.698]
+min/max envelope (up from 12.8% under the old peak-pixel readout on the
+same run). Taken at face value that looks like a fix. It is NOT: the
+real distribution's median is 0.619 ppm; the simulated median is 0.054
+ppm -- more than 10x smaller -- and the simulated MAX (0.562) does not
+even reach the real MEDIAN. The min/max containment check passed only
+because the simulated distribution collapsed almost entirely toward
+zero, not because it now resembles the real distribution's shape. This
+is the same lesson as Task 3's "check the shape, not just the range"
+principle turned back on this task's own result -- reported honestly
+rather than claimed as a fix.
+
+Cause, verified analytically, not guessed: computed the Gaussian plume's
+sigma_y (1-sigma crosswind half-width) at the near-zone's outer radius
+(27.75 km), stability class B: 2285 m. A near-zone DISK of that radius
+has area ~2419 km^2 and circumference ~174 km; the plume's ~2-sigma
+core width at that radius is ~4.6 km -- only ~2.6% of the disk's
+circumference. For a SINGLE fixed wind direction (each synthetic tile
+samples exactly one), more than 97% of the near-zone disk sits at pure
+background, so averaging over the whole disk dilutes the plume signal
+by roughly two orders of magnitude relative to the plume's own peak.
+Real near-plant soundings, by contrast, are NOT one snapshot -- they are
+whatever OCO-3 soundings landed within that disk across MANY overpass
+days over up to a year, each day potentially carrying a DIFFERENT real
+wind direction, so different days' plumes sweep different wedges of the
+disk and the accumulated "near" sample captures elevated readings from
+several directions, not just one. A single synthetic tile with one
+sampled wind direction structurally cannot reproduce that -- it is
+comparing a single-day snapshot's spatial mean to a multi-day aggregate
+by construction, not a like-for-like readout.
+
+VERDICT: this CONFIRMS, rather than merely leaves open, the possibility
+flagged going into this task -- physics_ime.py's inverse mass-balance
+method (Q fit to reproduce a many-day-aggregated near/background
+difference, via an assumed effective velocity/length scaling, not
+literal forward dispersion) and this script's forward Gaussian
+point-source model (single-snapshot, single-wind-direction dispersion at
+near-field range) are genuinely different formulations of "Q" that do
+not invert each other under any evaluation scale tried: point-sampling
+the peak pixel over-shoots the real range by 1-2 orders of magnitude
+(Task 1/2), and IME-style disk-integration under-shoots it by about the
+same amount in the other direction (Task 4), for the identical
+underlying field and the identical Q. Both directions of failure trace
+to the same root cause -- a forward model evaluated at ONE wind
+direction cannot be read out, at ANY single spatial scale, to match a
+quantity whose real-world definition is implicitly averaged over MANY
+wind directions across a year of overpasses.
+
+This is reported as an OPEN, PAUSED negative result, per the explicit
+instruction and this project's own diminishing-returns discipline
+(WEEK13_LOG.txt). No further Q-range or readout-geometry patching is
+attempted past this point. See SIMULATOR_METHODOLOGY_NOTE.md for the
+consolidated design history (near-field fix, wind floor, resolution
+match, area-averaging, Q-source falsification, forward/inverse
+consistency) and the two candidate paths forward that were NOT
+attempted this session: (a) simulate multiple wind-direction draws per
+plant and aggregate their near/bg means before computing the readout,
+which would test the diagnosis above directly but is a materially larger
+scope change than a readout-geometry fix, or (b) abandon single-snapshot
+forward simulation as the training-label source entirely and generate
+segmentation masks/Q labels through a method structurally consistent
+with IME's own multi-day aggregation assumption. The U-Net (blueprint
+Paper 2 stage 1) remains NOT STARTED.

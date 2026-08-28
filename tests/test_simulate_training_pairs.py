@@ -97,6 +97,40 @@ class TestMakeTile(unittest.TestCase):
             _, _, params = sim.make_tile(rng, positive=True)
             self.assertGreaterEqual(params["wind_speed_ms"], 1.2)
 
+    def test_positive_tile_has_ime_readout_field(self):
+        rng = np.random.default_rng(3)
+        _, _, params = sim.make_tile(rng, positive=True)
+        self.assertIn("ime_readout_ppm", params)
+        self.assertTrue(np.isfinite(params["ime_readout_ppm"]))
+
+
+class TestImeStyleReadout(unittest.TestCase):
+    def test_matches_physics_ime_geometry_constants(self):
+        # Task 4: the readout MUST use physics_ime.py's own NEAR/BG_IN/
+        # BG_OUT constants, not invented values -- this pins that link.
+        import physics_ime
+        self.assertAlmostEqual(sim.IME_NEAR_KM, physics_ime.NEAR * sim.KM_PER_DEG)
+        self.assertAlmostEqual(sim.IME_BG_IN_KM, physics_ime.BG_IN * sim.KM_PER_DEG)
+        self.assertAlmostEqual(sim.IME_BG_OUT_KM, physics_ime.BG_OUT * sim.KM_PER_DEG)
+
+    def test_readout_grid_covers_full_background_annulus(self):
+        # The whole point of the separate calibration grid is that it must
+        # be big enough to contain BG_OUT -- if it weren't, the background
+        # mean would be silently wrong.
+        self.assertGreater(sim.READOUT_HALF_EXTENT_KM, sim.IME_BG_OUT_KM)
+
+    def test_negative_tile_readout_is_near_zero(self):
+        rng = np.random.default_rng(4)
+        vals = [sim.ime_style_readout_ppm(rng, 0.0, 2.0, 90.0, 220.0, "B")
+                for _ in range(20)]
+        self.assertLess(abs(np.mean(vals)), 0.05)
+
+    def test_positive_tile_readout_exceeds_negative_tile_readout(self):
+        rng = np.random.default_rng(5)
+        pos = sim.ime_style_readout_ppm(rng, 2e7, 2.0, 90.0, 220.0, "B")
+        neg = sim.ime_style_readout_ppm(rng, 0.0, 2.0, 90.0, 220.0, "B")
+        self.assertGreater(pos, neg)
+
 
 if __name__ == "__main__":
     unittest.main()

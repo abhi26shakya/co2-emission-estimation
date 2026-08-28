@@ -172,6 +172,28 @@ realistic near-field ppm under this forward model. Reported as an open,
 paused negative result, not resolved — the U-Net remains not started.
 See WEEK20_LOG.txt (Task 3).
 
+Task 4, same session: tested that mismatch hypothesis directly, without
+changing the underlying physics — replaced the peak-pixel readout with
+physics_ime.py's own near-plant/background-annulus geometry (NEAR/BG_IN/
+BG_OUT, ~27.75/44.4/99.9 km), computing mean(near-zone) - mean(bg-annulus)
+on a separate calibration-only grid (background annulus doesn't fit
+inside a 60km training tile). Result: 100% of tiles now fall within the
+real [-1.28, 3.70] ppm min/max range, but that's misleading — the real
+median is 0.619 ppm and the simulated median is 0.054 ppm (>10x smaller);
+the simulated distribution collapsed toward zero rather than matching the
+real one's shape. Diagnosed analytically: at the near-zone's outer
+radius, the plume's core width is only ~2.6% of that circle's
+circumference for one fixed wind direction, so >97% of the disk sits at
+background — real near-plant soundings aggregate MANY overpass days'
+(different) wind directions, which a single-snapshot synthetic tile
+structurally cannot reproduce. This CONFIRMS the forward/inverse
+mismatch: peak-pixel over-shoots the real range by 1-2 orders of
+magnitude, IME-style disk integration under-shoots it by about the same
+amount in the other direction, same field, same Q. Reported as an open,
+paused negative result — see SIMULATOR_METHODOLOGY_NOTE.md for the full
+design history and candidate next steps (not attempted), and
+WEEK20_LOG.txt (Task 4) for the full numbers. U-Net remains not started.
+
 ## Hard rules
 - Never use Climate TRACE as a training label. Benchmark only.
 - Never split train/test at tile level. Split by facility (see train_3channel.py).
