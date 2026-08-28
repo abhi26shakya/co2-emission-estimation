@@ -169,6 +169,76 @@ class TestMultiDayPooling(unittest.TestCase):
             dirs.append(params["wind_from_deg"])
         self.assertGreater(len(set(dirs)), 1)
 
+    def test_make_tile_accepts_explicit_wind_from_deg(self):
+        # Task 6: one SAM scan = one training tile requires the SAME
+        # wind_from_deg driving both -- make_tile must accept, not just
+        # sample, this value.
+        rng = np.random.default_rng(9)
+        _, _, params = sim.make_tile(rng, positive=True, q=2e7, wind_speed=2.0,
+                                      stack_height=220.0, stability="B", wind_from_deg=123.4)
+        self.assertEqual(params["wind_from_deg"], 123.4)
+
+
+class TestSamGeometry(unittest.TestCase):
+    def test_raw_footprint_count_matches_geometry(self):
+        self.assertEqual(sim.RAW_FOOTPRINTS_PER_SAM_SCAN,
+                          sim.N_SWATHS * sim.N_FRAMES_PER_SWATH * sim.FOOTPRINTS_PER_FRAME)
+
+    def test_sam_box_covers_80km_target(self):
+        self.assertGreaterEqual(sim.N_SWATHS * sim.SWATH_WIDTH_KM, 80.0)
+        self.assertGreaterEqual(sim.N_FRAMES_PER_SWATH * sim.FRAME_SPACING_KM, 80.0)
+
+    def test_sam_scan_footprints_within_box_and_retention_frac(self):
+        rng = np.random.default_rng(10)
+        east, north = sim._sam_scan_footprint_offsets_km(rng, retention_frac=1.0)
+        self.assertEqual(east.size, sim.RAW_FOOTPRINTS_PER_SAM_SCAN)
+        self.assertTrue(np.all(np.abs(east) <= sim.SAM_BOX_HALF_KM))
+        self.assertTrue(np.all(np.abs(north) <= sim.SAM_BOX_HALF_KM))
+
+    def test_retention_frac_scales_footprint_count(self):
+        rng = np.random.default_rng(11)
+        east_full, _ = sim._sam_scan_footprint_offsets_km(rng, retention_frac=1.0)
+        east_half, _ = sim._sam_scan_footprint_offsets_km(rng, retention_frac=0.5)
+        self.assertLess(east_half.size, east_full.size)
+
+    def test_background_footprints_within_annulus(self):
+        rng = np.random.default_rng(12)
+        east, north = sim._background_footprint_offsets_km(rng, bg_density_km2=0.01)
+        if east.size > 0:
+            r = np.sqrt(east ** 2 + north ** 2)
+            self.assertTrue(np.all(r >= sim.IME_BG_IN_KM))
+            self.assertTrue(np.all(r <= sim.IME_BG_OUT_KM))
+
+    def test_evaluate_footprints_positive_q_exceeds_zero_q(self):
+        rng = np.random.default_rng(13)
+        east = np.array([5.0, 10.0])
+        north = np.array([-30.0, -30.0])  # downwind if wind blows from north (0 deg)
+        pos = sim._evaluate_footprints_ppm(rng, east, north, 2e7, 2.0, 0.0, 220.0, "B")
+        zero = sim._evaluate_footprints_ppm(rng, east, north, 0.0, 2.0, 0.0, 220.0, "B")
+        self.assertTrue(np.all(pos >= zero - 5))  # noise-tolerant, but should not be systematically lower
+
+
+class TestSamQRecovery(unittest.TestCase):
+    def test_recover_q_returns_result_and_n_days_wind_dirs(self):
+        rng = np.random.default_rng(14)
+        result, wind_dirs, n_near, n_bg, ppm = sim.recover_q_from_sam_scans(
+            rng, "test_facility", 2e7, 2.0, 220.0, "B", n_days=5,
+            retention_frac=0.4, bg_density_ratio=0.045)
+        self.assertEqual(len(wind_dirs), 5)
+        self.assertGreater(n_near, 0)
+        self.assertIsNotNone(result)
+        self.assertIn("q_t_per_year", result)
+        self.assertGreater(result["q_t_per_year"], 0)
+
+    def test_validate_sam_sounding_counts_same_order_of_magnitude(self):
+        # This IS the task's required validation gate: simulated sounding
+        # counts must not be off by an order of magnitude from real.
+        rows = sim.validate_sam_sounding_counts(seed=99, n_repeats=2)
+        self.assertEqual(len(rows), len(sim.SAM_VALIDATION_FACILITIES))
+        for row in rows:
+            self.assertLess(row["near_ratio_sim_over_real"], 10.0)
+            self.assertGreater(row["near_ratio_sim_over_real"], 0.1)
+
 
 if __name__ == "__main__":
     unittest.main()

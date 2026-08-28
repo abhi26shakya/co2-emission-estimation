@@ -111,12 +111,72 @@ independently per tile, which is disclosed explicitly here: it does not
 change what any individual tile represents or how it is generated, only
 how several tiles are grouped together downstream for the pooled
 calibration check.
+
+TASK 6 fix (real OCO-3 orbital sampling geometry, see
+SIMULATOR_METHODOLOGY_NOTE.md Sec 4.4/6 for the full rationale): Task 5
+diagnosed why multi-day pooling failed -- the readout evaluated an
+EXHAUSTIVE spatial grid every day, not the SPARSE, orbital-track-shaped
+sample a real satellite actually produces, so pooling more full-disk
+days couldn't shift the systematic dilution bias. This fix replaces the
+exhaustive readout grid with a simulated OCO-3 Snapshot Area Mapping
+(SAM) scan: individual footprints 1.6km (cross-track) x 2.2km
+(along-track), approximated as a small rectangle rather than a true
+rhombus -- the corner-area difference between a rhombus and a rectangle
+of the same width/height is a small correction relative to the
+footprint-averaging step itself (already a simplification), so a
+rectangle was used for implementation simplicity, stated explicitly
+rather than silently. Footprints are arranged in frames of 8 across a
+~13km swath (8 x 1.6km = 12.8km), spaced contiguously along-track at the
+2.2km footprint dimension (a standard pushbroom-instrument design
+assumption -- contiguous coverage along track -- used here instead of an
+independently-sourced ISS ground-track speed, to avoid citing an
+uncertain external constant). SAM mode covers an ~80x80km box around the
+target via repeated parallel swaths: 7 swaths (12.8km each, covering
+89.6km) x 37 along-track frames (2.2km each, covering 81.4km) x 8
+footprints/frame = 2072 raw theoretical footprints per scan, BEFORE any
+cloud/data-quality loss.
+
+Background-annulus sampling (44.4-99.9km out) is NOT modeled with the
+same SAM-raster geometry -- SAM mode specifically targets a box around
+the facility (per the task's own framing) and a single 80km box cannot
+physically reach the real background annulus's outer edge (~100km), the
+same geometric mismatch already documented in Task 4. Background
+soundings are modeled as a much sparser, Poisson-scattered sample within
+the annulus, its density set as a fraction of the near-zone's simulated
+density -- calibrated (not independently derived from orbital mechanics,
+disclosed as the less rigorous half of this fix) against the same real
+facility data used to calibrate near-zone retention (see below).
+
+Both the near-zone SAM retention fraction and the background/near
+density ratio are drawn from REAL per-facility density ratios, not
+invented: computed from 5 real facilities (Sasan, Vindhyachal, Talcher,
+Rihand, Tamnar; data/plant_results.json "soundings"/"hit_days" for raw
+near-zone density, data/emission_estimates.json
+"n_bg_before_month_filter"/hit_days for background density) against this
+fix's own theoretical raw geometric footprint count -- retention 0.132
+to 0.534, background/near density ratio 0.0352 to 0.0600.
+
+Q is read back out using physics_ime.py's own
+estimate_emission_rate_from_arrays() applied DIRECTLY to this sparse,
+simulated sounding set (synthetic lat/lon built from the same
+km/111 deg conversion used throughout this file) -- not a hand-rolled
+near-mean-minus-bg-mean scalar as in Tasks 4-5. This is a materially
+different mathematical operation, not just a different sampling
+geometry: physics_ime.py's IME_kg is a SUM of positive excess over near
+soundings (soundings below background contribute exactly zero, not a
+diluting pull toward zero the way an unconditional MEAN does), and its
+effective length L_eff = sqrt(n_used * FOOTPRINT_AREA_M2) scales with
+how many near soundings actually sit on-plume, not with the fixed
+near-zone disk's full radius -- a genuinely different, and specifically
+motivated, test of whether this project's own inverse method recovers Q
+correctly given a realistically sparse forward-simulated sounding set.
 """
 import json
 import os
 
 import numpy as np
 
+import physics_ime
 import plume_model
 from physics_ime import BG_IN as IME_BG_IN_DEG
 from physics_ime import BG_OUT as IME_BG_OUT_DEG
@@ -194,6 +254,45 @@ READOUT_PX = int(round(2 * READOUT_HALF_EXTENT_KM / READOUT_PX_SIZE_KM))
 HIT_DAYS_POOL = [1, 1, 1, 1, 4, 4, 5, 5, 5, 5, 5, 5, 6, 7, 7, 9, 9, 10, 12,
                  14, 14, 15, 16, 16, 17, 19, 19, 20, 21, 25]
 NUM_POSITIVE_FACILITIES = 200  # synthetic facilities; total day-tiles = sum(n_days), reported at runtime
+
+# --- TASK 6: OCO-3 Snapshot Area Mapping (SAM) instrument/orbital geometry
+# -- see module docstring for the full rationale. ---
+FOOTPRINT_CROSS_TRACK_KM = 1.6
+FOOTPRINT_ALONG_TRACK_KM = 2.2
+FOOTPRINT_SUBGRID_N = 3  # small-footprint area-average subsamples (Task 2's principle, footprint scale)
+FOOTPRINTS_PER_FRAME = 8
+FRAME_SPACING_KM = FOOTPRINT_ALONG_TRACK_KM  # contiguous along-track coverage assumption
+SWATH_WIDTH_KM = FOOTPRINTS_PER_FRAME * FOOTPRINT_CROSS_TRACK_KM  # 12.8 km, ~"13km swath"
+SAM_BOX_HALF_KM = 40.0  # 80km x 80km SAM target box, centered on the facility
+N_SWATHS = int(np.ceil(2 * SAM_BOX_HALF_KM / SWATH_WIDTH_KM))          # 7 (covers 89.6 km)
+N_FRAMES_PER_SWATH = int(np.ceil(2 * SAM_BOX_HALF_KM / FRAME_SPACING_KM))  # 37 (covers 81.4 km)
+RAW_FOOTPRINTS_PER_SAM_SCAN = N_SWATHS * N_FRAMES_PER_SWATH * FOOTPRINTS_PER_FRAME  # 2072
+SAM_BOX_AREA_KM2 = (2 * SAM_BOX_HALF_KM) ** 2  # 6400
+
+# Retention fraction (cloud/data-quality loss applied to the raw 2072-
+# footprint raster) and background/near-zone density ratio, both computed
+# from 5 real facilities' actual sounding density -- not invented. See
+# module docstring for the exact computation (data/plant_results.json
+# "soundings"/hit_days for near-zone raw density against this fix's own
+# theoretical 783 near-zone-only footprint count; data/emission_estimates.json
+# "n_bg_before_month_filter"/hit_days for background density):
+#   Sasan 0.496 / 0.0372, Vindhyachal 0.534 / 0.0352, Talcher 0.132 / 0.0600,
+#   Rihand 0.485 / 0.0390, Tamnar 0.154 / 0.0359
+RETENTION_FRAC_RANGE = (0.132, 0.534)
+BG_DENSITY_RATIO_RANGE = (0.0352, 0.0600)
+
+# The 5 real facilities used to calibrate the two ranges above, kept here
+# for the sounding-count VALIDATION step (run each facility's own real Q,
+# wind speed, and hit_days back through this simulator and compare
+# simulated sounding counts to that facility's real ones).
+SAM_VALIDATION_FACILITIES = {
+    # name: (q_t_per_year, wind_speed_ms, hit_days, real_n_soundings_used, real_soundings_total)
+    "Sasan":       (3.9279e7, 1.3165, 19, 997, 7379),
+    "Vindhyachal": (3.6738e7, 1.2522, 17, 1083, 7114),
+    "Talcher":     (6.9146e6, 1.7695, 21, 105, 2165),
+    "Rihand":      (4.8347e7, 1.2935, 16, 1182, 6072),
+    "Tamnar":      (3.2231e6, 1.2260, 7, 86, 842),
+}
 
 
 def _pixel_centers_km(n_px=PX, size_km=SIZE_KM):
@@ -355,17 +454,228 @@ def multi_day_ime_readout_ppm(rng, Q_t_per_year, wind_speed_ms, stack_height_m,
     return pooled, wind_dirs
 
 
-def make_tile(rng, positive, q=None, wind_speed=None, stack_height=None, stability=None):
+def _sam_scan_footprint_offsets_km(rng, retention_frac):
+    """
+    TASK 6: the sparse (east_km, north_km) footprint centers one simulated
+    SAM scan of the 80x80km target box actually produces -- a raster of
+    N_SWATHS parallel swaths x N_FRAMES_PER_SWATH along-track frames x
+    FOOTPRINTS_PER_FRAME footprints, then a random cloud/data-quality
+    RETENTION_FRAC subset kept. Fixed local (east, north) frame -- real
+    satellite ground-track heading is not modeled, a stated simplification
+    (see module docstring).
+    """
+    swath_centers = ((np.arange(N_SWATHS) + 0.5) / N_SWATHS * (2 * SAM_BOX_HALF_KM)
+                      - SAM_BOX_HALF_KM)
+    frame_positions = ((np.arange(N_FRAMES_PER_SWATH) + 0.5) / N_FRAMES_PER_SWATH
+                        * (2 * SAM_BOX_HALF_KM) - SAM_BOX_HALF_KM)
+    footprint_cross_offsets = (np.arange(FOOTPRINTS_PER_FRAME) - (FOOTPRINTS_PER_FRAME - 1) / 2.0) \
+        * FOOTPRINT_CROSS_TRACK_KM
+
+    east_grid = (swath_centers[:, None, None] + footprint_cross_offsets[None, None, :])
+    east_grid = np.broadcast_to(east_grid, (N_SWATHS, N_FRAMES_PER_SWATH, FOOTPRINTS_PER_FRAME))
+    north_grid = np.broadcast_to(frame_positions[None, :, None],
+                                  (N_SWATHS, N_FRAMES_PER_SWATH, FOOTPRINTS_PER_FRAME))
+    east_all = east_grid.ravel()
+    north_all = north_grid.ravel()
+
+    keep = rng.random(east_all.size) < retention_frac
+    return east_all[keep].copy(), north_all[keep].copy()
+
+
+def _background_footprint_offsets_km(rng, bg_density_km2):
+    """
+    TASK 6: sparse Poisson-scattered background-annulus footprint centers
+    (see module docstring for why this uses a different, calibrated-only
+    model rather than SAM-raster geometry).
+    """
+    annulus_area_km2 = np.pi * (IME_BG_OUT_KM ** 2 - IME_BG_IN_KM ** 2)
+    n_expected = max(bg_density_km2 * annulus_area_km2, 0.0)
+    n = int(rng.poisson(n_expected)) if n_expected > 0 else 0
+    if n == 0:
+        return np.zeros(0), np.zeros(0)
+    r = np.sqrt(rng.uniform(IME_BG_IN_KM ** 2, IME_BG_OUT_KM ** 2, size=n))
+    theta = rng.uniform(0.0, 2 * np.pi, size=n)
+    return r * np.cos(theta), r * np.sin(theta)
+
+
+def _evaluate_footprints_ppm(rng, east_km, north_km, Q_t_per_year, wind_speed_ms,
+                              wind_from_deg, stack_height_m, stability_class):
+    """
+    TASK 6: small-footprint area-average (FOOTPRINT_SUBGRID_N x
+    FOOTPRINT_SUBGRID_N subsamples spanning each footprint's real
+    1.6km x 2.2km rectangular extent, consistent with Task 2's per-pixel
+    averaging principle applied at footprint scale) ppm value at each
+    scattered footprint center, with BUG 1's near-field guard applied at
+    every subsample. Same underlying physics as the training tile and the
+    Task 4/5 readout grid -- only the sample locations differ.
+    """
+    if east_km.size == 0:
+        return np.zeros(0)
+
+    cross_offsets = ((np.arange(FOOTPRINT_SUBGRID_N) + 0.5) / FOOTPRINT_SUBGRID_N
+                      * FOOTPRINT_CROSS_TRACK_KM - FOOTPRINT_CROSS_TRACK_KM / 2.0)
+    along_offsets = ((np.arange(FOOTPRINT_SUBGRID_N) + 0.5) / FOOTPRINT_SUBGRID_N
+                      * FOOTPRINT_ALONG_TRACK_KM - FOOTPRINT_ALONG_TRACK_KM / 2.0)
+
+    if Q_t_per_year > 0:
+        theta = np.radians(wind_from_deg + 180.0)
+        near_field_floor_m = max(3.0 * stack_height_m, 300.0)
+        acc = np.zeros_like(east_km, dtype=np.float64)
+        for dy in along_offsets:
+            for dx in cross_offsets:
+                e_m = (east_km + dx) * 1000.0
+                n_m = (north_km + dy) * 1000.0
+                downwind_x = e_m * np.sin(theta) + n_m * np.cos(theta)
+                crosswind_y = e_m * np.cos(theta) - n_m * np.sin(theta)
+                dx_clipped = np.where(downwind_x > near_field_floor_m,
+                                       downwind_x, near_field_floor_m)
+                conc = plume_model.ground_level_concentration(
+                    Q_t_per_year, wind_speed_ms, stack_height_m,
+                    dx_clipped, crosswind_y, stability_class)
+                conc = np.where(downwind_x <= 0, 0.0, conc)
+                acc += conc
+        conc_kg_m3 = acc / (FOOTPRINT_SUBGRID_N * FOOTPRINT_SUBGRID_N)
+        enhancement_ppm = conc_kg_m3 * H_PBL_M * PPM_PER_KG_M2
+    else:
+        enhancement_ppm = np.zeros_like(east_km, dtype=np.float64)
+
+    noise = rng.normal(0.0, SOUNDING_NOISE_STD_PPM, size=east_km.shape)
+    return BG_XCO2_PPM + enhancement_ppm + noise
+
+
+def simulate_sam_day_soundings(rng, day_int, Q_t_per_year, wind_speed_ms, wind_from_deg,
+                                stack_height_m, stability_class, retention_frac, bg_density_ratio):
+    """
+    TASK 6: one simulated facility-day's full sparse sounding set (near
+    SAM-box scan + background-annulus scatter), in the same lat/lon/xco2/
+    day array shape physics_ime.estimate_emission_rate_from_arrays()
+    expects. Synthetic lat/lon are built from the same km/111-deg
+    conversion used throughout this file (KM_PER_DEG), with the facility
+    placed at (lat, lon) = (0, 0) -- an arbitrary but harmless reference
+    since only relative distance matters and physics_ime.py's own `dist`
+    computation applies no cos(lat) correction either.
+    """
+    near_east, near_north = _sam_scan_footprint_offsets_km(rng, retention_frac)
+    near_zone_density_km2 = retention_frac * RAW_FOOTPRINTS_PER_SAM_SCAN / SAM_BOX_AREA_KM2
+    bg_density_km2 = bg_density_ratio * near_zone_density_km2
+    bg_east, bg_north = _background_footprint_offsets_km(rng, bg_density_km2)
+
+    east_all = np.concatenate([near_east, bg_east])
+    north_all = np.concatenate([near_north, bg_north])
+    xco2_all = _evaluate_footprints_ppm(rng, east_all, north_all, Q_t_per_year, wind_speed_ms,
+                                         wind_from_deg, stack_height_m, stability_class)
+    lat_all = north_all / KM_PER_DEG
+    lon_all = east_all / KM_PER_DEG
+    day_all = np.full(east_all.shape, day_int, dtype=np.int64)
+    return lat_all, lon_all, xco2_all, day_all, len(near_east), len(bg_east)
+
+
+def recover_q_from_sam_scans(rng, facility_name, Q_t_per_year, wind_speed_ms, stack_height_m,
+                              stability_class, n_days, retention_frac, bg_density_ratio,
+                              day_start=20200101):
+    """
+    TASK 6: simulates n_days independent SAM-scan days (fresh wind
+    direction each day) for one facility, pools all their sparse soundings
+    the way physics_ime.py itself pools real per-overpass soundings for
+    one plant, and reads Q back out via
+    physics_ime.estimate_emission_rate_from_arrays() -- the project's own,
+    unmodified IME implementation, not a hand-rolled readout. Returns
+    (result_dict_or_None, per_day_wind_from_deg, n_near_total, n_bg_total,
+    simple_ppm_readout_or_None).
+    """
+    lat_all, lon_all, xco2_all, day_all = [], [], [], []
+    wind_dirs = []
+    n_near_total = n_bg_total = 0
+    for i in range(n_days):
+        wind_from_deg = float(rng.uniform(0.0, 360.0))
+        day_int = day_start + i
+        lat, lon, xco2, day, n_near, n_bg = simulate_sam_day_soundings(
+            rng, day_int, Q_t_per_year, wind_speed_ms, wind_from_deg,
+            stack_height_m, stability_class, retention_frac, bg_density_ratio)
+        lat_all.append(lat)
+        lon_all.append(lon)
+        xco2_all.append(xco2)
+        day_all.append(day)
+        wind_dirs.append(wind_from_deg)
+        n_near_total += n_near
+        n_bg_total += n_bg
+
+    lat_all = np.concatenate(lat_all)
+    lon_all = np.concatenate(lon_all)
+    xco2_all = np.concatenate(xco2_all)
+    day_all = np.concatenate(day_all)
+
+    dist_km = np.sqrt(lat_all ** 2 + lon_all ** 2) * KM_PER_DEG
+    near_mask = dist_km < IME_NEAR_KM
+    bg_mask = (dist_km > IME_BG_IN_KM) & (dist_km < IME_BG_OUT_KM)
+    simple_ppm_readout = (float(xco2_all[near_mask].mean() - xco2_all[bg_mask].mean())
+                           if near_mask.sum() > 0 and bg_mask.sum() > 0 else None)
+
+    plant_row = {"lat": 0.0, "lon": 0.0}
+    wind_series = {int(day_start + i): wind_speed_ms for i in range(n_days)}
+    result = physics_ime.estimate_emission_rate_from_arrays(
+        facility_name, lat_all, lon_all, xco2_all, day_all, plant_row, wind_series)
+    return result, wind_dirs, n_near_total, n_bg_total, simple_ppm_readout
+
+
+def validate_sam_sounding_counts(seed=SEED, n_repeats=5):
+    """
+    TASK 6 REQUIRED VALIDATION -- run BEFORE trusting anything downstream.
+    For each of SAM_VALIDATION_FACILITIES, replays that REAL facility's
+    own (Q, wind speed, hit_days) through this simulator n_repeats times
+    (retention_frac and bg_density_ratio drawn fresh each repeat from
+    their real-data-calibrated ranges) and compares simulated sounding
+    counts to that facility's actual real counts. If simulated density
+    were off by an order of magnitude from real, the geometry parameters
+    would be wrong and nothing downstream should be trusted.
+    """
+    rng = np.random.default_rng(seed)
+    rows = []
+    for name, (q, wind_speed, hit_days, real_n_used, real_soundings) in SAM_VALIDATION_FACILITIES.items():
+        sim_near, sim_bg, sim_n_used, sim_q_ratio = [], [], [], []
+        for _ in range(n_repeats):
+            retention = float(rng.uniform(*RETENTION_FRAC_RANGE))
+            bg_ratio = float(rng.uniform(*BG_DENSITY_RATIO_RANGE))
+            result, _, n_near, n_bg, _ = recover_q_from_sam_scans(
+                rng, f"{name}_sim", q, wind_speed, 220.0, "B", hit_days, retention, bg_ratio)
+            sim_near.append(n_near)
+            sim_bg.append(n_bg)
+            if result is not None:
+                sim_n_used.append(result["n_soundings_used"])
+                sim_q_ratio.append(result["q_t_per_year"] / q)
+        rows.append(dict(
+            facility=name,
+            real_soundings_total=real_soundings,
+            sim_near_total_mean=float(np.mean(sim_near)),
+            sim_near_total_range=(int(np.min(sim_near)), int(np.max(sim_near))),
+            near_ratio_sim_over_real=float(np.mean(sim_near)) / real_soundings,
+            real_n_soundings_used=real_n_used,
+            sim_n_soundings_used_mean=float(np.mean(sim_n_used)) if sim_n_used else None,
+            n_used_ratio_sim_over_real=(float(np.mean(sim_n_used)) / real_n_used) if sim_n_used else None,
+            true_q_t_per_year=q,
+            recovered_q_ratio_mean=float(np.mean(sim_q_ratio)) if sim_q_ratio else None,
+            recovered_q_ratio_range=((min(sim_q_ratio), max(sim_q_ratio)) if sim_q_ratio else None),
+            n_repeats_with_valid_result=len(sim_q_ratio),
+        ))
+    return rows
+
+
+def make_tile(rng, positive, q=None, wind_speed=None, stack_height=None, stability=None,
+              wind_from_deg=None):
     """
     Generates ONE single-snapshot training tile (one wind direction, one
     simulated day, its own exact mask) -- unchanged mechanism from Tasks
     1-4. The optional q/wind_speed/stack_height/stability let TASK 5's
     facility grouping (see module docstring) share those facility-level
-    physical characteristics across several calls; wind_from_deg is
-    ALWAYS resampled fresh inside this function regardless, since a real
-    single overpass never shares its wind direction with another day.
-    Calling this with no optional args (the Tasks 1-4 behavior) samples
-    everything independently, exactly as before.
+    physical characteristics across several calls. wind_from_deg is
+    resampled fresh inside this function UNLESS explicitly passed in --
+    TASK 6 passes the SAME day's wind_from_deg used to generate that
+    day's SAM scan, so one simulated SAM-style scan = one training tile
+    (same physical realization), per the explicit requirement that the
+    sparse-sampling geometry change must not decouple a tile's image from
+    its calibration readout. Calling this with no optional args (the
+    Tasks 1-4 behavior) samples everything independently, exactly as
+    before.
     """
     if positive:
         if q is None:
@@ -373,7 +683,8 @@ def make_tile(rng, positive, q=None, wind_speed=None, stack_height=None, stabili
                                           np.log(Q_T_PER_YEAR_RANGE[1]))))
         if wind_speed is None:
             wind_speed = float(rng.uniform(*WIND_SPEED_RANGE))
-        wind_from_deg = float(rng.uniform(0.0, 360.0))
+        if wind_from_deg is None:
+            wind_from_deg = float(rng.uniform(0.0, 360.0))
         if stack_height is None:
             stack_height = float(rng.uniform(*STACK_HEIGHT_RANGE))
         if stability is None:
@@ -424,15 +735,20 @@ def main():
     tiles, masks, q_values, all_params = [], [], [], []
     facility_records = []
 
-    # TASK 5: positive tiles are generated in synthetic-facility groups.
-    # Each facility draws ONE (Q, wind speed, stack height, stability) and
-    # a real-data-sourced n_days (HIT_DAYS_POOL); each of its n_days draws
-    # a FRESH wind direction and is saved as its own independent,
-    # unaggregated single-snapshot training tile via make_tile() -- the
-    # exact same generation mechanism as Tasks 1-4. Pooling (physics_ime.py
-    # style: concatenate raw near/bg samples across days, then take the
-    # mean) happens ONLY in the separate calibration readout below, never
-    # touching the saved tiles/masks themselves.
+    # TASK 6: positive tiles are still generated in synthetic-facility
+    # groups (Task 5's structure), but the calibration readout now uses
+    # simulated OCO-3 SAM-mode sparse sounding geometry + physics_ime.py's
+    # own IME logic, replacing Task 4/5's exhaustive-grid mean-difference.
+    # Each facility draws ONE (Q, wind speed, stack height, stability,
+    # retention_frac, bg_density_ratio); each of its n_days (HIT_DAYS_POOL)
+    # draws ONE fresh wind direction, shared between that day's training
+    # tile (make_tile(), unchanged single-snapshot mechanism) and that
+    # day's simulated SAM scan -- one simulated SAM-style scan = one
+    # training tile, per the explicit requirement. Pooling across a
+    # facility's days happens via physics_ime.estimate_emission_rate_from_arrays()
+    # itself, exactly matching how the real per-plant pipeline pools
+    # soundings across hit_days -- never touching the saved tiles/masks.
+    n_facilities_insufficient = 0
     for facility_id in range(NUM_POSITIVE_FACILITIES):
         q = float(np.exp(rng.uniform(np.log(Q_T_PER_YEAR_RANGE[0]),
                                       np.log(Q_T_PER_YEAR_RANGE[1]))))
@@ -440,26 +756,55 @@ def main():
         stack_height = float(rng.uniform(*STACK_HEIGHT_RANGE))
         stability = str(rng.choice(STABILITY_CLASSES))
         n_days = int(rng.choice(HIT_DAYS_POOL))
+        retention_frac = float(rng.uniform(*RETENTION_FRAC_RANGE))
+        bg_density_ratio = float(rng.uniform(*BG_DENSITY_RATIO_RANGE))
+        day_start = 20200101 + facility_id * 40  # keep each facility's days in a distinct, non-overlapping dummy date block
 
-        day_near, day_bg, day_wind_dirs = [], [], []
-        for _ in range(n_days):
+        lat_all, lon_all, xco2_all, day_all = [], [], [], []
+        day_wind_dirs, n_near_total, n_bg_total = [], 0, 0
+        for day_idx in range(n_days):
+            wind_from_deg = float(rng.uniform(0.0, 360.0))
+            day_int = day_start + day_idx
+
             tile, mask, params = make_tile(rng, positive=True, q=q, wind_speed=wind_speed,
-                                            stack_height=stack_height, stability=stability)
+                                            stack_height=stack_height, stability=stability,
+                                            wind_from_deg=wind_from_deg)
             params["facility_id"] = facility_id
             tiles.append(tile)
             masks.append(mask)
             q_values.append(params["q_t_per_year"])
             all_params.append(params)
 
-            near_vals, bg_vals = _readout_zone_samples(
-                rng, q, wind_speed, params["wind_from_deg"], stack_height, stability)
-            day_near.append(near_vals)
-            day_bg.append(bg_vals)
-            day_wind_dirs.append(params["wind_from_deg"])
+            lat, lon, xco2, day, n_near, n_bg = simulate_sam_day_soundings(
+                rng, day_int, q, wind_speed, wind_from_deg, stack_height, stability,
+                retention_frac, bg_density_ratio)
+            lat_all.append(lat)
+            lon_all.append(lon)
+            xco2_all.append(xco2)
+            day_all.append(day)
+            day_wind_dirs.append(wind_from_deg)
+            n_near_total += n_near
+            n_bg_total += n_bg
 
-        pooled_near = np.concatenate(day_near)
-        pooled_bg = np.concatenate(day_bg)
-        pooled_readout = float(pooled_near.mean() - pooled_bg.mean())
+        lat_all = np.concatenate(lat_all)
+        lon_all = np.concatenate(lon_all)
+        xco2_all = np.concatenate(xco2_all)
+        day_all = np.concatenate(day_all)
+
+        dist_km = np.sqrt(lat_all ** 2 + lon_all ** 2) * KM_PER_DEG
+        near_mask = dist_km < IME_NEAR_KM
+        bg_mask = (dist_km > IME_BG_IN_KM) & (dist_km < IME_BG_OUT_KM)
+        simple_ppm_readout = (float(xco2_all[near_mask].mean() - xco2_all[bg_mask].mean())
+                               if near_mask.sum() > 0 and bg_mask.sum() > 0 else None)
+
+        plant_row = {"lat": 0.0, "lon": 0.0}
+        wind_series = {int(day_start + i): wind_speed for i in range(n_days)}
+        result = physics_ime.estimate_emission_rate_from_arrays(
+            f"synthetic_facility_{facility_id}", lat_all, lon_all, xco2_all, day_all,
+            plant_row, wind_series)
+        if result is None:
+            n_facilities_insufficient += 1
+
         facility_records.append(dict(
             facility_id=facility_id,
             q_t_per_year=q,
@@ -467,8 +812,16 @@ def main():
             stack_height_m=stack_height,
             stability_class=stability,
             n_days=n_days,
+            retention_frac=retention_frac,
+            bg_density_ratio=bg_density_ratio,
             per_day_wind_from_deg=day_wind_dirs,
-            pooled_ime_readout_ppm=pooled_readout,
+            n_near_soundings_total=n_near_total,
+            n_bg_soundings_total=n_bg_total,
+            simple_ppm_readout=simple_ppm_readout,
+            ime_result_available=result is not None,
+            ime_recovered_q_t_per_year=(result["q_t_per_year"] if result is not None else None),
+            ime_recovered_q_ratio=((result["q_t_per_year"] / q) if result is not None else None),
+            ime_n_soundings_used=(result["n_soundings_used"] if result is not None else None),
         ))
 
     for _ in range(N_NEGATIVE):
@@ -487,7 +840,11 @@ def main():
     pos_peaks = np.array([p["peak_enhancement_ppm"] for p in all_params if p["positive"]])
     pos_ime_readout = np.array([p["ime_readout_ppm"] for p in all_params if p["positive"]])
     neg_ime_readout = np.array([p["ime_readout_ppm"] for p in all_params if not p["positive"]])
-    pooled_readouts = np.array([r["pooled_ime_readout_ppm"] for r in facility_records])
+    sam_simple_readouts = np.array([r["simple_ppm_readout"] for r in facility_records
+                                     if r["simple_ppm_readout"] is not None])
+    valid_facilities = [r for r in facility_records if r["ime_result_available"]]
+    sam_q_ratios = np.array([r["ime_recovered_q_ratio"] for r in valid_facilities])
+    sam_n_soundings_used = np.array([r["ime_n_soundings_used"] for r in valid_facilities])
     n_positive_tiles = int(pos_peaks.size)
     real_min, real_max = -1.277, 3.698  # data/plant_results.json co2_enhancement_ppm, N=24
     # Full real distribution (not just min/max), data/plant_results.json
@@ -505,15 +862,26 @@ def main():
             max=float(vals.max()),
         )
 
+    print("Running TASK 6 required sounding-count validation against 5 real facilities "
+          "(their own real Q/wind speed/hit_days replayed through this simulator) "
+          "before trusting anything else...")
+    sam_validation = validate_sam_sounding_counts(seed=SEED, n_repeats=5)
+
     calibration_report = dict(
         n_positive_facilities=NUM_POSITIVE_FACILITIES,
         n_positive_tiles=n_positive_tiles,
         n_negative=N_NEGATIVE,
+        n_facilities_with_insufficient_soundings=n_facilities_insufficient,
         hit_days_pool_source="data/plant_results.json hit_days, N=30 (min 1, max 25, median 8, mean 9.93)",
+        retention_frac_range=RETENTION_FRAC_RANGE,
+        bg_density_ratio_range=BG_DENSITY_RATIO_RANGE,
+        sam_sounding_count_validation=sam_validation,
         peak_enhancement_ppm_stats=_dist_stats(pos_peaks),
         ime_readout_ppm_stats=_dist_stats(pos_ime_readout),
         ime_readout_ppm_stats_negative_tiles=_dist_stats(neg_ime_readout),
-        pooled_multi_day_ime_readout_ppm_stats=_dist_stats(pooled_readouts),
+        sam_facility_simple_ppm_readout_stats=_dist_stats(sam_simple_readouts),
+        sam_recovered_q_ratio_stats=_dist_stats(sam_q_ratios),
+        sam_n_soundings_used_stats=_dist_stats(sam_n_soundings_used),
         real_reference_distribution_ppm=dict(
             min=real_min, p10=real_p10, median=real_median, mean=real_mean,
             p90=real_p90, p99=real_p99, max=real_max, n_facilities=24,
@@ -522,8 +890,8 @@ def main():
             np.mean((pos_peaks >= real_min) & (pos_peaks <= real_max))),
         frac_positive_tiles_within_real_range_ime_readout=float(
             np.mean((pos_ime_readout >= real_min) & (pos_ime_readout <= real_max))),
-        frac_facilities_within_real_range_pooled_readout=float(
-            np.mean((pooled_readouts >= real_min) & (pooled_readouts <= real_max))),
+        frac_facilities_within_real_range_sam_readout=float(
+            np.mean((sam_simple_readouts >= real_min) & (sam_simple_readouts <= real_max))),
         h_pbl_m_assumption=H_PBL_M,
         area_avg_n=AREA_AVG_N,
         tile_px=PX,
@@ -535,6 +903,7 @@ def main():
         readout_half_extent_km=READOUT_HALF_EXTENT_KM,
         readout_px=READOUT_PX,
         readout_px_size_km=READOUT_PX_SIZE_KM,
+        raw_footprints_per_sam_scan=RAW_FOOTPRINTS_PER_SAM_SCAN,
     )
 
     meta = dict(
@@ -552,20 +921,34 @@ def main():
     print(f"Tile shape: {tiles.shape[1:]} ({SIZE_KM}km / {PX}px, ~{PX_SIZE_M:.1f}m/px)")
     print(f"n_days per facility drawn from real hit_days "
           f"(data/plant_results.json, N=30, min 1 max 25 median 8 mean 9.93)")
+    print(f"n_facilities with insufficient soundings for physics_ime (excluded from Q-recovery stats): "
+          f"{n_facilities_insufficient}/{NUM_POSITIVE_FACILITIES}")
+    print()
+    print("[TASK 6 VALIDATION] simulated vs real sounding counts, 5 real facilities' own "
+          "(Q, wind, hit_days) replayed, 5 repeats each:")
+    for row in sam_validation:
+        print(f"  {row['facility']}: real_soundings={row['real_soundings_total']} "
+              f"sim_near_mean={row['sim_near_total_mean']:.0f} "
+              f"(ratio sim/real={row['near_ratio_sim_over_real']:.2f}x)  "
+              f"real_n_used={row['real_n_soundings_used']} "
+              f"sim_n_used_mean={row['sim_n_soundings_used_mean']:.0f} "
+              f"(ratio={row['n_used_ratio_sim_over_real']:.2f}x)  "
+              f"recovered_Q_ratio_mean={row['recovered_q_ratio_mean']:.3f}")
+    print()
     print(f"[legacy] Peak enhancement (ppm), {n_positive_tiles} positive tiles:")
     for k, v in calibration_report["peak_enhancement_ppm_stats"].items():
         print(f"  {k}: {v:.3f}")
-    print(f"[TASK 4] Single-day IME-consistent readout (ppm), {n_positive_tiles} positive tiles "
+    print(f"[TASK 4] Single-day exhaustive-grid readout (ppm), {n_positive_tiles} positive tiles "
           f"(near<{IME_NEAR_KM:.1f}km minus bg {IME_BG_IN_KM:.1f}-{IME_BG_OUT_KM:.1f}km):")
     for k, v in calibration_report["ime_readout_ppm_stats"].items():
         print(f"  {k}: {v:.3f}")
-    print(f"[TASK 4] Single-day IME-consistent readout (ppm), {N_NEGATIVE} negative "
-          f"(no-plume) tiles (sanity check, should be ~0):")
-    for k, v in calibration_report["ime_readout_ppm_stats_negative_tiles"].items():
+    print(f"[TASK 6] SAM-sparse simple ppm readout (near.mean()-bg.mean() on the sparse "
+          f"sounding set), {NUM_POSITIVE_FACILITIES} synthetic facilities:")
+    for k, v in calibration_report["sam_facility_simple_ppm_readout_stats"].items():
         print(f"  {k}: {v:.3f}")
-    print(f"[TASK 5] POOLED multi-day IME-consistent readout (ppm), "
-          f"{NUM_POSITIVE_FACILITIES} synthetic facilities:")
-    for k, v in calibration_report["pooled_multi_day_ime_readout_ppm_stats"].items():
+    print(f"[TASK 6] physics_ime.py RECOVERED Q / TRUE Q ratio, "
+          f"{len(valid_facilities)}/{NUM_POSITIVE_FACILITIES} synthetic facilities with a valid IME result:")
+    for k, v in calibration_report["sam_recovered_q_ratio_stats"].items():
         print(f"  {k}: {v:.3f}")
     print(f"Real full distribution (ppm), N=24 (data/plant_results.json co2_enhancement_ppm):")
     for k, v in calibration_report["real_reference_distribution_ppm"].items():
@@ -573,8 +956,8 @@ def main():
             print(f"  {k}: {v:.3f}" if isinstance(v, float) else f"  {k}: {v}")
     print(f"Fraction within real min/max range -- peak pixel: "
           f"{calibration_report['frac_positive_tiles_within_real_range_peak']:.3f}, "
-          f"single-day readout: {calibration_report['frac_positive_tiles_within_real_range_ime_readout']:.3f}, "
-          f"pooled multi-day readout: {calibration_report['frac_facilities_within_real_range_pooled_readout']:.3f}")
+          f"single-day exhaustive-grid readout: {calibration_report['frac_positive_tiles_within_real_range_ime_readout']:.3f}, "
+          f"SAM-sparse simple readout: {calibration_report['frac_facilities_within_real_range_sam_readout']:.3f}")
     print(f"Meta + calibration report written to {OUT_META}")
 
 

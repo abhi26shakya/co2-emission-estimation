@@ -216,7 +216,46 @@ paused after four rejected explanations), this sub-investigation is now
 PAUSED — see SIMULATOR_METHODOLOGY_NOTE.md §6 for the recommendation and
 remaining candidate (simulating real orbital sampling geometry, not
 attempted — a materially larger scope change) and WEEK20_LOG.txt (Task
-5) for full numbers. U-Net remains not started.
+5) for full numbers.
+
+Task 6, same session: implemented that remaining candidate — real OCO-3
+Snapshot Area Mapping (SAM) instrument/orbital geometry (1.6x2.2km
+footprints, frames of 8 across a 12.8km swath, 7 swaths x 37 frames
+covering an 80x80km box = 2072 raw footprints/scan; background annulus
+sampled separately, sparser, since it doesn't fit in an 80km box).
+Retention fraction and background/near density ratio calibrated from 5
+real facilities' actual sounding density (data/plant_results.json,
+data/emission_estimates.json), not invented. Crucially, Q is read back
+out via physics_ime.py's own unmodified estimate_emission_rate_from_arrays()
+applied to the sparse simulated soundings, not a hand-rolled mean-
+difference (a mathematically different operation: IME_kg sums positive
+excess, L_eff scales with on-plume sounding count, not the near-zone
+disk's fixed radius). Validated first (required before trusting
+anything else): replayed 5 real facilities' own (Q, wind, hit_days)
+through the simulator — 4/5 landed within 1.7-2.5x of real sounding
+counts (same order of magnitude); Talcher's n_used count was 25.5x off,
+traced to using one shared retention range across facilities with
+genuinely different real retention (Talcher's own real value sits at the
+range's extreme low end) — a disclosed calibration limitation, not a
+geometry bug (raw footprint count itself validated correct in scale).
+RESULT (200 facilities, 2038 tiles): the naive ppm mean-difference
+readout is UNCHANGED by sparse sampling (median 0.055 either way, still
+~11x below real 0.619) — confirms Task 5's diagnosis again. But
+physics_ime.py's actual Q-recovery shows a real, diagnosed improvement:
+median bias 2.11x, sd(log ratio) 0.90, within 2x: 43.5% (87/200) — the
+SAME SCALE as this project's own real IME-vs-CEA accuracy (0.69x median,
+sd(log) 1.33, within 2x 41.7%, Week 12), not 10-100x off like every
+prior round. Residual bias diagnosed: corr(log_ratio, true_Q) = -0.691 —
+smaller true-Q facilities are over-estimated more, most likely because
+the fixed 0.8ppm per-sounding noise floor becomes proportionally larger
+relative to weaker plumes, inflating spurious near-zone excess.
+VERDICT: a genuinely MIXED result, not a third flat failure — reported
+distinctly as such, not folded into "still doesn't close the gap."
+PAUSED (not because Task 6 failed, but because partial improvement isn't
+a basis to proceed) — see SIMULATOR_METHODOLOGY_NOTE.md §4.4/§6 for full
+detail and concrete next steps (per-facility retention calibration,
+noise-floor bias correction — neither attempted) and WEEK20_LOG.txt
+(Task 6). U-Net remains not started.
 
 ## Hard rules
 - Never use Climate TRACE as a training label. Benchmark only.

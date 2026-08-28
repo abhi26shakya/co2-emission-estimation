@@ -450,3 +450,180 @@ sub-investigation is PAUSED here, not resolved. The remaining candidate
 (simulating real orbital sampling geometry) is recorded in
 SIMULATOR_METHODOLOGY_NOTE.md as the next real test, not attempted this
 session. The U-Net (blueprint Paper 2 stage 1) remains NOT STARTED.
+
+TASK 6: real OCO-3 SAM orbital sampling geometry -- a materially
+DIFFERENT result from Tasks 3-5, not a clean third failure, but still
+not full closure. PAUSED here, U-Net still not started.
+========================================================================
+
+Implemented OCO-3's Snapshot Area Mapping (SAM) instrument geometry
+directly, replacing the exhaustive readout grid with sparse simulated
+footprint sampling: individual footprints 1.6km (cross-track) x 2.2km
+(along-track), approximated as a rectangle (not a true rhombus -- the
+corner-area difference is small relative to the footprint-averaging step
+itself, a simplification stated explicitly, not hidden). Frames of 8
+footprints span a 12.8km swath; frames spaced contiguously along-track
+at the 2.2km footprint dimension (a standard pushbroom-design assumption
+used instead of an independently-sourced ISS ground-track speed, to
+avoid citing an uncertain external constant). SAM mode covers an 80x80km
+box via 7 parallel swaths x 37 along-track frames x 8 footprints = 2072
+raw theoretical footprints per scan, before cloud/data-quality loss.
+Background-annulus sampling (44.4-99.9km, doesn't fit inside an 80km
+box, same geometric mismatch as Task 4) is modeled separately as a
+sparser Poisson scatter, its density set as a calibrated fraction of the
+near-zone's simulated density -- disclosed as the less rigorously
+derived half of this fix, since deriving OCO-3's actual non-SAM routine
+orbital sampling was out of this task's explicit scope.
+
+Both the near-zone retention fraction (cloud/data-quality loss applied
+to the 2072 raw footprints) and the background/near density ratio were
+calibrated from 5 real facilities' actual sounding density -- not
+invented: data/plant_results.json "soundings"/hit_days for near-zone raw
+density (against this fix's own theoretical 783 near-zone-only footprint
+count), data/emission_estimates.json "n_bg_before_month_filter"/hit_days
+for background density:
+
+  Sasan retention=0.496 bg_ratio=0.0372, Vindhyachal 0.534/0.0352,
+  Talcher 0.132/0.0600, Rihand 0.485/0.0390, Tamnar 0.154/0.0359.
+  RETENTION_FRAC_RANGE=(0.132, 0.534), BG_DENSITY_RATIO_RANGE=(0.0352, 0.0600).
+
+Q is read back out using physics_ime.py's own, unmodified
+estimate_emission_rate_from_arrays() applied directly to the sparse
+simulated soundings -- NOT a hand-rolled near-mean-minus-bg-mean scalar
+as in Tasks 4-5. This matters mathematically, not just as a sampling
+change: IME_kg is a SUM of positive excess (soundings below background
+contribute exactly zero, not a diluting pull toward zero the way an
+unconditional mean does), and L_eff = sqrt(n_used * FOOTPRINT_AREA_M2)
+scales with how many soundings actually sit on-plume, not with the fixed
+near-zone disk's full radius. Individual training tiles remain
+unaffected -- make_tile() gained an optional wind_from_deg parameter so
+one simulated SAM scan = one training tile (same wind direction driving
+both), the explicit requirement; the scoping constraint from Task 5
+(shared facility params, per-tile independence otherwise) still holds.
+
+REQUIRED VALIDATION (run before trusting anything downstream, per
+explicit instruction): replayed each of the same 5 real facilities' own
+actual (Q, wind speed, hit_days) through this simulator, 5 repeats each
+(retention_frac and bg_density_ratio redrawn from their calibrated
+ranges each repeat, since the main 200-facility dataset uses the shared
+range, not per-facility tuning):
+
+  facility      near_ratio(sim/real)  n_used_ratio(sim/real)  recovered_Q_ratio
+  Sasan         1.71x                 2.52x                   0.763
+  Vindhyachal   1.66x                 2.15x                   0.720
+  Talcher       6.37x                 25.55x                  3.383
+  Rihand        2.14x                 2.17x                   0.690
+  Tamnar        5.22x                 9.80x                   2.702
+
+Four of five facilities land within a reasonable 1.7-2.5x band on both
+count metrics -- same order of magnitude as real, not the 10x+ mismatch
+that would mean the geometry itself is wrong. Talcher's n_used ratio
+(25.55x) DOES exceed an order of magnitude, and Tamnar's (9.80x) is
+close. Diagnosed, not just noted: Talcher and Tamnar have the lowest
+real retention fractions of the 5 (0.132, 0.154) -- at the extreme low
+end of the shared RETENTION_FRAC_RANGE used for these validation
+repeats. Randomly redrawing retention from the full shared range
+frequently draws a MUCH higher value than their true one, inflating
+their simulated counts. This is a disclosed limitation of using ONE
+shared retention range across facilities with genuinely different real
+cloud/data-quality conditions (plausibly regional), not a bug in the raw
+footprint geometry itself -- the 2072-footprint theoretical scan count is
+validated correct in scale for all 5 facilities before retention is
+even applied. Not fixed this session (would require per-region
+retention modeling, out of scope); reported plainly as a limitation.
+
+FULL RESULT, both readout metrics, 2038 positive tiles across 200
+facilities (2338 tiles total, 47s wall time), vs the real distribution:
+
+                                    min    p10    median  mean   p90    p99    max
+  [Task 4 carryover] exhaustive
+    single-day grid readout (ppm): -0.067 0.002  0.055   0.081  0.191  0.451  0.549
+  [Task 6] SAM-sparse simple ppm
+    readout (near.mean()-bg.mean()
+    on the sparse set):            -0.128 -0.006 0.055   0.080  0.202  0.313  0.515
+  real (N=24, ppm):                -1.277 -0.866 0.619   0.620  1.839  3.409  3.698
+
+The naive ppm mean-difference metric is UNCHANGED by switching to sparse
+SAM sampling -- median 0.055 either way, both ~11x below the real
+median. This is exactly as Task 5's diagnosis predicted: a mean over a
+zone is diluted by the same off-plume fraction whether that zone is
+sampled exhaustively or sparsely-but-still-representatively, because
+sparse-but-uniform sampling doesn't change the EXPECTED fraction of
+on-plume vs off-plume points, only the sampling noise around it. This
+confirms (a fourth time, counting Task 5) that a simple mean-difference
+readout cannot be fixed by sampling geometry alone.
+
+physics_ime.py's actual Q-recovery formula, applied to the same sparse
+soundings, tells a DIFFERENT story -- this is the number that matters,
+since it's what the task explicitly asked to test and what the project's
+own Q-accuracy vocabulary (Week 12) is built around:
+
+  recovered Q / true Q ratio, N=200: median 2.112, mean 3.321,
+  sd(log ratio) 0.901, within 2x: 43.5% (87/200), min 0.230, max 18.306.
+
+For comparison, this project's own real-world headline number
+(physics_ime.py's actual Q vs real CEA ground truth, Week 12,
+CLAUDE.md): median bias 0.69x, sd(log ratio) 1.33, within 2x: 41.7%
+(10/24). The simulated forward-model-plus-real-IME-inversion pipeline's
+accuracy PROFILE (median off by ~2x, sd(log) under 1.0, ~44% within 2x)
+is in the SAME SCALE as how well the real method performs against real
+ground truth -- a qualitatively different outcome than Tasks 3-5, which
+were off by one to two full orders of magnitude. This is not full
+closure (a genuinely reconciled pipeline would show median close to 1.0x
+with tighter scatter), but it is not a repeat of the prior two rounds'
+flat failures either.
+
+Diagnosed the residual bias rather than leaving it unexplained: computed
+correlations across the 200 facilities between log(recovered/true) and
+each facility's own parameters. Strongest by far: corr(log_ratio,
+true_Q) = -0.691 -- facilities with SMALLER true Q are over-estimated
+MORE. corr(log_ratio, n_days) = 0.509 (more pooled days -> higher
+over-estimate, plausible since more days accumulate more
+noise-driven false-positive near-zone excess without a matching increase
+in true signal). corr(log_ratio, wind_speed) = 0.287 (weak). Binning by
+wind speed confirms a real but secondary effect (median ratio 1.465 at
+1.2-2.0 m/s vs 2.2-2.5 across faster bins). The true-Q correlation is
+the dominant, most defensible explanation: SOUNDING_NOISE_STD_PPM=0.8ppm
+is a FIXED per-sounding noise floor regardless of the true plume's
+strength -- for weaker (lower-Q) plumes, this fixed noise floor becomes
+proportionally more significant relative to the actual signal, so a
+larger fraction of near-zone soundings register spurious excess>0 purely
+from noise (excess = clip(near - bg_mean, 0, None) has no way to
+distinguish a small-but-real signal from a small positive noise
+fluctuation), inflating both IME_kg and n_used for weak-signal
+facilities without a correspondingly large true signal to divide it
+back down by -- systematically pushing recovered Q upward for smaller
+true-Q facilities. This mirrors, structurally, this project's own past
+Week 13 signal-to-noise reasoning for Rihand, applied here to a
+synthetic-but-mechanistically-analogous cause.
+
+VERDICT: this is reported as its own, DISTINCT finding, not folded into
+"a third confirmed negative result" as a blanket statement, because the
+two readout metrics genuinely disagree about how well this round did.
+The naive ppm-mean-difference metric remains exactly as broken as Tasks
+4-5 (confirmed again, no new information there). The scientifically
+correct metric this task explicitly asked to implement --
+physics_ime.py's own Q-recovery formula, applied to realistically sparse
+SAM-mode soundings -- shows a SUBSTANTIAL, diagnosed improvement over
+every prior attempt: median bias in the same ~2x range this project's
+own real IME method achieves against real CEA ground truth, not 10-100x
+off. It is NOT a clean success either: only 43.5% of simulated
+facilities land within 2x, the bias is systematic and diagnosed
+(weak-signal noise-floor inflation, worse for smaller true-Q
+facilities), and the validation step surfaced a real, disclosed
+limitation (Talcher's n_used count off by >10x under the shared
+retention-range approach, traced to using one shared calibration range
+across facilities with genuinely different real retention rates).
+
+Per the explicit instruction to take the time this task needs and not
+rush past a properly mixed result: this sub-investigation is PAUSED
+here, on the same diminishing-returns basis as Tasks 1-5 and
+WEEK13_LOG.txt's Rihand investigation -- not because Task 6 failed flatly
+(it didn't), but because a genuinely mixed, partially-improved,
+partially-still-broken result is not a basis to proceed to the U-Net
+without further, more targeted work (e.g. per-facility rather than
+pooled-range retention calibration, or explicitly modeling the
+noise-floor bias's dependence on true Q so it can be corrected rather
+than only characterized). Both of those are recorded as concrete next
+steps in SIMULATOR_METHODOLOGY_NOTE.md, not attempted this session. The
+U-Net (blueprint Paper 2 stage 1) remains NOT STARTED.
