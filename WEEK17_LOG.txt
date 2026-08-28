@@ -1,0 +1,98 @@
+WEEK 17 — RESEARCH_PAPER.md consistency pass: a real documentation gap
+                        found (not just staleness), §5.2.1b written, the
+                        paper retitled
+
+- Question: as sections accumulate across sessions, does the paper's own
+  abstract and conclusion stay in sync with the body, or does a
+  skimming-reviewer-facing summary quietly go stale? Specific checks
+  requested: (1) do the abstract and conclusion state the same core
+  findings in the same terms; (2) does the abstract mention every major
+  finding, not just the earliest ones; (3) does Future Work list exactly
+  what's genuinely still untested; (4) do numbers repeated in multiple
+  places match exactly; (5) does the title still fit.
+
+- Audit result, most consequential finding: "capacity beats satellite"
+  (Week 12's baseline_capacity.py result, already recorded in
+  CLAUDE.md's headline numbers) had NEVER been written into
+  RESEARCH_PAPER.md at all -- not stale, simply absent. Full-file grep
+  for "capacity.*beat" and "baseline_capacity" turned up nothing before
+  this pass. This is a pre-existing gap predating this session's other
+  edits, not something that went stale from recent work.
+
+- Secondary findings, genuine staleness (not absence): §5.2.8 (Gaussian
+  cross-section, Week 15) and §3.1 (regional coverage map, Week 16) were
+  both written into the body but never propagated to the abstract or the
+  numbered status list in §8's Conclusion -- exactly the failure mode
+  the audit was asked to check for.
+
+- Future Work check: the per-overpass-wind-direction rerun for the
+  Gaussian cross-section method (later completed in Week 18) was named
+  in §5.2.8's body but missing from §8's numbered list entirely -- added.
+  Plume geometry for Rihand was already present (§8 item 11). A
+  requested "USA/CEMS replication idea" was searched for across the
+  whole repo (RESEARCH_PLAN.md, NEXT_STEPS.md, NOVEL_METHODOLOGY_
+  PROPOSAL.md) and found nowhere as an actual stated future-work item --
+  only as background context for why Climate TRACE isn't ground truth in
+  India. Flagged rather than fabricated; not added to Future Work.
+
+- Number consistency check: Rihand's Climate TRACE mismatch (134%)
+  checked across all 6 mentions in the paper -- consistent everywhere,
+  no 134/135 drift found. The Gaussian cross-section fit rate (10/30)
+  and the coverage-map percentage (130/1,470, 8.8%) were each checked
+  across every citation and found consistent. No numeric inconsistencies
+  survived the audit -- the only real problem was the capacity finding's
+  complete absence, not disagreement between existing numbers.
+
+- Action: wrote new section 5.2.1b ("Capacity Baseline: A Sobering
+  Comparison"), documenting baseline_capacity.py's actual result:
+  capacity_mw alone beats Track B's satellite estimate outright at
+  predicting CEA ground truth (LOO R^2 = 0.527 vs -0.152, N=24; MAE(log)
+  0.398 vs 0.596; within-2x 20/24 vs 15/24), a gap that holds even
+  restricted to IME's own best-case "quality gate" subset (capacity R^2
+  0.665 vs gated IME R^2 -0.242, N=7). Combining capacity with IME
+  doesn't recover the shortfall either (R^2=0.505, marginally worse than
+  capacity alone). Inserted as a LETTERED subsection (5.2.1b, matching
+  the paper's own existing 5.3.1a-d precedent) specifically to avoid
+  renumbering 5.2.2 through 5.2.8 and every cross-reference to them
+  elsewhere in the paper -- a real risk that was caught and avoided
+  before writing anything.
+
+- Propagated the new section everywhere a skimming reader would expect
+  to find it, matching how §5.2.8 and §3.1 were already handled: the
+  abstract (new sentences alongside the existing Rihand mention), the
+  Conclusion's numbered list (new items 12-14, covering the capacity
+  baseline, the Gaussian cross-section result, and the coverage map
+  together), the top-of-file revision note, §1.3 Contributions (leading
+  with the finding, not the method, per explicit direction), and a
+  one-sentence cross-reference added to §5.2.7's Rihand case study,
+  since Rihand's own nameplate capacity would have placed its emissions
+  in a far more defensible range than the satellite estimate did.
+
+- Retitled the paper. Old title ("Wind-Conditioned CO2 Emission
+  Estimation from OCO-3, Corrected Against Independent Ground-Truth
+  Emissions Data: An Uncertainty-Aware, Facility-Generalizing Study of
+  Indian Coal Power Plants") led with the estimation method itself.
+  With §5.2.1b in place, the more consequential result is arguably that
+  a free baseline beats the satellite method, not the method's own
+  internal sophistication. New title, chosen from several options shown
+  before applying: "When Does Satellite CO2 Estimation Beat a Simple
+  Baseline? A Ground-Truth-Validated Study of Indian Coal Power Plants"
+  -- deliberately framed as an open question rather than a flat verdict,
+  since the paper's actual position is nuanced (satellite loses on raw
+  accuracy but is argued for on independent-verifiability grounds
+  instead). "Uncertainty-aware" was dropped from the title on request --
+  true, but a methods detail, not the paper's central finding; it stays
+  fully described in the abstract and §4.2/4.3. Verified no other
+  reference to the old title existed anywhere in the file before
+  applying.
+
+- VERDICT: the audit process itself worked as intended -- it caught a
+  real, consequential documentation gap (not a false-positive staleness
+  scare), left every previously-consistent number untouched, and the fix
+  (a new lettered subsection, not a renumber) avoided introducing the
+  exact kind of cross-reference breakage a less careful edit could have
+  caused.
+
+Files changed: RESEARCH_PAPER.md only (new §5.2.1b, §5.2.7 cross-
+reference, abstract, §8 Conclusion items 12-14, revision note, §1.3
+Contributions, title).
