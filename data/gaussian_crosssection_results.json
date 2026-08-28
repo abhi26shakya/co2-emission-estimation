@@ -1,0 +1,418 @@
+{
+  "method": "gaussian cross-sectional flux",
+  "n_plants_total": 30,
+  "n_fit": 10,
+  "n_skipped": 20,
+  "per_plant": [
+    {
+      "plant": "Akaltara",
+      "status": "skipped",
+      "reason": "too few near/bg soundings"
+    },
+    {
+      "plant": "Anpara",
+      "status": "skipped",
+      "reason": "degenerate fit: sigma pinned at cap (83km)",
+      "n_downwind_soundings": 407,
+      "n_overpass_days_used": 10
+    },
+    {
+      "plant": "Bellary",
+      "status": "skipped",
+      "reason": "too few near/bg soundings"
+    },
+    {
+      "plant": "ChandrapurCoal",
+      "status": "skipped",
+      "reason": "degenerate fit: sigma pinned at cap (83km)",
+      "n_downwind_soundings": 60,
+      "n_overpass_days_used": 3
+    },
+    {
+      "plant": "Chhabra",
+      "status": "skipped",
+      "reason": "too few downwind soundings (0 < 8)",
+      "n_downwind_soundings": 0,
+      "n_overpass_days_used": 0
+    },
+    {
+      "plant": "Dadri(Nctpp)",
+      "status": "skipped",
+      "reason": "degenerate fit: sigma pinned at cap (83km)",
+      "n_downwind_soundings": 756,
+      "n_overpass_days_used": 9
+    },
+    {
+      "plant": "Farakka",
+      "status": "fit",
+      "n_downwind_soundings": 353,
+      "n_overpass_days_used": 7,
+      "bg_mean_ppm": 412.75531005859375,
+      "gaussian_amplitude_kg_m2": 0.016335573954772944,
+      "gaussian_sigma_m": 23412.85936100287,
+      "fit_r2": 0.009350414757506087,
+      "wind_speed_ms": 2.2113413912853783,
+      "wind_mode": "per-overpass",
+      "u_eff_ms": 1.1056706956426892,
+      "q_kg_s": 1059.996882567777,
+      "q_t_per_year": 33428061.688657414
+    },
+    {
+      "plant": "KGudemNew",
+      "status": "fit",
+      "n_downwind_soundings": 114,
+      "n_overpass_days_used": 3,
+      "bg_mean_ppm": 413.97705078125,
+      "gaussian_amplitude_kg_m2": 0.040630281751051274,
+      "gaussian_sigma_m": 18944.663431713136,
+      "fit_r2": 0.17911109139453274,
+      "wind_speed_ms": 2.5049366135649636,
+      "wind_mode": "per-overpass",
+      "u_eff_ms": 1.2524683067824818,
+      "q_kg_s": 2416.5367671063213,
+      "q_t_per_year": 76207903.48746495
+    },
+    {
+      "plant": "Kahalgaon",
+      "status": "skipped",
+      "reason": "too few downwind soundings above background",
+      "n_downwind_soundings": 20,
+      "n_overpass_days_used": 2
+    },
+    {
+      "plant": "Koradi",
+      "status": "skipped",
+      "reason": "degenerate fit: sigma pinned at cap (83km)",
+      "n_downwind_soundings": 328,
+      "n_overpass_days_used": 9
+    },
+    {
+      "plant": "Korba",
+      "status": "fit",
+      "n_downwind_soundings": 63,
+      "n_overpass_days_used": 1,
+      "bg_mean_ppm": 410.849609375,
+      "gaussian_amplitude_kg_m2": 0.007929551588122703,
+      "gaussian_sigma_m": 7684.786670788862,
+      "fit_r2": 0.012770465863475633,
+      "wind_speed_ms": 1.3126873140018682,
+      "wind_mode": "annual-mean (fallback)",
+      "u_eff_ms": 0.6563436570009341,
+      "q_kg_s": 100.25399127344234,
+      "q_t_per_year": 3161609.8687992776
+    },
+    {
+      "plant": "Kudgi",
+      "status": "fit",
+      "n_downwind_soundings": 113,
+      "n_overpass_days_used": 1,
+      "bg_mean_ppm": 415.39447021484375,
+      "gaussian_amplitude_kg_m2": 0.005038693445771087,
+      "gaussian_sigma_m": 29918.748358766894,
+      "fit_r2": 0.008973848446072408,
+      "wind_speed_ms": 3.2513283652972476,
+      "wind_mode": "annual-mean (fallback)",
+      "u_eff_ms": 1.6256641826486238,
+      "q_kg_s": 614.3022826948455,
+      "q_t_per_year": 19372636.78706465
+    },
+    {
+      "plant": "Lalitpur",
+      "status": "skipped",
+      "reason": "too few near/bg soundings"
+    },
+    {
+      "plant": "Mouda",
+      "status": "fit",
+      "n_downwind_soundings": 333,
+      "n_overpass_days_used": 9,
+      "bg_mean_ppm": 412.25555419921875,
+      "gaussian_amplitude_kg_m2": 0.030137150186614035,
+      "gaussian_sigma_m": 12225.524963047686,
+      "fit_r2": 0.24166199526912013,
+      "wind_speed_ms": 1.3626313940787576,
+      "wind_mode": "per-overpass",
+      "u_eff_ms": 0.6813156970393788,
+      "q_kg_s": 629.2279828969707,
+      "q_t_per_year": 19843333.66863887
+    },
+    {
+      "plant": "Mundra",
+      "status": "skipped",
+      "reason": "too few near/bg soundings"
+    },
+    {
+      "plant": "Pryagraj(Bara)",
+      "status": "fit",
+      "n_downwind_soundings": 478,
+      "n_overpass_days_used": 8,
+      "bg_mean_ppm": 413.26873779296875,
+      "gaussian_amplitude_kg_m2": 0.016970708944200774,
+      "gaussian_sigma_m": 18548.43581611484,
+      "fit_r2": 0.03326567714545814,
+      "wind_speed_ms": 2.260281162818783,
+      "wind_mode": "per-overpass",
+      "u_eff_ms": 1.1301405814093914,
+      "q_kg_s": 891.7224095854508,
+      "q_t_per_year": 28121357.908686776
+    },
+    {
+      "plant": "RGundem",
+      "status": "skipped",
+      "reason": "too few downwind soundings (4 < 8)",
+      "n_downwind_soundings": 4,
+      "n_overpass_days_used": 1
+    },
+    {
+      "plant": "Raichur",
+      "status": "skipped",
+      "reason": "degenerate fit: sigma pinned at cap (83km)",
+      "n_downwind_soundings": 18,
+      "n_overpass_days_used": 2
+    },
+    {
+      "plant": "RayalSeema",
+      "status": "skipped",
+      "reason": "degenerate fit: sigma pinned at cap (83km)",
+      "n_downwind_soundings": 21,
+      "n_overpass_days_used": 3
+    },
+    {
+      "plant": "Rihand",
+      "status": "fit",
+      "n_downwind_soundings": 692,
+      "n_overpass_days_used": 10,
+      "bg_mean_ppm": 413.2850646972656,
+      "gaussian_amplitude_kg_m2": 0.047930106816139406,
+      "gaussian_sigma_m": 16246.636111935772,
+      "fit_r2": 0.08814754424886195,
+      "wind_speed_ms": 1.3935503014532902,
+      "wind_mode": "per-overpass",
+      "u_eff_ms": 0.6967751507266451,
+      "q_kg_s": 1360.0486331261855,
+      "q_t_per_year": 42890493.694267385
+    },
+    {
+      "plant": "Sagardighi",
+      "status": "skipped",
+      "reason": "too few downwind soundings (0 < 8)",
+      "n_downwind_soundings": 0,
+      "n_overpass_days_used": 0
+    },
+    {
+      "plant": "Sasan",
+      "status": "fit",
+      "n_downwind_soundings": 911,
+      "n_overpass_days_used": 12,
+      "bg_mean_ppm": 413.3589782714844,
+      "gaussian_amplitude_kg_m2": 0.0494053477223635,
+      "gaussian_sigma_m": 12292.378134720651,
+      "fit_r2": 0.10548607549804778,
+      "wind_speed_ms": 1.3524401211980812,
+      "wind_mode": "per-overpass",
+      "u_eff_ms": 0.6762200605990406,
+      "q_kg_s": 1029.4087517802723,
+      "q_t_per_year": 32463434.396142665
+    },
+    {
+      "plant": "ShriSingajiMalwa",
+      "status": "skipped",
+      "reason": "too few downwind soundings above background",
+      "n_downwind_soundings": 9,
+      "n_overpass_days_used": 1
+    },
+    {
+      "plant": "Simhadri",
+      "status": "skipped",
+      "reason": "too few near/bg soundings"
+    },
+    {
+      "plant": "Sipat",
+      "status": "skipped",
+      "reason": "too few near/bg soundings"
+    },
+    {
+      "plant": "Talcher",
+      "status": "fit",
+      "n_downwind_soundings": 96,
+      "n_overpass_days_used": 5,
+      "bg_mean_ppm": 413.56121826171875,
+      "gaussian_amplitude_kg_m2": 0.07561849245491,
+      "gaussian_sigma_m": 3201.0093580324356,
+      "fit_r2": 0.2549088837243788,
+      "wind_speed_ms": 1.7508850619147864,
+      "wind_mode": "per-overpass",
+      "u_eff_ms": 0.8754425309573932,
+      "q_kg_s": 531.1687722838545,
+      "q_t_per_year": 16750938.402743638
+    },
+    {
+      "plant": "TalwandiSabo",
+      "status": "skipped",
+      "reason": "too few downwind soundings above background",
+      "n_downwind_soundings": 9,
+      "n_overpass_days_used": 1
+    },
+    {
+      "plant": "Tamnar",
+      "status": "skipped",
+      "reason": "degenerate fit: sigma pinned at cap (83km)",
+      "n_downwind_soundings": 94,
+      "n_overpass_days_used": 3
+    },
+    {
+      "plant": "Tirora",
+      "status": "skipped",
+      "reason": "too few downwind soundings (5 < 8)",
+      "n_downwind_soundings": 5,
+      "n_overpass_days_used": 1
+    },
+    {
+      "plant": "Vindhyachal",
+      "status": "fit",
+      "n_downwind_soundings": 712,
+      "n_overpass_days_used": 12,
+      "bg_mean_ppm": 413.373046875,
+      "gaussian_amplitude_kg_m2": 0.054928302760773796,
+      "gaussian_sigma_m": 19888.68088625338,
+      "fit_r2": 0.04397677093959251,
+      "wind_speed_ms": 1.3090775845624818,
+      "wind_mode": "per-overpass",
+      "u_eff_ms": 0.6545387922812409,
+      "q_kg_s": 1792.3692496329027,
+      "q_t_per_year": 56524156.65642322
+    }
+  ],
+  "ime_vs_gaussian": {
+    "n_common": 10,
+    "common_plants": [
+      "Farakka",
+      "KGudemNew",
+      "Korba",
+      "Kudgi",
+      "Mouda",
+      "Pryagraj(Bara)",
+      "Rihand",
+      "Sasan",
+      "Talcher",
+      "Vindhyachal"
+    ],
+    "r_log_ime_gaussian": 0.6401267419211106,
+    "ime_over_gaussian_ratio": {
+      "Farakka": 0.33220947905165693,
+      "KGudemNew": 0.13141992797935279,
+      "Korba": 1.3293010900943365,
+      "Kudgi": 0.24354071977634859,
+      "Mouda": 0.5169650349282832,
+      "Pryagraj(Bara)": 0.6127224485693056,
+      "Rihand": 1.127225549108319,
+      "Sasan": 1.2099400737478736,
+      "Talcher": 0.4127913748836911,
+      "Vindhyachal": 0.6499530854423654
+    }
+  },
+  "rihand_check": {
+    "cea_t_per_year": 20613491.507199902,
+    "gaussian_q_t_per_year": 42890493.694267385,
+    "gaussian_log_ratio_vs_cea": 0.7327044202125037,
+    "ime_q_t_per_year": 48347260.30604745,
+    "ime_log_ratio_vs_cea": 0.8524637675518628,
+    "gaussian_closer_to_cea": true
+  },
+  "loo_vs_cea": {
+    "gaussian_all_fit_plants": {
+      "label": "Gaussian cross-section, all fit plants (N=10)",
+      "n": 10,
+      "loo_mae_log": 0.7996596811536447,
+      "loo_r2": -0.9656678640917613,
+      "within_2x": 5,
+      "within_2x_frac": 0.5,
+      "per_plant_abs_log_error": {
+        "Farakka": 0.2340680582214425,
+        "KGudemNew": 0.44797835689991317,
+        "Korba": 1.7584022830330834,
+        "Kudgi": 1.4180310427589706,
+        "Mouda": 0.846917139084562,
+        "Pryagraj(Bara)": 0.41817433752594724,
+        "Rihand": 0.4744556798101911,
+        "Sasan": 0.8390027924459744,
+        "Talcher": 0.48366521192579626,
+        "Vindhyachal": 1.0759019098305664
+      }
+    },
+    "ime_all_plants": {
+      "label": "IME, all plants (N=24)",
+      "n": 24,
+      "loo_mae_log": 0.5957900161783679,
+      "loo_r2": -0.15245817800980865,
+      "within_2x": 15,
+      "within_2x_frac": 0.625,
+      "per_plant_abs_log_error": {
+        "Sasan": 0.9581586481200794,
+        "Tirora": 1.2239995383736346,
+        "Vindhyachal": 1.1347570247880903,
+        "Talcher": 0.7311057812876598,
+        "Rihand": 0.573076416123925,
+        "ChandrapurCoal": 0.46026796110287904,
+        "Anpara": 0.1555547192266502,
+        "RGundem": 0.6278426710717362,
+        "Korba": 0.7567211602519599,
+        "ShriSingajiMalwa": 0.5129722435761384,
+        "Koradi": 0.29612437939006675,
+        "Tamnar": 0.17143633914584022,
+        "Kudgi": 0.9698672848930325,
+        "Kahalgaon": 0.015094718931056406,
+        "Mouda": 0.5424266640208497,
+        "Chhabra": 0.6088796003549479,
+        "Farakka": 0.051462397875216226,
+        "TalwandiSabo": 0.3282575446619127,
+        "Dadri(Nctpp)": 1.274214052313834,
+        "KGudemNew": 0.007894523609209614,
+        "Pryagraj(Bara)": 0.19710681434809274,
+        "Raichur": 1.00781229105597,
+        "RayalSeema": 1.602517117271221,
+        "Sagardighi": 0.09141049648682653
+      }
+    },
+    "gaussian_common_subset": {
+      "label": "Gaussian cross-section, common subset (N=10)",
+      "n": 10,
+      "loo_mae_log": 0.7996596811536447,
+      "loo_r2": -0.9656678640917613,
+      "within_2x": 5,
+      "within_2x_frac": 0.5,
+      "per_plant_abs_log_error": {
+        "Farakka": 0.2340680582214425,
+        "KGudemNew": 0.44797835689991317,
+        "Korba": 1.7584022830330834,
+        "Kudgi": 1.4180310427589706,
+        "Mouda": 0.846917139084562,
+        "Pryagraj(Bara)": 0.41817433752594724,
+        "Rihand": 0.4744556798101911,
+        "Sasan": 0.8390027924459744,
+        "Talcher": 0.48366521192579626,
+        "Vindhyachal": 1.0759019098305664
+      }
+    },
+    "ime_common_subset": {
+      "label": "IME, common subset (N=10)",
+      "n": 10,
+      "loo_mae_log": 0.5897503587792439,
+      "loo_r2": -0.11080687167670566,
+      "within_2x": 6,
+      "within_2x_frac": 0.6,
+      "per_plant_abs_log_error": {
+        "Farakka": 0.11840683644640393,
+        "KGudemNew": 0.1444757951607336,
+        "Korba": 1.2572315986422709,
+        "Kudgi": 1.0734550800473794,
+        "Mouda": 0.7262277951882847,
+        "Pryagraj(Bara)": 0.544406216497805,
+        "Rihand": 0.2258875752406233,
+        "Sasan": 0.3665892011315002,
+        "Talcher": 0.8396889527327929,
+        "Vindhyachal": 0.6011345367046452
+      }
+    }
+  }
+}
