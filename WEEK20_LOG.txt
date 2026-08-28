@@ -345,3 +345,108 @@ forward simulation as the training-label source entirely and generate
 segmentation masks/Q labels through a method structurally consistent
 with IME's own multi-day aggregation assumption. The U-Net (blueprint
 Paper 2 stage 1) remains NOT STARTED.
+
+TASK 5: multi-day aggregation, implemented as candidate (a) above --
+SECOND confirmed negative result. Recommend pausing this
+sub-investigation.
+========================================================================
+
+Implemented candidate (a) from Task 4's close-out, under a strict
+scoping constraint: the fix applies ONLY to the calibration/verification
+readout. Each individual training tile remains exactly the single-
+snapshot mechanism of Tasks 1-4 (one wind direction, one day, its own
+exact mask, saved unaggregated) -- make_tile() now optionally accepts a
+pre-drawn (Q, wind_speed, stack_height, stability) so several tiles can
+share one synthetic facility's physical characteristics, but ALWAYS
+resamples wind_from_deg fresh per call, and every tile is still generated
+and saved through the identical code path as before. This is a disclosed
+structural change to how tiles are GROUPED downstream (by facility, not
+independently), not to how any individual tile is generated -- see
+SIMULATOR_METHODOLOGY_NOTE.md for the full scoping argument.
+
+n_days per synthetic facility was NOT an arbitrary constant: bootstrap-
+sampled directly from the real per-facility hit_days values in
+data/plant_results.json (N=30: min 1, max 25, median 8, mean 9.93,
+HIT_DAYS_POOL in simulate_training_pairs.py). 200 synthetic facilities
+were simulated (chosen for runtime, not to hit a target number), giving
+1936 total single-snapshot positive tiles (well over the 500-tile
+standard from prior rounds) plus 300 negative tiles -- 2236 tiles total,
+67.8s wall time.
+
+For each facility, multi_day_ime_readout_ppm() pools ALL n_days' raw
+near-zone and background-annulus pixel samples (concatenated, exactly
+matching physics_ime.py's own pooling: raw soundings across days
+concatenated, THEN a single mean taken -- not an average of per-day
+scalars) into one pooled readout. Full distribution, 200 pooled facility
+readouts, vs the single-day (Task 4) distribution and the real
+distribution:
+
+                              min     p10    median   mean    p90    p99    max
+  single-day (Task 4, this run): -0.086  0.000   0.057   0.075   0.180  0.293  0.437
+  pooled multi-day (Task 5):     -0.048  0.010   0.058   0.076   0.174  0.255  0.410
+  real (N=24):                   -1.277 -0.866   0.619   0.620   1.839  3.409  3.698
+
+Result: pooling did NOT close the gap. The pooled median (0.058 ppm) is
+statistically indistinguishable from the single-day median (0.057 ppm)
+-- both remain >10x smaller than the real median (0.619 ppm). 100% of
+facilities land within the real [-1.277, 3.698] min/max range, same as
+Task 4's single-day result and, per Task 4's own finding, still a
+misleading pass for the same reason (distribution collapsed near zero,
+not shaped like the real one).
+
+What DID change, precisely: pooling narrowed the SPREAD slightly (max
+0.437->0.410, p99 0.293->0.255, min -0.086->-0.048) but left the CENTER
+essentially unmoved (median/mean flat to three decimal places). Checked
+directly: correlation between a facility's n_days (1 to 25, the real
+range) and its pooled readout value is -0.018 -- statistically zero.
+More pooled days produces NO systematic increase in the readout,
+regardless of how many days are pooled.
+
+Cause, verified analytically: this implementation's per-day sample is
+the FULL near-zone/background-annulus GRID (thousands of pixels,
+exhaustively covering every crosswind position), not a sparse
+satellite-track sample. Because the grid already spatially integrates
+over the ENTIRE disk on any single day, the "on-plume fraction" of that
+day's near-zone pixels is already a stable expected value the moment one
+day is evaluated -- pooling more full-disk days is mathematically close
+to averaging several i.i.d. draws of an already-converged population
+mean: it reduces the pooled estimate's NOISE (explaining the narrower
+spread above) but cannot shift its EXPECTED VALUE, because the expected
+on-plume fraction per full disk doesn't depend on how many additional
+identical-composition disks get pooled in. A real per-overpass "near"
+sample is NOT an exhaustive disk -- it is wherever OCO-3's actual,
+narrow ground track happened to cross that day, so a day whose track
+crosses the plume can contribute a near-zone sample that is
+disproportionately plume-heavy (few points, many on-plume), and pooling
+across many such days lets favorable-track days pull the aggregate up in
+a way an exhaustive per-day grid mean structurally cannot. This is a
+genuinely different mechanism than "more days of coverage" -- it is
+"sparse, track-shaped sampling occasionally aligning with the plume,"
+which this implementation did not simulate.
+
+VERDICT: SECOND confirmed negative result. Multi-day aggregation, as the
+most direct and literal translation of the Task 4 diagnosis into an
+implementation, does not close the gap, and the reason it doesn't is now
+also understood analytically rather than left as a mystery: the fix
+addressed "one wind direction" but not the other real-world ingredient
+the diagnosis actually depended on -- sparse, orbital-track-shaped
+per-day sampling, not exhaustive per-day spatial coverage. Simulating
+that properly (real OCO-3 orbital geometry, sounding density, and swath
+width per overpass) is a materially larger scope change than anything
+attempted in this sub-investigation so far -- effectively building a
+second, independent satellite-sampling simulator, not a readout-geometry
+adjustment.
+
+Five rounds have now been run against this gap: near-field/wind-
+floor/resolution fixes (Tasks 1-2, both correct and kept), area-
+averaging (Task 2, correct and kept, but insufficient alone), Q-source
+falsification (Task 3, ruled out, made things worse), IME-consistent
+readout geometry (Task 4, confirmed the forward/inverse mismatch but
+flipped the error direction), and multi-day pooling (Task 5, confirmed
+again, near-zero effect, now with a specific analytical cause). Per this
+project's own diminishing-returns discipline (WEEK13_LOG.txt's Rihand
+investigation, paused after four rejected explanations), this
+sub-investigation is PAUSED here, not resolved. The remaining candidate
+(simulating real orbital sampling geometry) is recorded in
+SIMULATOR_METHODOLOGY_NOTE.md as the next real test, not attempted this
+session. The U-Net (blueprint Paper 2 stage 1) remains NOT STARTED.

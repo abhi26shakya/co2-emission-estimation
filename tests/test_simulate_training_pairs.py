@@ -132,5 +132,43 @@ class TestImeStyleReadout(unittest.TestCase):
         self.assertGreater(pos, neg)
 
 
+class TestMultiDayPooling(unittest.TestCase):
+    def test_n_days_matches_wind_dirs_returned(self):
+        rng = np.random.default_rng(6)
+        pooled, wind_dirs = sim.multi_day_ime_readout_ppm(rng, 2e7, 2.0, 220.0, "B", n_days=7)
+        self.assertEqual(len(wind_dirs), 7)
+        self.assertTrue(np.isfinite(pooled))
+
+    def test_wind_directions_vary_across_days(self):
+        # Each day must resample its own wind direction, not reuse one.
+        rng = np.random.default_rng(7)
+        _, wind_dirs = sim.multi_day_ime_readout_ppm(rng, 2e7, 2.0, 220.0, "B", n_days=10)
+        self.assertGreater(len(set(wind_dirs)), 1)
+
+    def test_pooling_uses_real_hit_days_range(self):
+        # Task 5: N must come from the real hit_days distribution, not an
+        # arbitrary constant -- pins the documented real range.
+        self.assertEqual(min(sim.HIT_DAYS_POOL), 1)
+        self.assertEqual(max(sim.HIT_DAYS_POOL), 25)
+        self.assertEqual(len(sim.HIT_DAYS_POOL), 30)
+
+    def test_make_tile_shares_facility_params_but_resamples_wind_direction(self):
+        # Scoping constraint: individual tiles must still be single-
+        # snapshot -- shared (q, wind_speed, stack, stability) but a FRESH
+        # wind_from_deg every call.
+        rng = np.random.default_rng(8)
+        q, wind_speed, stack_height, stability = 2e7, 2.0, 220.0, "B"
+        dirs = []
+        for _ in range(5):
+            _, _, params = sim.make_tile(rng, positive=True, q=q, wind_speed=wind_speed,
+                                          stack_height=stack_height, stability=stability)
+            self.assertEqual(params["q_t_per_year"], q)
+            self.assertEqual(params["wind_speed_ms"], wind_speed)
+            self.assertEqual(params["stack_height_m"], stack_height)
+            self.assertEqual(params["stability_class"], stability)
+            dirs.append(params["wind_from_deg"])
+        self.assertGreater(len(set(dirs)), 1)
+
+
 if __name__ == "__main__":
     unittest.main()

@@ -1,11 +1,12 @@
 # Simulator Methodology Note: `simulate_training_pairs.py`
 
-**Status: OPEN, PAUSED negative result.** This document exists so a future
-session doesn't have to re-derive four rounds of debugging from
-WEEK20_LOG.txt alone, the same role NOVEL_METHODOLOGY_PROPOSAL.md served
-for the hotspot-map work. It records what was tried, what was ruled out
-and why, and what genuinely remains open. Nothing here claims the
-simulator is fixed — as of Week 20 it is not.
+**Status: PAUSED, two confirmed negative results.** This document exists
+so a future session doesn't have to re-derive five rounds of debugging
+from WEEK20_LOG.txt alone, the same role NOVEL_METHODOLOGY_PROPOSAL.md
+served for the hotspot-map work. It records what was tried, what was
+ruled out and why, and what genuinely remains open. Nothing here claims
+the simulator is fixed — as of Week 20 it is not, and this
+sub-investigation is explicitly paused (§6), not resolved.
 
 ## 1. What this script is for
 
@@ -119,27 +120,108 @@ direction cannot reproduce that by construction — it compares a
 single-day snapshot's spatial mean to a multi-day aggregate, which is not
 a like-for-like readout no matter how the zone geometry is defined.
 
-## 5. Current best explanation (confirmed, not just hypothesized)
+### 4.3 Multi-day aggregation (Task 5) — implemented, SECOND confirmed negative result
+
+**Hypothesis tested**: §4.2's own diagnosis suggested the fix — pool
+several single-direction days' near/background samples the way
+`physics_ime.py` pools real per-overpass soundings (concatenate raw
+samples across days, then take one mean), rather than reading out one
+day at a time.
+
+**Scoping constraint, strictly enforced**: this changes ONLY the
+calibration/verification readout. Every individual training tile remains
+the exact single-snapshot mechanism of Tasks 1-4 — one wind direction,
+one day, its own exact mask, saved unaggregated. `make_tile()` gained
+optional `q`/`wind_speed`/`stack_height`/`stability` arguments so several
+tiles can share one synthetic facility's physical characteristics, but
+`wind_from_deg` is always resampled fresh inside the function regardless.
+The only disclosed structural change is that tiles are now generated in
+facility-grouped batches (sharing Q etc.) rather than fully independently
+— not a change to what any individual tile represents or how it's made.
+
+`n_days` per facility was bootstrap-sampled from the real per-facility
+`hit_days` values in `data/plant_results.json` (N=30: min 1, max 25,
+median 8, mean 9.93) — not an arbitrary constant. 200 synthetic
+facilities were simulated, yielding 1936 total single-snapshot positive
+training tiles (well over the 500-tile standard) plus 300 negative tiles.
+
+**Result** (200 pooled facility readouts vs. the single-day distribution
+from the same run, vs. real):
+
+| | min | p10 | median | mean | p90 | p99 | max |
+|---|---|---|---|---|---|---|---|
+| Single-day (Task 4, this run) | -0.086 | 0.000 | 0.057 | 0.075 | 0.180 | 0.293 | 0.437 |
+| Pooled multi-day (Task 5) | -0.048 | 0.010 | 0.058 | 0.076 | 0.174 | 0.255 | 0.410 |
+| Real (N=24) | -1.277 | -0.866 | 0.619 | 0.620 | 1.839 | 3.409 | 3.698 |
+
+Pooling did not close the gap. The pooled median (0.058) is
+indistinguishable from the single-day median (0.057) — both remain over
+10x smaller than the real median (0.619). What DID change: the spread
+narrowed slightly (max 0.437→0.410, p99 0.293→0.255) while the center
+stayed flat. Checked directly: correlation between a facility's `n_days`
+(1–25, the real range) and its pooled readout is **-0.018** —
+statistically zero. Pooling more days gives no systematic increase,
+regardless of how many.
+
+**Cause, verified analytically**: this implementation's per-day sample is
+the FULL near-zone/background-annulus grid — thousands of pixels,
+exhaustively covering every crosswind position — not a sparse
+satellite-track sample. Because a single day's grid already spatially
+integrates over the *entire* disk, its on-plume fraction is already a
+stable expected value from one day; pooling more full-disk days is
+statistically close to averaging several i.i.d. draws of an
+already-converged population mean — it reduces the *noise* of the pooled
+estimate (explaining the narrower spread) but cannot shift its *expected
+value*. A real per-overpass "near" sample is not an exhaustive disk — it
+is wherever OCO-3's actual, narrow ground track happened to cross that
+day, so a day whose track crosses the plume contributes a
+disproportionately plume-heavy sample (few points, many on-plume), and
+pooling across many such days lets favorable-track days pull the
+aggregate up in a way an exhaustive per-day grid mean structurally
+cannot. The missing ingredient in this implementation isn't "more days"
+— it's *sparse, orbital-track-shaped* per-day sampling, which was not
+simulated.
+
+## 5. Current best explanation (confirmed across two independent tests)
 
 Peak-pixel readout over-shoots the real range by 1-2 orders of magnitude
 (Tasks 1-3). IME-style disk-integration under-shoots it by about the same
-amount in the *other* direction (Task 4) — for the **identical**
-underlying physical field and the **identical** Q. Both failure
-directions trace to the same root cause: a forward model evaluated at
-**one** wind direction cannot be read out, at **any** single spatial
-scale, to match a real-world quantity whose definition is implicitly
-averaged over **many** wind directions across a year of overpasses.
-`physics_ime.py`'s Q and this simulator's forward Gaussian dispersion are
-not mathematical inverses of each other, and no single-snapshot readout
-geometry closes that gap.
+amount in the *other* direction (Task 4), and pooling that disk-based
+readout across a realistic number of days does not close the gap either
+(Task 5) — for the **identical** underlying physical field and the
+**identical** Q throughout. `physics_ime.py`'s Q and this simulator's
+forward Gaussian dispersion, read out via an exhaustive spatial grid at
+any scale or day-count tried, are not mathematical inverses of each
+other. The Task 5 diagnosis narrows *why* one level further: the missing
+ingredient is not "single day vs. many days" but "exhaustive spatial
+coverage vs. sparse, orbital-track-shaped sampling" — a materially
+different kind of fix than anything tried in Tasks 1-5.
 
-## 6. Paths forward — not attempted this session, listed so they aren't re-derived from scratch
+## 6. Recommendation: PAUSE this sub-investigation
 
-1. **Multi-direction aggregation.** Simulate several wind-direction draws
-   per plant (representing several overpass days) and aggregate their
-   near/background means before computing the readout, directly testing
-   §5's diagnosis. Materially larger scope than a readout-geometry change
-   — not attempted, flagged as the most direct next test.
+Five rounds have now been run against this gap — near-field/wind-floor/
+resolution fixes and area-averaging (Tasks 1-2, correct and kept, but
+insufficient alone), Q-source falsification (Task 3, ruled out, made
+things worse), IME-consistent readout geometry (Task 4, confirmed the
+mismatch but flipped the error direction), and multi-day pooling
+(Task 5, confirmed again, near-zero effect, now with a specific
+analytical cause). This matches this project's own diminishing-returns
+discipline for when to stop iterating and report plainly — see
+WEEK13_LOG.txt's Rihand investigation, paused after four independently
+rejected explanations. This sub-investigation is PAUSED here on the same
+basis, not resolved.
+
+### Paths forward — not attempted, listed so they aren't re-derived from scratch
+
+1. **Simulate real orbital sampling geometry.** The one path Task 5's
+   diagnosis points to directly: replace the exhaustive per-day readout
+   grid with a sparse sample matching OCO-3's actual ground-track width
+   and sounding density, so a day's near-zone sample can be
+   disproportionately plume-heavy when the track crosses the plume and
+   near-empty otherwise. This is effectively building a second,
+   independent satellite-sampling simulator, not a readout-geometry
+   adjustment — a materially larger scope change than anything attempted
+   in this note so far.
 2. **Different label-generation methodology entirely.** Abandon
    single-snapshot forward Gaussian simulation as the training-label
    source and generate segmentation masks/Q labels through a method
@@ -159,9 +241,13 @@ geometry closes that gap.
   unchanged throughout all of this — see `tests/test_plume_model.py`.
 - The near-field guard, wind floor, resolution match, and area-averaging
   fixes (§3) are all independently verified and not implicated in the
-  Task 3/4 findings.
-- The U-Net (blueprint Paper 2 stage 1) has not been started. It should
-  not be started until this note's open question is resolved or a
-  different label-generation approach (§6.2/§6.3) is adopted and
-  independently verified against the real distribution — the same
-  standard this note itself was held to.
+  Task 3/4/5 findings.
+- The multi-day pooling MECHANISM itself (§4.3) is verified correct — it
+  reduces variance as expected; it simply doesn't address a bias that
+  turned out not to be a sampling-count problem.
+- The U-Net (blueprint Paper 2 stage 1) has not been started, and per
+  this note's recommendation (§6) should not be started until either the
+  sparse-sampling path (§6.1) is tried and verified, or a different
+  label-generation approach (§6.2/§6.3) is adopted and independently
+  verified against the real distribution — the same standard this note
+  itself was held to.

@@ -192,7 +192,31 @@ magnitude, IME-style disk integration under-shoots it by about the same
 amount in the other direction, same field, same Q. Reported as an open,
 paused negative result — see SIMULATOR_METHODOLOGY_NOTE.md for the full
 design history and candidate next steps (not attempted), and
-WEEK20_LOG.txt (Task 4) for the full numbers. U-Net remains not started.
+WEEK20_LOG.txt (Task 4) for the full numbers.
+
+Task 5, same session: implemented the direct next test — pool near/bg
+samples across multiple simulated days (n_days bootstrap-sampled from
+real hit_days, data/plant_results.json N=30: min 1, max 25, median 8,
+mean 9.93) per synthetic facility, same way physics_ime.py pools real
+soundings, while keeping every individual training tile exactly the
+single-snapshot mechanism of Tasks 1-4 (scoping constraint: calibration-
+readout-only change, verified not to alter training-tile generation).
+200 facilities, 1936 positive tiles. Result: pooling did NOT close the
+gap — pooled median (0.058 ppm) ≈ single-day median (0.057 ppm), both
+still >10x below the real median (0.619 ppm); corr(n_days, readout) =
+-0.018, statistically zero. Diagnosed why: this readout evaluates the
+FULL near-zone/bg-annulus grid every simulated day (not a sparse
+satellite-track sample), so a single day's on-plume fraction is already
+a converged expected value — pooling more full-disk days reduces noise
+(spread narrowed slightly) but can't shift that expected value. The
+missing ingredient is sparse, orbital-track-shaped per-day sampling, not
+day count. SECOND confirmed negative result. Per this project's own
+diminishing-returns discipline (WEEK13_LOG.txt's Rihand investigation,
+paused after four rejected explanations), this sub-investigation is now
+PAUSED — see SIMULATOR_METHODOLOGY_NOTE.md §6 for the recommendation and
+remaining candidate (simulating real orbital sampling geometry, not
+attempted — a materially larger scope change) and WEEK20_LOG.txt (Task
+5) for full numbers. U-Net remains not started.
 
 ## Hard rules
 - Never use Climate TRACE as a training label. Benchmark only.
