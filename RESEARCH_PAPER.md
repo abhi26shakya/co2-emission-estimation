@@ -361,6 +361,52 @@ The following items track the original roadmap (`RESEARCH_PLAN.md` §14) plus it
 13. ~~Benchmark IME against an alternate Q-estimation method~~ — **Done, negative result** (§5.2.8): a Gaussian cross-sectional-flux estimator, benchmarked directly against IME across all 30 facilities, fit only 10 and underperformed IME on CEA ground truth wherever a comparison was possible (LOO R²=−0.966 vs −0.111, N=10). IME remains the better-justified estimator, now on comparative evidence. **The annual-mean-direction limitation this left open has since been tested and closed** (§5.2.8, Week 18): rerunning the 18 facilities with per-overpass wind direction found no improvement — fit rate barely moved (9/18 vs 8/18) and churned rather than improved, only 1 of 6 facilities fit both ways moved closer to CEA, and LOO R² against CEA got worse, not better, on the shared subset. Wind-direction resolution was not the fixable half of this method's weakness.
 14. ~~Quantify regional satellite-coverage sparsity~~ — **Done, descriptive** (§3.1): pooling all 30 facilities' already-downloaded OCO-3 soundings into a 0.5°-gridded regional map finds only 130 of 1,470 cells (8.8%) have enough coverage (≥3 soundings) to report a value — not a new estimator, but a quantified statement of how little of the study region has usable satellite coverage outside each facility's own sampling footprint, useful context for every Track B number in this paper.
 
+15. **Segmentation-only deep learning extension** — **Done, moderate-quality, honestly-bounded result** (§9): after the simulated-Q-label investigation below concluded Q regression could not be trusted, a U-Net segmentation model was built and trained on simulated (XCO2 tile, plume mask) pairs, evaluated on a facility-held-out test split — positive-tile median Dice 0.73 / IoU 0.57, with a clearly diagnosed weakness on low-Q (weak-signal) tiles (median Dice 0.38 vs 0.85 for higher-Q tiles). Explicitly not validated against real OCO-3 tiles.
+
+---
+
+## 9. A Segmentation-Only Deep Learning Extension
+
+### 9.1 Why segmentation only, not the blueprint's full architecture
+
+The project's original deep-learning blueprint (`4ypblueprint.pdf`, Paper 2 / Dumont Le Brazidec et al. 2024) proposes a two-stage architecture for satellite CO2 point-source imagery: a U-Net segmentation stage that localizes the plume within a tile, feeding a CNN regression stage that predicts the point source's emission rate Q. Track B, as built in this project, never implemented either stage — it remained a pure physics pipeline (`physics_ime.py`, §4.2).
+
+Building this architecture requires labeled (tile, mask, Q) training triples, and no real labeled dataset of this kind exists at this project's scale — the same constraint SMARTCARB addressed with a transport-model simulator rather than real labels. `simulate_training_pairs.py` was built for exactly this purpose, reusing this project's own validated Gaussian plume physics (`plume_model.py`, §4.3) as its simulation engine.
+
+An eight-task investigation (Week 20; full detail in `WEEK20_LOG.txt` and `SIMULATOR_METHODOLOGY_NOTE.md`) attempted to validate the simulator's Q labels against this project's own real-world Q-accuracy standard (`physics_ime.py`'s known accuracy against CEA ground truth, §5.2.1). Each task was mechanistically distinct — near-field dispersion physics, tile resolution matching, per-pixel area-averaging, an IME-consistent spatial readout, multi-day sounding pooling, real OCO-3 orbital sampling geometry (Snapshot Area Mapping), per-facility sounding-density calibration, and finally a closed-form statistical correction for a diagnosed noise-floor bias. The investigation concluded that simulated Q labels could not be brought to this project's trusted accuracy standard: the blocking mechanism, isolated by the final two tasks, is that individual-sounding signal-to-noise makes accurate Q recovery from sparse, noisy simulated samples inherently unstable — a property of the underlying measurement/estimation problem, not a fixable simulator defect. That investigation explicitly distinguished this from the plume **mask**, which is built directly from the true, noise-free physics field and was never part of the failed Q-calibration pipeline. Q regression, as the blueprint scoped it, is therefore treated here as a **documented deviation**, not attempted in this section. This section builds and evaluates only the segmentation stage.
+
+### 9.2 Data and model
+
+Training data: `simulate_training_pairs.py`'s simulated tiles (`data/simulated_train/simulated_tiles.npz`) — 2,286 64×64 single-channel XCO2 tiles (1,986 positive/plume, 300 negative), each with a binary ground-truth plume mask and realistic baked-in cloud-gap missingness (mean ~38% of pixels per tile). `q_t_per_year` is loaded only to bucket test tiles by true emission strength for reporting; it is never used as a training target.
+
+Split discipline matches this project's own established rule (§5.1, Track A's Week 11 facility-level-split fix): tiles are split by `facility_id`, not individually — multiple tiles can share a synthetic facility (different simulated overpass days/wind directions for the same plant), and a tile-level split would leak. 70%/15%/15% train/val/test by facility unit (350/75/75 of 500 total units: 200 simulated positive facilities plus 300 independently-sampled negative tiles, each its own unit), giving 1,606/329/351 tiles respectively. Zero facility overlap between splits is asserted in code, not just assumed by construction.
+
+Cloud-gap NaN pixels are excluded from both the loss and every reported metric via a validity mask (verified directly: an extreme out-of-range prediction at an excluded pixel leaves the loss numerically unchanged) — chosen over adding a second input channel as the simpler of the two options, since the ground-truth mask is defined everywhere but the network has no evidence at an occluded pixel.
+
+Model: a compact 3-level U-Net (488K parameters, `unet_segmentation.py`), sized for this dataset and for training on a MacBook Air M1 (`mps` backend, no CUDA) rather than a full 5-level architecture. Loss combines pixel-wise BCE with a soft Dice term, both restricted to valid pixels — Dice is included because plume masks are sparse (mean 4.6% of pixels positive on positive tiles).
+
+### 9.3 Results
+
+Evaluated on the facility-held-out test split (351 tiles / 75 facilities, never seen during training or checkpoint selection):
+
+| | Mean | Median | N |
+|---|---|---|---|
+| Positive-tile Dice | 0.550 | 0.727 | 301 |
+| Positive-tile IoU | 0.485 | 0.571 | 301 |
+| Negative-tile Dice | 0.940 | 1.000 | 50 |
+
+The model reliably predicts "no plume" on negative tiles and achieves moderate, usable overlap on positive tiles — but the mean sits well below the median (0.55 vs 0.73), indicating a heavy tail of near-total failures rather than uniformly mediocre performance. Splitting positive test tiles into the bottom tercile by true Q ("low-Q", ≤4.28×10⁶ t/yr, n=108) versus the rest ("high-Q", n=193) makes this explicit:
+
+| | Low-Q median Dice | High-Q median Dice |
+|---|---|---|
+| Dice | 0.380 | 0.846 |
+
+Performance degrades sharply on weak-signal tiles — the same underlying signal-to-noise limitation §9.1's Q-calibration investigation diagnosed shows up here as a harder segmentation problem for weak plumes, not only a harder scalar-recovery problem. Qualitative inspection (`data/unet_segmentation_qualitative.png`, six facility-held-out test tiles selected by a fixed random seed, not cherry-picked) shows a correspondingly mixed picture: near-total misses when the true plume is mostly cloud-occluded with only a thin sliver visible, a clean match on a well-observed elongated plume, and a systematic tendency toward blobbier, more compact predicted shapes than the true thin diagonal plume streak. Validation Dice across training epochs was noisy (0.40–0.57 across 60 epochs, not a clean monotone convergence) — reported as observed, not smoothed over. Full detail, including the exact per-bucket numbers and the qualitative figure's honest caveats, is in `WEEK21_LOG.txt`.
+
+### 9.4 What this result does and does not establish
+
+This is a **simulated-data-only capability demonstration**. It shows that a compact U-Net can learn a moderate-quality plume-localization signal from this project's physics-based simulator, with an interpretable failure mode (weak-signal tiles) rather than an opaque one. It does **not** show that this model — or this architecture — generalizes to real OCO-3 satellite tiles: the simulator's own validated limitations (§9.1; `SIMULATOR_METHODOLOGY_NOTE.md`) mean its XCO2 fields, while built from validated dispersion physics, are not a substitute for real satellite imagery, and no real-tile evaluation has been attempted. The Dice/IoU numbers above characterize this model's performance against this project's own simulated ground truth, not against a real-world benchmark. Extending this capability to real tiles, and revisiting Q regression under a materially different approach (§6 of `SIMULATOR_METHODOLOGY_NOTE.md`), remain open, explicitly out of scope for this section.
+
 ---
 
 ## References
