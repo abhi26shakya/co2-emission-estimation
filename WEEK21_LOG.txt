@@ -202,3 +202,60 @@ train_unet_segmentation.py -- training script. Loads data, splits by
   (best-val-Dice checkpoint), and data/unet_segmentation_qualitative.png.
 tests/test_unet_segmentation.py -- 14 tests covering the split, NaN
   handling, Dice/IoU, masked loss, and model output shape. All pass.
+
+ADDENDUM: QUALITATIVE-ONLY sanity check on real facility tiles
+================================================================
+No accuracy metric of any kind was computed against real data --
+there is no real ground-truth plume mask for any facility, which is
+exactly why this model was trained on simulated data in the first
+place. This is an eyeball check only, reported as such.
+
+Picked Vindhyachal and Rihand -- this paper's best/worst IME cases
+(§5.2, RESEARCH_PAPER.md), chosen for continuity with the rest of the
+project rather than for how they'd look here. Real tiles were built
+(sanity_check_real_tiles.py) from each plant's actual OCO-3 soundings
+(data/vindhyachal_soundings.npz, data/Rihand_soundings.npz), gridded
+onto this project's standard 60km/64px convention, using each plant's
+single BEST-COVERED real overpass day (both happened to be 2020-11-30)
+-- a single day, not a multi-day composite, since the model was trained
+on single-snapshot tiles.
+
+Both real tiles came out far sparser than anything in training: 546
+soundings (Vindhyachal) and 459 (Rihand) landed in-tile, filling only
+13.3% and 11.2% of the 64x64 grid respectively. Training tiles' cloud-
+gap fraction ranged 15-55% MISSING (45-85% VALID) -- real single-day
+coverage here is roughly 4-8x sparser than even the worst training
+tile. This alone is a meaningful, quantified caveat, not just a
+qualitative impression: real single-overpass data and this simulator's
+cloud-gap model are not close in density.
+
+Visual read (data/unet_segmentation_real_tile_sanity_check.png): the
+predicted "plume" pixels for BOTH plants form a scattered, speckled
+region loosely following a rough diagonal band -- and that band is
+visibly similar between the two plants' predictions, closely tracking
+the shape of the real DATA-COVERAGE pattern itself (both tiles are from
+the same day and geographically close, so their coverage speckle
+happens to look alike). Neither prediction resembles a coherent,
+elongated plume shape the way the simulated qualitative examples
+(§ above, data/unet_segmentation_qualitative.png) sometimes did. This
+reads as the model responding to the INPUT'S MISSINGNESS PATTERN rather
+than to any real spatial CO2 structure -- plausible given real coverage
+here (11-13% valid, in a scattered swath-track speckle) is both far
+sparser than training AND geometrically different in kind from
+training's cloud-gap pattern (simulate_training_pairs.py's
+_cloud_gap_mask uses a small number of large rectangular blocks, not a
+fine scattered speckle -- these are not the same missingness
+distribution the model learned to handle).
+
+VERDICT (qualitative, not a validation result): this sanity check does
+NOT look like evidence the model transfers to real tiles as-is. The
+predicted masks are not visibly nonsensical in a random sense -- they
+concentrate in a specific, structured region rather than firing
+uniformly -- but that structure looks tied to the real coverage
+pattern's own shape, not to a plausible plume. This is consistent with,
+not contradictory to, RESEARCH_PAPER.md Sec 9.4's existing statement
+that this model is not validated against real tiles; if anything it
+gives a concrete, inspectable illustration of why that statement is
+there, and surfaces a specific, previously-undocumented gap (coverage
+density AND coverage-pattern shape, not just "simulated vs real") worth
+recording for whoever attempts real-tile evaluation next.
