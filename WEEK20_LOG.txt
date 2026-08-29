@@ -763,3 +763,166 @@ sub-investigation remains PAUSED (not resolved) on the same basis as
 Task 6 -- see SIMULATOR_METHODOLOGY_NOTE.md Sec 4.5/6 for the updated
 recommendation. The U-Net (blueprint Paper 2 stage 1) remains NOT
 STARTED.
+
+TASK 8: direct mechanistic correction of the noise-floor bias -- FAILED
+in two mechanistically distinct ways. Sub-investigation CONCLUDED, not
+paused again. Final verdict.
+========================================================================
+
+Before writing any code: checked physics_ime.py's own comments and this
+project's citations for a documented basis for option (b) (per-sounding
+noise scaling with local signal strength). Found none -- physics_ime.py
+discusses SAMPLING noise (bootstrap over near/bg populations) and
+background-definition SENSITIVITY (diagnose_talcher.py's finding that
+this is "a much larger error source than wind or IME-sampling noise for
+plants with a thin/weak plume signal" -- itself a prior, independent
+piece of evidence that this project has already flagged weak-signal
+facilities as a known-harder case), but nothing suggesting real OCO-3
+retrieval noise scales with local variability rather than being a flat
+per-sounding value. Proceeded with option (a): a closed-form statistical
+correction applied to physics_ime.py's OUTPUT, not a retuned
+SOUNDING_NOISE_STD_PPM constant.
+
+THE MECHANISM: clip(near_i - bg_mean, 0, None) is a rectified/censored
+Gaussian. For an off-plume sounding (true enhancement 0) under noise
+N ~ Normal(0, sigma), E[max(N,0)] = sigma/sqrt(2*pi) -- NOT zero -- and
+Prob(N>0) = 0.5 -- also not zero. Verified bg_std (a real-world-
+observable quantity, computable from any physics_ime.py run, real or
+simulated) is a good estimator of sigma: this simulator's own bg-zone
+std comes out ~0.776-0.81ppm against a true injected noise std of
+0.8ppm.
+
+ATTEMPT 1 -- correct IME_kg only (subtract n_near_total * bg_std /
+sqrt(2*pi), converted to kg via column_mass_enhancement, from IME_kg
+before computing Q): FAILED, systematically and badly. Tested against
+all 5 real-facility validation replays with their own exact Task 7
+retention:
+
+  facility      uncorrected Q ratio   IME-kg-only corrected
+  Sasan         0.970                 0.501
+  Vindhyachal   0.955                 0.485
+  Talcher       2.155                 0.183
+  Rihand        0.788                 0.440
+  Tamnar        2.003                 0.203
+
+This made EVERY facility worse, including the two that were already
+close to 1.0 uncorrected. Diagnosed why, not just observed: for Sasan,
+n_soundings_used=3852 out of n_near_total=7343 -- almost EXACTLY the
+~50% pure-noise baseline (3671.5 expected from Prob(N>0)=0.5 alone).
+This means L_eff (=sqrt(n_used*area)) was ALSO overwhelmingly noise-
+driven, not just IME_kg. The "good" uncorrected ratio for Sasan was an
+ACCIDENTAL CANCELLATION between a noise-inflated numerator and a
+noise-inflated denominator, not a genuine recovery -- correcting only
+the numerator broke that cancellation instead of fixing the underlying
+estimate. This is a materially deeper finding than Tasks 6/7's own
+diagnosis reached: the near-zone dataset, as simulated, is dominated by
+noise-driven false-positive detections even for LARGE, easy-to-detect
+facilities, not only weak ones.
+
+ATTEMPT 2 -- correct BOTH IME_kg and n_used/L_eff consistently
+(subtract 0.5*n_near_total, the same Prob(N>0)=0.5 baseline, from
+n_soundings_used before computing L_eff): mechanistically the correct
+next step (fixing the numerator alone was internally inconsistent), but
+FAILED differently -- through severe numerical instability, not a
+systematic direction error. Full 200-facility result:
+
+                    before (Task 7)   after (Task 8, both terms corrected)
+  median bias       1.540x            1.037x   <- looks like a near-perfect fix
+  mean bias         2.396             1.827
+  sd(log ratio)     0.918             5.096    <- exploded, 5.5x worse
+  within 2x         53.0%             48.5%    <- did NOT improve
+  corr(log_ratio,
+    true_Q)         -0.643            +0.255   <- weakened in magnitude but changed sign
+
+The median moving to 1.037 looks, in isolation, like a near-perfect fix
+-- exactly the kind of single-number result this task's own instructions
+warned against trusting without the full picture. The full picture: 30
+of 200 facilities produced absurd ratios (near-zero or as high as 44x).
+Root cause: n_used_corrected = n_used - 0.5*n_near_total subtracts two
+LARGE, comparable-magnitude quantities to get a SMALL residual (for
+Sasan: 3852 - 3671.5 = 180.5) -- classic "difference of nearly-equal
+large numbers" numerical instability. Small relative errors in the
+~50%-baseline assumption (itself only exact in the infinite-sample
+limit; real finite samples fluctuate around it) get massively amplified
+in the small residual, which then sits in L_eff's denominator, further
+amplifying the effect on Q. This is not a bug to patch further within
+this approach -- it is the SAME statistical phenomenon (signal buried in
+noise at the individual-sounding level) reappearing as an estimation-
+variance problem once an attempt is made to explicitly separate them.
+
+REQUIRED CHECK -- Talcher/Tamnar, the sharpest test (per explicit
+instruction): sampled several Task-8-corrected synthetic facilities
+sourced from Talcher's and Tamnar's own real retention values directly
+from the 200-facility run:
+
+  source    true_Q     ratio_before   ratio_after
+  Talcher   1.11e7     1.422          0.825
+  Talcher   3.74e6     4.848          3.165
+  Talcher   2.15e6     3.790          0.000   <- complete overcorrection
+  Talcher   3.01e6     5.645          0.000   <- complete overcorrection
+  Talcher   6.32e6     3.479          0.000   <- complete overcorrection
+  Talcher   3.26e7     0.921          4.715   <- large facility pushed badly wrong
+  Tamnar    1.85e7     0.701          0.519
+  Tamnar    1.04e7     1.878          0.805
+  Tamnar    2.10e7     0.614          0.126
+  Tamnar    4.59e6     1.546          0.000   <- complete overcorrection
+
+No consistent improvement. Several facilities collapse to exactly 0
+(IME_kg_corrected or n_used_corrected clipped at the floor), others move
+further from 1.0 than before, one large Talcher-sourced facility that
+was ALREADY accurate (0.921) gets pushed to 4.715. This is decisive: the
+fix does not reliably help even its own target case, confirming
+Attempt 2's aggregate instability is not a statistical artifact of
+looking only at means.
+
+VERDICT -- SUB-INVESTIGATION CONCLUDED, not paused again: two
+mechanistically distinct, principled attempts at a closed-form
+statistical correction for the diagnosed noise-floor bias both failed --
+the first systematically (broke a previously-working accidental
+cancellation), the second through numerical instability (small-number
+subtraction amplifying finite-sample noise into a wildly unreliable
+correction, worse in aggregate variance than doing nothing). The
+weak-signal bias is real, mechanistically understood down to the
+individual-sounding level (rectified-Gaussian expectation, verified
+against real-world-observable bg_std), and NOT fixable by a direct
+closed-form correction at this level of effort -- fixing it properly
+would require materially more sophisticated statistical machinery
+(e.g. a Bayesian/shrinkage estimator, or substantially larger near-zone
+sample sizes to reduce subtraction variance before it gets amplified),
+which is a different, larger undertaking than a mechanistic correction,
+not a next incremental patch.
+
+Eight tasks, eight mechanistically distinct attempts, run across this
+sub-investigation tonight: near-field singularity fix, wind-speed floor,
+resolution match (Task 1, all correct, kept), area-averaging (Task 2,
+correct, kept, insufficient alone), Q-source falsification (Task 3,
+ruled out), IME-consistent readout geometry (Task 4, confirmed a
+forward/inverse mismatch), multi-day pooling (Task 5, confirmed again,
+near-zero effect), real OCO-3 SAM orbital sampling geometry with native
+IME Q-recovery (Task 6, first genuinely mixed result), per-facility
+retention calibration (Task 7, clean win on sounding counts, isolated
+the remaining bias to one mechanism), and direct mechanistic correction
+of that mechanism (Task 8, failed two distinct ways). This is a
+complete, honest negative result for the specific goal of "generate
+physics-simulated (XCO2 tile, mask, Q) training triples whose Q label
+matches physics_ime.py's own real-world accuracy profile" -- not because
+any one component is wrong (the plume physics, the orbital sampling
+geometry, and the sounding-count calibration are all independently
+verified correct), but because the fundamental signal-to-noise regime at
+individual-sounding scale makes accurate Q recovery from sparse,
+noisy, single-facility samples inherently unstable, a property of the
+measurement/estimation problem itself, not of this simulator's
+implementation.
+
+RESOLUTION: per explicit instruction, this is reported as the
+reportable outcome, not attempted a ninth way. See
+SIMULATOR_METHODOLOGY_NOTE.md for the final written verdict and the
+recommended scope: the U-Net's SEGMENTATION stage (mask quality, built
+directly from the true noise-free physics field, independent of all
+Q-calibration work in Tasks 3-8) has never been shown problematic and
+remains a defensible, separately-buildable capability; Q REGRESSION as
+originally scoped in the blueprint should be treated as a documented
+deviation, not attempted with training labels this investigation could
+not make trustworthy. Building the segmentation-only U-Net is new work,
+not started this session -- deferred to a future session with its own
+dedicated scope, not tacked onto the close of this investigation.

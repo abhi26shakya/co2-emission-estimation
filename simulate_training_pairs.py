@@ -675,12 +675,68 @@ def recover_q_from_sam_scans(rng, facility_name, Q_t_per_year, wind_speed_ms, st
     bg_mask = (dist_km > IME_BG_IN_KM) & (dist_km < IME_BG_OUT_KM)
     simple_ppm_readout = (float(xco2_all[near_mask].mean() - xco2_all[bg_mask].mean())
                            if near_mask.sum() > 0 and bg_mask.sum() > 0 else None)
+    bg_std_ppm = float(xco2_all[bg_mask].std()) if bg_mask.sum() > 1 else None
 
     plant_row = {"lat": 0.0, "lon": 0.0}
     wind_series = {int(day_start + i): wind_speed_ms for i in range(n_days)}
     result = physics_ime.estimate_emission_rate_from_arrays(
         facility_name, lat_all, lon_all, xco2_all, day_all, plant_row, wind_series)
-    return result, wind_dirs, n_near_total, n_bg_total, simple_ppm_readout
+    return result, wind_dirs, n_near_total, n_bg_total, simple_ppm_readout, bg_std_ppm
+
+
+def bias_corrected_q_t_per_year(result, n_near_total, bg_std_ppm):
+    """
+    TASK 8 (see WEEK20_LOG.txt Task 8 / SIMULATOR_METHODOLOGY_NOTE.md Sec
+    4.6): a MECHANISTIC correction for the noise-floor rectification bias
+    diagnosed in Tasks 6-7, not a re-tuned SOUNDING_NOISE_STD_PPM constant.
+
+    physics_ime.py's IME_kg sums clip(near_i - bg_mean, 0, None) over
+    every near-zone sounding. For an off-plume sounding (true enhancement
+    0) under measurement noise N ~ Normal(0, sigma),
+    E[max(N, 0)] = sigma / sqrt(2*pi) -- a standard closed-form fact about
+    the half-normal distribution, NOT zero, and Prob(N > 0) = 0.5, NOT
+    zero either. So the SAME noise floor inflates BOTH terms of
+    Q = U_eff * IME_kg / L_eff: IME_kg (a SUM, biased upward by
+    sigma/sqrt(2*pi) per near-zone sounding) AND n_used -> L_eff = sqrt(
+    n_used * FOOTPRINT_AREA_M2) (n_used inflated by ~50% of n_near_total
+    purely from noise crossing zero, independent of true signal).
+
+    FIRST ATTEMPT (kept here as a documented negative finding, not
+    silently dropped): correcting ONLY IME_kg made results WORSE for
+    every facility, including ones that looked accurate uncorrected
+    (Sasan/Vindhyachal ~0.97/0.96 -> ~0.50/0.49). Diagnosed why: for
+    Sasan, n_used=3852 of n_near=7343 -- almost exactly the ~50% pure-
+    noise baseline (3671.5), meaning L_eff was ALSO overwhelmingly
+    noise-driven. The previously "good" uncorrected ratio was an
+    ACCIDENTAL cancellation between a noise-inflated numerator and a
+    noise-inflated denominator, not a genuine recovery -- correcting only
+    the numerator broke that cancellation instead of fixing the estimate.
+    This IS the mechanism, going one level deeper than Task 6/7's
+    diagnosis reached, and BOTH terms must be corrected together for the
+    fix to be internally consistent.
+
+    sigma is estimated as bg_std_ppm -- the background annulus's own std
+    -- a REAL-WORLD-OBSERVABLE quantity (checked: this simulator's own
+    bg_std comes out ~0.776-0.81ppm against a true noise std of 0.8ppm),
+    not simulator-only oracle knowledge. Both corrections below use only
+    bg_std_ppm and n_near_total -- quantities equally computable from a
+    real physics_ime.py run, not just a simulated one. This is a
+    closed-form statistical de-biasing of physics_ime.py's OUTPUT, not a
+    modification to physics_ime.py itself (unchanged, per this project's
+    reuse convention) and not a re-tuned noise constant.
+    """
+    if result is None or bg_std_ppm is None:
+        return None
+    expected_noise_floor_ppm_sum = n_near_total * bg_std_ppm / np.sqrt(2 * np.pi)
+    ime_kg_correction = column_mass_enhancement(expected_noise_floor_ppm_sum) * physics_ime.FOOTPRINT_AREA_M2
+    ime_kg_corrected = max(result["ime_kg"] - ime_kg_correction, 0.0)
+
+    expected_false_positive_n_used = 0.5 * n_near_total
+    n_used_corrected = max(result["n_soundings_used"] - expected_false_positive_n_used, 1.0)
+    l_eff_corrected = np.sqrt(n_used_corrected * physics_ime.FOOTPRINT_AREA_M2)
+
+    q_kg_s_corrected = result["u_eff_ms"] * ime_kg_corrected / l_eff_corrected
+    return q_kg_s_corrected * physics_ime.SEC_PER_YEAR / 1000.0
 
 
 def validate_sam_sounding_counts(seed=SEED, n_repeats=5):
@@ -702,15 +758,18 @@ def validate_sam_sounding_counts(seed=SEED, n_repeats=5):
     rows = []
     for name, (q, wind_speed, hit_days, real_n_used, real_soundings) in SAM_VALIDATION_FACILITIES.items():
         retention, bg_ratio, _, _ = FACILITY_RETENTION_TABLE[name]
-        sim_near, sim_bg, sim_n_used, sim_q_ratio = [], [], [], []
+        sim_near, sim_bg, sim_n_used, sim_q_ratio, sim_q_ratio_corrected = [], [], [], [], []
         for _ in range(n_repeats):
-            result, _, n_near, n_bg, _ = recover_q_from_sam_scans(
+            result, _, n_near, n_bg, _, bg_std_ppm = recover_q_from_sam_scans(
                 rng, f"{name}_sim", q, wind_speed, 220.0, "B", hit_days, retention, bg_ratio)
             sim_near.append(n_near)
             sim_bg.append(n_bg)
             if result is not None:
                 sim_n_used.append(result["n_soundings_used"])
                 sim_q_ratio.append(result["q_t_per_year"] / q)
+                q_corrected = bias_corrected_q_t_per_year(result, n_near, bg_std_ppm)
+                if q_corrected is not None:
+                    sim_q_ratio_corrected.append(q_corrected / q)
         rows.append(dict(
             facility=name,
             real_soundings_total=real_soundings,
@@ -723,6 +782,10 @@ def validate_sam_sounding_counts(seed=SEED, n_repeats=5):
             true_q_t_per_year=q,
             recovered_q_ratio_mean=float(np.mean(sim_q_ratio)) if sim_q_ratio else None,
             recovered_q_ratio_range=((min(sim_q_ratio), max(sim_q_ratio)) if sim_q_ratio else None),
+            recovered_q_ratio_corrected_mean=(float(np.mean(sim_q_ratio_corrected))
+                                               if sim_q_ratio_corrected else None),
+            recovered_q_ratio_corrected_range=((min(sim_q_ratio_corrected), max(sim_q_ratio_corrected))
+                                                if sim_q_ratio_corrected else None),
             n_repeats_with_valid_result=len(sim_q_ratio),
         ))
     return rows
@@ -867,6 +930,7 @@ def main():
         bg_mask = (dist_km > IME_BG_IN_KM) & (dist_km < IME_BG_OUT_KM)
         simple_ppm_readout = (float(xco2_all[near_mask].mean() - xco2_all[bg_mask].mean())
                                if near_mask.sum() > 0 and bg_mask.sum() > 0 else None)
+        bg_std_ppm = float(xco2_all[bg_mask].std()) if bg_mask.sum() > 1 else None
 
         plant_row = {"lat": 0.0, "lon": 0.0}
         wind_series = {int(day_start + i): wind_speed for i in range(n_days)}
@@ -875,6 +939,12 @@ def main():
             plant_row, wind_series)
         if result is None:
             n_facilities_insufficient += 1
+
+        # TASK 8: mechanistic noise-floor bias correction (see
+        # bias_corrected_q_t_per_year's docstring). Computed for every
+        # facility so the required corr(log_ratio, true_Q) before/after
+        # check can be run.
+        q_corrected = bias_corrected_q_t_per_year(result, n_near_total, bg_std_ppm)
 
         facility_records.append(dict(
             facility_id=facility_id,
@@ -890,9 +960,12 @@ def main():
             n_near_soundings_total=n_near_total,
             n_bg_soundings_total=n_bg_total,
             simple_ppm_readout=simple_ppm_readout,
+            bg_std_ppm=bg_std_ppm,
             ime_result_available=result is not None,
             ime_recovered_q_t_per_year=(result["q_t_per_year"] if result is not None else None),
             ime_recovered_q_ratio=((result["q_t_per_year"] / q) if result is not None else None),
+            ime_recovered_q_t_per_year_corrected=q_corrected,
+            ime_recovered_q_ratio_corrected=(q_corrected / q if q_corrected is not None else None),
             ime_n_soundings_used=(result["n_soundings_used"] if result is not None else None),
         ))
 

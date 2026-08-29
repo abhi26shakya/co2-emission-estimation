@@ -286,7 +286,43 @@ its target, diagnosed non-bonus partial movement on Q-bias, both
 reported separately, not conflated. Remaining problem is now isolated to
 ONE mechanism (fixed per-sounding noise floor vs. true Q) — see
 SIMULATOR_METHODOLOGY_NOTE.md §4.5/§6 and WEEK20_LOG.txt (Task 7).
-PAUSED, same basis as Task 6. U-Net remains not started.
+
+Task 8, same session: attempted to fix that isolated mechanism directly.
+Checked physics_ime.py's own comments/citations first for a basis to
+scale noise with signal (option b) — found none, only sampling-noise and
+background-sensitivity discussion. Implemented option (a) instead: a
+closed-form statistical correction on physics_ime.py's OUTPUT (not a
+retuned 0.8ppm constant), based on the rectified-Gaussian fact that
+E[max(N,0)]=sigma/sqrt(2*pi) and Prob(N>0)=0.5 for noise N~Normal(0,sigma)
+— sigma estimated via bg_std (real-world-observable, verified ~0.78-
+0.81ppm against true 0.8ppm). Attempt 1 (correct IME_kg only): FAILED
+systematically — made every validated facility worse (Sasan 0.97->0.50),
+because L_eff was ALSO noise-dominated (Sasan's n_used=3852 of
+n_near=7343, near-exactly the 50% pure-noise baseline) — the previously
+"good" uncorrected ratio was an accidental numerator/denominator
+cancellation, not genuine recovery. Attempt 2 (correct both IME_kg AND
+n_used/L_eff consistently): mechanistically necessary, but FAILED
+through numerical instability — median moved to 1.037 (looks perfect)
+but sd(log ratio) exploded 0.92->5.10, within-2x didn't improve
+(53.0%->48.5%), 30/200 facilities got absurd ratios (near-zero or up to
+44x) from subtracting two large near-equal numbers (a "difference of
+nearly-equal numbers" amplification). Talcher/Tamnar check (the sharpest
+test, per instruction): no consistent improvement, several collapse to
+exactly 0, one already-accurate large facility pushed to 4.7x.
+VERDICT: SUB-INVESTIGATION CONCLUDED (not paused again). Eight
+mechanistically distinct tasks tonight — this is a complete, honest
+negative result for "physics-simulated Q training labels matching
+physics_ime.py's own real-world accuracy," not because any component is
+wrong (plume physics, orbital geometry, and sounding-count calibration
+are all independently verified correct) but because individual-sounding
+signal-to-noise makes accurate Q recovery from sparse noisy samples
+inherently unstable — a property of the estimation problem, not this
+simulator. Recommendation: the U-Net's SEGMENTATION stage was never
+blocked by any of this (mask ground truth never depended on Q
+calibration) and remains buildable; Q regression as originally scoped is
+a documented blueprint deviation. Building the segmentation-only U-Net
+is new work, not started this session. See SIMULATOR_METHODOLOGY_NOTE.md
+(final verdict) and WEEK20_LOG.txt (Task 8) for full detail.
 
 ## Hard rules
 - Never use Climate TRACE as a training label. Benchmark only.

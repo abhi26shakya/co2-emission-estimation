@@ -1,15 +1,14 @@
 # Simulator Methodology Note: `simulate_training_pairs.py`
 
-**Status: PAUSED. Two confirmed negative results (Tasks 3, 5); Task 6 a
-genuinely mixed result; Task 7 a clean win on sounding-count accuracy
-that further isolates (without fixing) the one remaining Q-bias
-mechanism.** This document exists so a future session doesn't have to
-re-derive seven rounds of debugging from WEEK20_LOG.txt alone, the same
-role NOVEL_METHODOLOGY_PROPOSAL.md served for the hotspot-map work. It
-records what was tried, what was ruled out and why, and what genuinely
-remains open. Nothing here claims the simulator is fixed — as of Week 20
-it is not, and this sub-investigation is explicitly paused (§6), not
-resolved.
+**Status: CONCLUDED (Task 8), not paused.** Eight tasks, eight
+mechanistically distinct attempts. Q regression as originally scoped in
+the blueprint is a documented deviation — this investigation could not
+produce a Q label this project's own diminishing-returns discipline
+would trust. The segmentation stage is NOT blocked by any of this and
+remains a defensible, separately-buildable capability — see §6 for the
+full verdict. This document exists so a future session doesn't have to
+re-derive eight rounds of debugging from WEEK20_LOG.txt alone, the same
+role NOVEL_METHODOLOGY_PROPOSAL.md served for the hotspot-map work.
 
 ## 1. What this script is for
 
@@ -389,91 +388,166 @@ independently-found and fixed reporting bug) and a diagnosed, explained,
 not-a-bonus-win partial movement on the Q-bias number. Both reported
 plainly, not conflated.
 
-## 5. Current best explanation (four consistent findings, not one)
+### 4.6 Direct mechanistic correction of the noise-floor bias (Task 8) — FAILED two distinct ways; sub-investigation CONCLUDED
 
-1. A naive mean-difference readout cannot be fixed by sampling geometry
-   alone — confirmed four times now (Tasks 4, 5, and twice within
-   Task 6's own comparison).
-2. `physics_ime.py`'s actual Q-recovery formula, applied to realistically
-   sparse SAM-mode soundings, substantially closes the SCALE of the gap
-   (from 10-100x off to ~1.5-2x median off) — the first approach in this
-   investigation to land in the same range as the real method's own
-   real-world accuracy, rather than off by orders of magnitude.
-3. Sounding-count/geometry accuracy is now a solved sub-problem
-   (Task 7): every validated facility matches real counts within 1%,
-   with the calibration table sourced from all 24 real facilities and
-   one real reporting bug found and fixed along the way.
-4. The remaining gap is now isolated to ONE mechanism, confirmed stable
-   across two independent tasks: a fixed per-sounding noise floor
-   (`SOUNDING_NOISE_STD_PPM = 0.8ppm`) disproportionately inflates
-   recovered Q for facilities with smaller true Q
-   (`corr(log_ratio, true_Q) ≈ -0.65 to -0.69` in both Task 6 and
-   Task 7), independent of sounding density or sampling geometry, both
-   of which are now correctly calibrated.
+**Checked before writing code**: physics_ime.py's own comments and this
+project's citations for a documented basis for noise scaling with local
+signal strength (§4.6's option (b)). None found — only sampling-noise
+and background-definition-sensitivity discussion (the latter, from
+`diagnose_talcher.py`, already flagged weak-signal facilities as a
+harder case for a *different*, independently-discovered reason). This
+ruled out option (b); proceeded with option (a): a closed-form
+statistical correction on `physics_ime.py`'s **output**, not a retuned
+`SOUNDING_NOISE_STD_PPM` constant.
 
-## 6. Recommendation: PAUSE this sub-investigation
+**The mechanism**: `clip(near_i - bg_mean, 0, None)` is a rectified/
+censored Gaussian. For an off-plume sounding under noise
+`N ~ Normal(0, sigma)`: `E[max(N,0)] = sigma/sqrt(2*pi)` (not zero), and
+`Prob(N>0) = 0.5` (not zero). `bg_std` (real-world-observable, verified
+~0.78-0.81ppm against a true injected 0.8ppm) estimates sigma.
 
-Seven rounds have now been run against this gap. Tasks 1-2 (near-field/
-wind-floor/resolution fixes, area-averaging) are correct and kept, but
-insufficient alone. Task 3 (Q-source falsification) was ruled out, made
-things worse. Task 4 (IME-consistent readout geometry) confirmed the
-forward/inverse mismatch but flipped the error direction. Task 5
-(multi-day pooling) confirmed again, near-zero effect, specific
-analytical cause. Task 6 (real orbital sampling geometry with native IME
-Q-recovery) was the first genuinely mixed result — substantially
-improved scale, not fully closed, diagnosed residual bias. Task 7
-(per-facility retention calibration) cleanly solved the sounding-count
-sub-problem and further isolated — without fixing — the one remaining
-bias mechanism. This matches this project's own diminishing-returns
-discipline — see WEEK13_LOG.txt's Rihand investigation, paused after
-four independently rejected explanations. Tasks 6 and 7 are NOT rejected
-explanations the way Tasks 3 and 5 were; this is paused because a
-partially-improved, partially-still-biased result — now precisely
-isolated to one mechanism — is not, on its own, a basis to proceed to
-the U-Net without a fix specifically targeting that mechanism.
+**Attempt 1 — correct `IME_kg` only**: failed systematically. Made
+*every* validated facility worse, including the two already near 1.0:
 
-### Paths forward — not attempted, listed so they aren't re-derived from scratch
+| Facility | Uncorrected | IME-kg-only corrected |
+|---|---|---|
+| Sasan | 0.970 | 0.501 |
+| Vindhyachal | 0.955 | 0.485 |
+| Talcher | 2.155 | 0.183 |
+| Rihand | 0.788 | 0.440 |
+| Tamnar | 2.003 | 0.203 |
 
-1. **Model or correct the weak-signal noise-floor bias directly** — now
-   the SOLE remaining candidate, confirmed stable and isolated across
-   Tasks 6 and 7 (`corr(log_ratio, true_Q) ≈ -0.65 to -0.69`,
-   independent of sounding density/geometry, both now correctly
-   calibrated per Task 7). E.g. a Q-dependent correction informed by
-   this measured relationship, or reconsidering whether
-   `SOUNDING_NOISE_STD_PPM` should scale with local background
-   variability rather than being a single fixed constant.
-2. **Different label-generation methodology entirely.** Abandon
-   single-snapshot forward Gaussian simulation as the training-label
-   source and generate segmentation masks/Q labels through a method
-   structurally consistent with IME's own multi-day aggregation
-   assumption.
-3. **Re-scope what the U-Net is meant to learn.** If neither of the
-   above converges, train the segmentation stage on the spatial *shape*
-   of the plume only (mask quality), with Q regression handled by a
-   separate mechanism not dependent on this simulator's ppm calibration
-   at all.
+Diagnosed why: for Sasan, `n_soundings_used=3852` of `n_near_total=7343`
+— almost exactly the ~50% pure-noise baseline (3671.5). `L_eff` was
+**also** overwhelmingly noise-driven, not just `IME_kg`. The "good"
+uncorrected ratio was an *accidental cancellation* between a
+noise-inflated numerator and a noise-inflated denominator — correcting
+only the numerator broke that cancellation. This is a materially deeper
+finding than §4.4/§4.5 reached: near-zone data is noise-dominated even
+for large, easy-to-detect facilities, not only weak ones.
+
+**Attempt 2 — correct both `IME_kg` and `n_used`/`L_eff` consistently**
+(subtract the same `0.5 * n_near_total` baseline from `n_soundings_used`
+before computing `L_eff`): mechanistically the necessary next step, but
+failed through **numerical instability**, not a systematic direction
+error. Full 200-facility result:
+
+| | Before (Task 7) | After (Task 8) |
+|---|---|---|
+| Median bias | 1.540x | 1.037x |
+| Mean bias | 2.396 | 1.827 |
+| sd(log ratio) | 0.918 | **5.096** |
+| Within 2x | 53.0% | 48.5% |
+| `corr(log_ratio, true_Q)` | -0.643 | +0.255 |
+
+The median moving to 1.037 looks, in isolation, like a near-perfect fix
+— exactly what this task's own instructions warned against trusting
+without the full picture. In full: 30/200 facilities produced absurd
+ratios (near-zero or up to 44x). Root cause: `n_used_corrected = n_used
+- 0.5*n_near_total` subtracts two large, comparable-magnitude quantities
+to get a small residual (Sasan: 3852 - 3671.5 = 180.5) — a classic
+"difference of nearly-equal large numbers" instability. Small relative
+errors in the 50%-baseline assumption (exact only in the infinite-sample
+limit) get massively amplified in the residual, which then sits in
+`L_eff`'s denominator.
+
+**Required check — Talcher/Tamnar, the sharpest test**: sampled several
+Task-8-corrected facilities sourced from Talcher's/Tamnar's own real
+retention directly from the 200-facility run — no consistent
+improvement; several collapse to exactly 0 (complete overcorrection),
+one already-accurate large Talcher-sourced facility (0.921) gets pushed
+to 4.715. Decisive: the fix does not reliably help even its own target
+case.
+
+**Verdict**: two mechanistically distinct, principled correction
+attempts both failed — the first systematically, the second through
+instability worse in aggregate variance than doing nothing. The
+weak-signal bias is real and mechanistically understood down to the
+individual-sounding level, but not fixable by a direct closed-form
+correction at this level of effort. Fixing it properly would need
+materially more sophisticated machinery (a Bayesian/shrinkage estimator,
+or substantially larger near-zone samples to reduce subtraction variance
+before amplification) — a different, larger undertaking, not a next
+incremental patch.
+
+## 5. Final synthesis — eight tasks, eight mechanistically distinct attempts
+
+1. Near-field singularity fix, wind-speed floor, resolution match
+   (Task 1) — correct, kept.
+2. Area-averaging (Task 2) — correct, kept, insufficient alone.
+3. Q-source falsification (Task 3) — ruled out, made things worse.
+4. IME-consistent readout geometry (Task 4) — confirmed a forward/
+   inverse mismatch, flipped the error direction.
+5. Multi-day pooling (Task 5) — confirmed again, near-zero effect,
+   specific analytical cause.
+6. Real OCO-3 SAM orbital sampling geometry with native IME Q-recovery
+   (Task 6) — first genuinely mixed result, scale substantially
+   improved.
+7. Per-facility retention calibration (Task 7) — clean win on sounding
+   counts (within 1% for all 5 validated facilities, plus a real bug
+   found and fixed), isolated the remaining bias to one mechanism.
+8. Direct mechanistic correction of that mechanism (Task 8) — failed two
+   distinct, well-diagnosed ways.
+
+This is a complete, honest negative result for the specific goal of
+*"generate physics-simulated (XCO2 tile, mask, Q) training triples whose
+Q label matches physics_ime.py's own real-world accuracy profile."* Not
+because any one component is wrong — the plume physics (§3), the orbital
+sampling geometry (§4.4), and the sounding-count calibration (§4.5) are
+all independently verified correct — but because the fundamental
+signal-to-noise regime at individual-sounding scale makes accurate Q
+recovery from sparse, noisy, single-facility samples inherently
+unstable. That is a property of the measurement/estimation problem
+itself, not of this simulator's implementation.
+
+## 6. CONCLUDED — not paused, resolved
+
+Per this project's own diminishing-returns discipline (WEEK13_LOG.txt's
+Rihand investigation), this sub-investigation is concluded here, not
+attempted a ninth way. Recommended path forward:
+
+- **The U-Net's SEGMENTATION stage** (mask quality) has never been shown
+  problematic across any of the 8 tasks — the mask is built directly
+  from the true, noise-free physics field (§1-3), entirely independent
+  of every Q-calibration attempt in §4.1-4.6. It remains a defensible,
+  separately-buildable capability.
+- **Q REGRESSION as originally scoped in the blueprint** (Paper 2's
+  U-Net → CNN regression architecture) should be treated as a
+  **documented deviation**: this investigation could not produce a
+  training label this project's own diminishing-returns discipline would
+  trust, despite eight mechanistically distinct, honestly-reported
+  attempts. Attempting Q regression on these labels would train a model
+  whose accuracy claims this project could not stand behind.
+- **Recommendation**: build the U-Net scoped to segmentation only (plume
+  mask quality), with Q regression deferred to a separate mechanism not
+  dependent on this simulator's Q calibration — this is new work, not
+  started in this session, deferred to a future session with its own
+  dedicated scope rather than tacked onto the close of an 8-task
+  investigation.
 
 ## 7. What is NOT open
 
 - The Gaussian plume physics itself (`plume_model.py`) is validated and
   unchanged throughout all of this — see `tests/test_plume_model.py`.
 - The near-field guard, wind floor, resolution match, and area-averaging
-  fixes (§3) are all independently verified and not implicated in the
-  Task 3/4/5/6/7 findings.
+  fixes (§3) are all independently verified and not implicated in any
+  Task 3-8 finding.
 - The multi-day pooling MECHANISM itself (§4.3) is verified correct — it
   reduces variance as expected; it simply doesn't address a bias that
   turned out not to be a sampling-count problem.
 - Sounding-count/geometry accuracy (§4.5) is CLOSED as of Task 7 — every
-  validated facility matches real counts within 1%. It is not the
-  remaining open problem.
+  validated facility matches real counts within 1%. It was never the
+  remaining problem.
 - The SAM raw footprint GEOMETRY itself (§4.4) is validated correct in
   scale against 4 of 5 real facilities before retention calibration is
-  even applied — the residual mismatch traces to the shared-range
-  calibration choice and the weak-signal noise bias, not the orbital
-  geometry parameters.
-- The U-Net (blueprint Paper 2 stage 1) has not been started, and per
-  this note's recommendation (§6) should not be started until either the
-  sparse-sampling path (§6.1) is tried and verified, or a different
-  label-generation approach (§6.2/§6.3) is adopted and independently
-  verified against the real distribution — the same standard this note
-  itself was held to.
+  even applied.
+- The Q-recovery bias's MECHANISM is understood, not mysterious — a
+  rectified-Gaussian noise floor at individual-sounding scale, verified
+  down to matching physics_ime.py's own internal near/n_used counts
+  (§4.6). It is CLOSED as an open question (the cause is known); it is
+  NOT closed as a fixable problem (§4.6's two attempts both failed).
+- **The U-Net's segmentation stage is NOT blocked by any of this** — see
+  §6. Its mask ground truth never depended on Q calibration.
+- **Q regression as originally scoped in the blueprint IS blocked**, and
+  per §6's verdict, concluded as a documented deviation rather than left
+  open for a ninth attempt.

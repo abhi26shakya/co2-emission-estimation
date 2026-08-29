@@ -221,7 +221,7 @@ class TestSamGeometry(unittest.TestCase):
 class TestSamQRecovery(unittest.TestCase):
     def test_recover_q_returns_result_and_n_days_wind_dirs(self):
         rng = np.random.default_rng(14)
-        result, wind_dirs, n_near, n_bg, ppm = sim.recover_q_from_sam_scans(
+        result, wind_dirs, n_near, n_bg, ppm, bg_std = sim.recover_q_from_sam_scans(
             rng, "test_facility", 2e7, 2.0, 220.0, "B", n_days=5,
             retention_frac=0.4, bg_density_ratio=0.045)
         self.assertEqual(len(wind_dirs), 5)
@@ -229,6 +229,7 @@ class TestSamQRecovery(unittest.TestCase):
         self.assertIsNotNone(result)
         self.assertIn("q_t_per_year", result)
         self.assertGreater(result["q_t_per_year"], 0)
+        self.assertIsNotNone(bg_std)
 
     def test_validate_sam_sounding_counts_same_order_of_magnitude(self):
         # This IS the task's required validation gate: simulated sounding
