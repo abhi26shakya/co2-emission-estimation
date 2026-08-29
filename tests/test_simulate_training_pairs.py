@@ -83,13 +83,25 @@ class TestMakeTile(unittest.TestCase):
         self.assertEqual(params["q_t_per_year"], 0.0)
         self.assertTrue(np.all(mask == 0))
 
-    def test_cloud_gap_fraction_in_expected_range(self):
+    def test_coverage_is_sam_sampler_derived_and_sparse(self):
+        # WEEK 22: coverage now comes from the real SAM footprint sampler
+        # (Task 6), not the old CLOUD_GAP_FRAC_RANGE rectangular blocks --
+        # valid_pixel_frac should be small (real single-day coverage is
+        # sparse) and should scale with the tile's own retention_frac,
+        # not a fixed range.
         rng = np.random.default_rng(1)
         for _ in range(10):
             tile, mask, params = sim.make_tile(rng, positive=True)
-            self.assertGreaterEqual(params["cloud_gap_frac"], sim.CLOUD_GAP_FRAC_RANGE[0] - 0.05)
-            self.assertLessEqual(params["cloud_gap_frac"], sim.CLOUD_GAP_FRAC_RANGE[1] + 0.05)
             self.assertTrue(np.any(np.isnan(tile)))
+            self.assertLess(params["valid_pixel_frac"], 0.5)  # real coverage is always sparse
+            self.assertGreaterEqual(params["valid_pixel_frac"], 0.0)
+            self.assertIn("retention_frac", params)
+
+    def test_higher_retention_gives_more_coverage(self):
+        rng = np.random.default_rng(5)
+        _, _, low = sim.make_tile(rng, positive=True, retention_frac=0.05)
+        _, _, high = sim.make_tile(rng, positive=True, retention_frac=0.5)
+        self.assertGreater(high["valid_pixel_frac"], low["valid_pixel_frac"])
 
     def test_wind_speed_never_below_real_data_floor(self):
         rng = np.random.default_rng(2)
@@ -177,6 +189,33 @@ class TestMultiDayPooling(unittest.TestCase):
         _, _, params = sim.make_tile(rng, positive=True, q=2e7, wind_speed=2.0,
                                       stack_height=220.0, stability="B", wind_from_deg=123.4)
         self.assertEqual(params["wind_from_deg"], 123.4)
+
+
+class TestSamTileValidMask(unittest.TestCase):
+    def test_shape_and_dtype(self):
+        rng = np.random.default_rng(0)
+        valid = sim._sam_tile_valid_mask(rng, retention_frac=0.3)
+        self.assertEqual(valid.shape, (sim.PX, sim.PX))
+        self.assertEqual(valid.dtype, bool)
+
+    def test_higher_retention_more_valid_pixels(self):
+        rng = np.random.default_rng(1)
+        low = sim._sam_tile_valid_mask(rng, retention_frac=0.05).sum()
+        high = sim._sam_tile_valid_mask(rng, retention_frac=0.5).sum()
+        self.assertGreater(high, low)
+
+    def test_coverage_roughly_matches_real_calibration(self):
+        # Vindhyachal's own real retention (0.5343) should give tile
+        # coverage in the right ballpark of the real 60km-tile check
+        # (13.3% observed in the Week 21 sanity check), not exact (this
+        # samples the full 80km SAM box then crops to 60km, so some
+        # variance is expected) but same order of magnitude.
+        rng = np.random.default_rng(2)
+        retention, _, _, _ = sim.FACILITY_RETENTION_TABLE["Vindhyachal"]
+        fracs = [sim._sam_tile_valid_mask(rng, retention).mean() for _ in range(20)]
+        mean_frac = np.mean(fracs)
+        self.assertGreater(mean_frac, 0.03)
+        self.assertLess(mean_frac, 0.30)
 
 
 class TestSamGeometry(unittest.TestCase):

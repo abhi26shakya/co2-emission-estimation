@@ -531,6 +531,45 @@ def _sam_scan_footprint_offsets_km(rng, retention_frac):
     return east_all[keep].copy(), north_all[keep].copy()
 
 
+def _sam_tile_valid_mask(rng, retention_frac):
+    """
+    WEEK 22 (see WEEK22_LOG.txt / RESEARCH_PAPER.md Sec 9.5): builds the
+    training tile's valid/cloud-gap mask by reusing Task 6's real,
+    already-validated SAM-mode sparse footprint sampler
+    (_sam_scan_footprint_offsets_km), restricted to the training tile's
+    own 60km extent, instead of _cloud_gap_mask's random-rectangular-
+    block approximation. This makes simulated tile coverage
+    geometrically consistent with the SAME sampler already verified
+    against real per-facility sounding density (WEEK20_LOG.txt Tasks
+    6-7: near-count match within 1% of real for all 5 validated
+    facilities) -- not a second, unverified coverage model. Motivated by
+    Week 21's real-tile sanity check, which found the segmentation
+    model's predictions tracked the OLD mask's large-rectangular-block
+    coverage pattern rather than real single-overpass data's sparse,
+    scattered speckle.
+
+    Background-annulus footprints are not included: BG_IN_KM (44.4km)
+    exceeds the tile's own half-width (30km, SIZE_KM=60), so background
+    points never fall inside a 60km training tile regardless -- only the
+    near-SAM-box sampler is geometrically relevant here.
+
+    Returns a (PX, PX) boolean array, True where a simulated SAM
+    footprint landed in that grid cell (i.e. real data available there).
+    """
+    east, north = _sam_scan_footprint_offsets_km(rng, retention_frac)
+    half = SIZE_KM / 2.0
+    in_bounds = (np.abs(east) < half) & (np.abs(north) < half)
+    east, north = east[in_bounds], north[in_bounds]
+
+    px_size_km = PX_SIZE_M / 1000.0
+    col = np.clip(np.floor((east + half) / px_size_km).astype(int), 0, PX - 1)
+    row = np.clip(np.floor((north + half) / px_size_km).astype(int), 0, PX - 1)
+
+    valid = np.zeros((PX, PX), dtype=bool)
+    valid[row, col] = True
+    return valid
+
+
 def _background_footprint_offsets_km(rng, bg_density_km2):
     """
     TASK 6: sparse Poisson-scattered background-annulus footprint centers
@@ -792,7 +831,7 @@ def validate_sam_sounding_counts(seed=SEED, n_repeats=5):
 
 
 def make_tile(rng, positive, q=None, wind_speed=None, stack_height=None, stability=None,
-              wind_from_deg=None):
+              wind_from_deg=None, retention_frac=None):
     """
     Generates ONE single-snapshot training tile (one wind direction, one
     simulated day, its own exact mask) -- unchanged mechanism from Tasks
@@ -807,7 +846,19 @@ def make_tile(rng, positive, q=None, wind_speed=None, stack_height=None, stabili
     its calibration readout. Calling this with no optional args (the
     Tasks 1-4 behavior) samples everything independently, exactly as
     before.
+
+    WEEK 22: retention_frac (also optional, defaults to a bootstrap draw
+    from FACILITY_RETENTION_TABLE -- the same real-data-calibrated table
+    Task 7 uses, not a new range) now governs the tile's valid/cloud-gap
+    mask via _sam_tile_valid_mask(), replacing _cloud_gap_mask()'s random
+    rectangular blocks. main()'s facility loop passes the SAME
+    retention_frac already used for that facility's SAM-scan Q readout,
+    so one facility has one consistent coverage-density characteristic
+    everywhere it's used, not two independently-drawn ones.
     """
+    if retention_frac is None:
+        retention_frac = float(FACILITY_RETENTION_TABLE[str(rng.choice(FACILITY_RETENTION_NAMES))][0])
+
     if positive:
         if q is None:
             q = float(np.exp(rng.uniform(np.log(Q_T_PER_YEAR_RANGE[0]),
@@ -838,7 +889,8 @@ def make_tile(rng, positive, q=None, wind_speed=None, stack_height=None, stabili
     noise = rng.normal(0.0, SOUNDING_NOISE_STD_PPM, size=(PX, PX))
     tile = BG_XCO2_PPM + enhancement_ppm + noise
 
-    cloud_mask = _cloud_gap_mask(rng)
+    valid_mask = _sam_tile_valid_mask(rng, retention_frac)
+    cloud_mask = ~valid_mask
     tile = tile.copy()
     tile[cloud_mask] = np.nan
 
@@ -852,7 +904,9 @@ def make_tile(rng, positive, q=None, wind_speed=None, stack_height=None, stabili
         wind_from_deg=wind_from_deg,
         stack_height_m=stack_height,
         stability_class=stability,
+        retention_frac=retention_frac,
         cloud_gap_frac=float(cloud_mask.mean()),
+        valid_pixel_frac=float(valid_mask.mean()),
         peak_enhancement_ppm=peak_ppm,
         ime_readout_ppm=ime_readout_ppm,
     )
@@ -902,7 +956,7 @@ def main():
 
             tile, mask, params = make_tile(rng, positive=True, q=q, wind_speed=wind_speed,
                                             stack_height=stack_height, stability=stability,
-                                            wind_from_deg=wind_from_deg)
+                                            wind_from_deg=wind_from_deg, retention_frac=retention_frac)
             params["facility_id"] = facility_id
             tiles.append(tile)
             masks.append(mask)
