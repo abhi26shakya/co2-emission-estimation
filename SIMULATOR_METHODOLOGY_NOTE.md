@@ -525,6 +525,57 @@ attempted a ninth way. Recommended path forward:
   dedicated scope rather than tacked onto the close of an 8-task
   investigation.
 
+### 6.1 Update (Weeks 21-23): the real-tile TRANSFER problem — also concluded, three attempts
+
+The segmentation stage described above as "not blocked" was built
+(Week 21) and immediately tested against real single-overpass OCO-3
+tiles for Vindhyachal and Rihand — qualitatively only, since no real
+ground-truth plume mask exists to score against. Three independently-
+targeted, honestly-reported attempts followed, all documented in
+WEEK21_LOG.txt / WEEK22_LOG.txt / WEEK23_LOG.txt:
+
+1. **Baseline (Week 21).** The trained model's real-tile predictions
+   tracked the input's cloud-COVERAGE pattern, not plume shape.
+   Diagnosed cause: training tiles' coverage mask (large random
+   rectangular blocks, 45–85% valid) looked nothing like real single-
+   overpass coverage (sparse scattered speckle, 11–13% valid).
+2. **Coverage density fix (Week 22).** Replaced the rectangular-block
+   mask with Week 20 Task 6's already-validated real SAM-mode sparse
+   footprint sampler, restricted to the training tile's extent — reused,
+   not reinvented. Confirmed the density fix directly (median valid
+   fraction dropped from the old 45–85% range to 3.9%, matching the real
+   regime). The real-tile check still showed the same coverage-tracking
+   behavior. Density was not the cause.
+3. **Coverage-shape disambiguation via an explicit input channel
+   (Week 23).** Gave the model an explicit second channel (1=valid,
+   0=missing), built identically in both the simulated-training and
+   real-tile pipelines by sharing one function
+   (`unet_segmentation.build_model_input`), to test whether the model
+   was exploiting the NaN-fill value's boundary discontinuity as an
+   implicit shortcut. The real-tile check still showed the same
+   coverage-tracking behavior, visually nearly indistinguishable from
+   Week 22's.
+
+**This is now a confirmed structural finding, not an open question**:
+this project's simulated training data cannot currently produce a
+segmentation model that transfers to real single-overpass OCO-3 tiles,
+across three mechanistically distinct fixes (density, and coverage-shape
+disambiguation via an explicit channel). Neither the density hypothesis
+nor the NaN-fill-boundary shortcut hypothesis explains or fixes the
+behavior. **The remaining candidate — a fundamentally different label-
+generation methodology (item 2 in the original Task 6/7-era "paths
+forward" list, superseded by this section) — is now the SOLE untried
+path for real-tile transfer, not one of several.** What specifically
+remains untried, per WEEK23_LOG.txt: confirming whether the coverage
+pattern itself is the dominant learned shortcut (versus some other
+simulator-specific artifact) via a more targeted diagnostic (e.g. real
+coverage patterns overlaid on simulated signal, or probing what the
+model's early layers actually respond to); and, more fundamentally,
+whether single-snapshot forward-simulated tiles can ever be made to
+transfer, or whether the training-label methodology needs to change
+structurally. Not attempted in Weeks 21-23, per the same diminishing-
+returns discipline this file's Task 8 conclusion already applied.
+
 ## 7. What is NOT open
 
 - The Gaussian plume physics itself (`plume_model.py`) is validated and
