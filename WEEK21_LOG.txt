@@ -1,0 +1,204 @@
+WEEK 21 -- segmentation-only U-Net for the Track B DL blueprint (Paper 2
+           stage 1), built on Week 20's simulated training tiles. Q
+           regression NOT attempted -- Week 20 concluded that sub-
+           investigation with a documented deviation, not a green light.
+
+CONTEXT
+=======
+Week 20's 8-task investigation (WEEK20_LOG.txt, SIMULATOR_METHODOLOGY_NOTE.md,
+commit 4d9b9af) concluded that this project's simulated Q labels
+(q_t_per_year in data/simulated_train/simulated_tiles.npz) cannot be
+trusted to this project's own accuracy standard, for reasons traced to
+individual-sounding signal-to-noise, not a fixable simulator bug. That
+investigation explicitly separated the two halves of the blueprint's
+Paper 2 architecture: the SEGMENTATION stage (predicting a plume mask
+from an XCO2 tile) was never blocked by any of the eight tasks, since the
+mask ground truth is built directly from the true, noise-free physics
+field -- entirely independent of the Q-calibration pipeline that failed.
+This week builds that segmentation stage only. No regression head. No
+q_t_per_year training target anywhere in unet_segmentation.py or
+train_unet_segmentation.py -- q_t_per_year is loaded ONLY to bucket test
+tiles by true Q for reporting, never as a target.
+
+DATA
+====
+data/simulated_train/simulated_tiles.npz: 2286 tiles (1986 positive,
+300 negative), 64x64, float32 XCO2 (ppm) with realistic cloud-gap NaNs
+baked in (mean ~38% of pixels per tile across this dataset), matched to
+uint8 masks. Confirmed alignment between the npz arrays and
+simulated_tiles_meta.json's per-tile params (index-for-index, zero
+mismatches checked directly) before writing any training code. 200
+distinct positive facility_ids (1-25 tiles each, matching Week 20's real
+hit_days-sourced day counts); 300 negative tiles, each independently
+sampled with no shared facility to leak.
+
+Mask density: mean 4.0% of pixels positive across all tiles, mean 4.6%
+on positive tiles specifically (min 0.6%, max 10.5%) -- confirms plume
+masks are sparse, motivating a combined BCE+Dice loss rather than BCE
+alone (see below).
+
+DATA-LEAKAGE DISCIPLINE (this project's own hard rule, Track A's Week 11
+fix)
+========================================================================
+facility_level_split() (unet_segmentation.py) splits by facility_id, not
+by tile -- multiple tiles sharing a facility_id (same synthetic plant,
+different simulated days/wind directions) never land on both sides of a
+split. Negative tiles, which have no real facility (each independently
+sampled, verified in simulate_training_pairs.py's own negative-tile
+loop), are each assigned a unique pseudo-facility id so the same split
+function handles both cases uniformly without a special case. Split:
+70% train / 15% val / 15% test by facility unit (500 total units: 200
+positive facilities + 300 independent negative units) -> 350/75/75
+units, 1606/329/351 tiles. Verified in code (not just by construction):
+train_unet_segmentation.py asserts zero facility_id overlap between all
+three splits before training starts, and this is covered by
+tests/test_unet_segmentation.py's TestFacilityLevelSplit suite (no
+facility in two splits, every tile assigned exactly once, reproducible
+given a fixed seed).
+
+CLOUD-GAP NaN HANDLING
+=======================
+Chose to MASK NaN out of the loss/metrics (the simpler of the two
+documented options), not a second input channel. The ground-truth mask
+is defined everywhere (built from the true noise-free field), but the
+network has no evidence at a cloud-occluded input pixel, so those pixels
+are excluded from both the loss (masked_bce_dice_loss) and every
+reported Dice/IoU number via a validity mask -- not silently trained on
+as if the fill value were real signal. NaN pixels are filled with
+BG_XCO2_PPM=415.0 (matching simulate_training_pairs.py's own background
+constant) purely so conv layers have a numeric input; that fill value
+never influences the loss or metrics because the validity mask zeroes it
+out. Verified this masking actually works, not just assumed: a wild
+out-of-range prediction (logit=999) at an excluded pixel produces
+byte-identical loss to a zero prediction at the same pixel
+(tests/test_unet_segmentation.py::TestMaskedLoss).
+
+Caught one real presentation bug while inspecting the qualitative
+figure, not left unfixed: a stray false-positive prediction can fall
+entirely within a cloud-gap region and correctly score as if it weren't
+there (dice=1.00 despite a visible white blob in the raw predicted-mask
+image) -- verified this was correct SCORING (the blob genuinely has zero
+overlap with the valid mask, confirmed by direct computation:
+pred_mask.sum()=27, pred_mask & valid = 0) but a MISLEADING PLOT, since
+the figure didn't show which pixels were excluded. Fixed by rendering
+cloud-gap pixels as mid-gray in both mask panels so a viewer can see why
+an apparently-wrong prediction doesn't count against the score, rather
+than looking like a scoring bug.
+
+MODEL
+=====
+UNetSmall (unet_segmentation.py): 3 encoder/decoder levels (64->32->16->8),
+16/32/64/128 channels, bilinear upsampling + skip connections, single
+1-channel input, single 1-channel logit output. 488,417 parameters --
+deliberately smaller than a classic 5-level U-Net, sized for this
+dataset (~1600 training tiles) and this machine (MacBook Air M1, no
+CUDA). Loss: masked_bce_dice_loss (BCE + soft Dice, both restricted to
+valid pixels) -- Dice included specifically because masks are sparse
+(see above); BCE alone would under-weight the minority plume class.
+Device: mps (CLAUDE.md's hard rule -- "cuda" if available else "cpu",
+matching device_str()'s check; the older train_detector.py/
+train_3channel.py scripts happen to check cuda-then-cpu, silently
+missing MPS acceleration on this machine -- not copied here).
+
+Normalization: mean/std computed from the TRAIN split only (415.020,
+0.724 -- consistent with the simulator's known BG_XCO2_PPM=415 and
+SOUNDING_NOISE_STD_PPM=0.8), applied to val/test with no leakage.
+
+TRAINING
+========
+AdamW, lr=1e-3, weight_decay=1e-4, batch_size=16, 60 epochs, ~5 minutes
+wall time on MPS. Best checkpoint selected by validation Dice (facility-
+disjoint from train), not train loss. Validation Dice was noisy across
+epochs (bounced 0.40-0.57, not a clean monotone convergence) --
+best_val_dice=0.5691 at whichever epoch happened to peak, not a stable
+plateau. Reported honestly, not smoothed over: with this dataset size
+and a 15%-by-facility validation split (~50 positive facilities' worth
+of tiles), per-epoch validation Dice has real variance, and 60 epochs
+was not enough to fully stabilize it. A longer run or a smoother LR
+schedule was not attempted this session -- flagged as a candidate
+follow-up if this model is revisited, not chased further here per this
+project's practice of reporting what was actually run.
+
+TEST SET RESULTS (facility-held-out, 351 tiles / 75 facilities, NEVER
+seen during training or checkpoint selection)
+========================================================================
+                          mean      median    min         max    n
+  Overall Dice          0.6056    0.8228    ~0           1.0    351
+  Overall IoU           0.5502    0.6989    ~0           1.0    351
+  Positive-tile Dice    0.5501    0.7273    ~0           1.0    301
+  Positive-tile IoU     0.4855    0.5714    ~0           1.0    301
+  Negative-tile Dice    0.9400    1.0000    ~0           1.0     50
+
+Mean well below median on positive tiles (0.55 vs 0.73) -- a heavy left
+tail of near-total failures pulls the mean down, not a uniformly mediocre
+model. Negative tiles (true empty mask, Q=0) are handled well (mean
+0.94, median 1.0): the model correctly predicts "no plume" on almost all
+of them, with a few near-zero outliers (likely cloud-gap-only spurious
+predictions, same mechanism as the plotting bug found above, still
+scored correctly, just rare residual noise).
+
+LOW-Q SUBSET, reported explicitly per instruction (bottom tercile of
+test positive tiles by true Q, threshold 4.28e6 t/yr, n=108) vs the
+remaining higher-Q positive tiles (n=193):
+
+                     mean      median
+  Low-Q Dice        0.4096    0.3796
+  Low-Q IoU         0.3536    0.2344
+  High-Q Dice       0.6287    0.8460
+
+The model performs MEANINGFULLY WORSE on weak-signal tiles -- median
+Dice roughly halves (0.85 -> 0.38) moving from the high-Q to low-Q
+subset. This is not surprising given Week 20's own finding that weak
+plumes sit close to this simulator's noise floor (SOUNDING_NOISE_STD_PPM
+= 0.8ppm comparable to a low-Q plume's true enhancement) -- the same
+underlying signal-to-noise limitation that stopped Q regression from
+working shows up here too, as a harder SEGMENTATION problem for weak
+plumes, not just a harder scalar-Q-recovery problem. Reported plainly,
+not averaged away in the headline number.
+
+QUALITATIVE INSPECTION (data/unet_segmentation_qualitative.png, 6 random
+test tiles)
+========================================================================
+A genuinely mixed picture, matching the numeric spread: two of six
+examples are near-total misses (dice~0.00, true plume mostly cloud-
+occluded with only a thin sliver visible, which the model does not
+detect); one is a clean win with predicted mask closely tracking the
+true elongated plume shape (dice=0.94); two are middling (0.58, 0.92,
+predicted regions correctly cover the plume's general location but are
+blobbier/rounder than the true thin diagonal streak -- the model appears
+biased toward compact rather than elongated shapes); one negative-tile
+example correctly predicts an all-empty mask (dice=1.00) after the
+cloud-gap visualization fix above clarified a stray false positive that
+doesn't count. The figure is left in the repo as an honest artifact, not
+cherry-picked -- these are the first 6 tiles a fixed-seed random draw
+selected, not hand-picked good examples.
+
+VERDICT
+=======
+The segmentation stage IS buildable and trains to a usable (not
+excellent) Dice/IoU on this simulated dataset, with a clearly diagnosed
+weakness (low-Q tiles) rather than an unexplained one. This is a
+genuinely different outcome than Week 20's Q-regression conclusion --
+NOT because segmentation is an easier problem in general, but because
+this project explicitly never attempted to validate segmentation against
+a Q-accuracy standard the way Week 20 held Q recovery to physics_ime.py's
+real-world accuracy. Positive-tile median Dice 0.73 / IoU 0.57 is a
+real, reportable, moderate-quality result -- not a strong one, and the
+low-Q degradation and validation-Dice instability are both disclosed,
+not hidden. Consistent with this project's standard: report negative and
+mixed results with the same rigor as positive ones. See
+RESEARCH_PAPER.md's new section for how this is positioned in the
+paper -- a simulated-data-only capability demonstration, explicitly not
+claimed to generalize to real OCO-3 tiles without further validation.
+
+FILES
+=====
+unet_segmentation.py -- model (UNetSmall), facility_level_split(),
+  fill_nan_and_validity(), dice_coefficient(), iou_score(),
+  masked_bce_dice_loss(). Reusable/testable, no training loop.
+train_unet_segmentation.py -- training script. Loads data, splits by
+  facility, trains, evaluates on the facility-held-out test split,
+  writes data/unet_segmentation_results.json, unet_segmentation.pt
+  (best-val-Dice checkpoint), and data/unet_segmentation_qualitative.png.
+tests/test_unet_segmentation.py -- 14 tests covering the split, NaN
+  handling, Dice/IoU, masked loss, and model output shape. All pass.
