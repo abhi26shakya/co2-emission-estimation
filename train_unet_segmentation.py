@@ -6,6 +6,16 @@ only -- q_t_per_year is loaded here ONLY to report per-Q-bucket test
 metrics (does the model do worse on low-signal tiles), never as a
 training target. See unet_segmentation.py's module docstring and
 WEEK21_LOG.txt for the scope boundary this respects.
+
+WEEK 23: input is now 2-channel (unet_segmentation.build_model_input) --
+channel 0 the normalized XCO2 tile, channel 1 the explicit valid/missing
+mask -- to test whether Week 22's persistent real-tile coverage-
+tracking behavior came from the model relying on the NaN-fill value's
+boundary discontinuity as an implicit shortcut feature. See
+WEEK23_LOG.txt. sanity_check_real_tiles.py calls the SAME
+build_model_input() function on real tiles -- that is the only way this
+comparison is meaningful (see WEEK23_LOG.txt's explicit consistency
+check).
 """
 import json
 
@@ -17,8 +27,8 @@ import torch
 from torch.utils.data import DataLoader, Dataset
 
 from unet_segmentation import (
-    UNetSmall, device_str, dice_coefficient, facility_level_split,
-    fill_nan_and_validity, iou_score, masked_bce_dice_loss,
+    UNetSmall, build_model_input, device_str, dice_coefficient,
+    facility_level_split, fill_nan_and_validity, iou_score, masked_bce_dice_loss,
 )
 
 SEED = 42
@@ -32,19 +42,24 @@ BATCH_SIZE = 16
 EPOCHS = 60
 LR = 1e-3
 MASK_THRESHOLD = 0.5  # predicted-probability threshold for binarizing IoU/Dice
+IN_CHANNELS = 2  # WEEK 23: [normalized tile, explicit valid mask]
 
 
 class TileMaskDataset(Dataset):
-    def __init__(self, tiles, masks, valid):
-        self.tiles = torch.from_numpy(tiles).unsqueeze(1)   # (N,1,64,64)
+    def __init__(self, norm_tiles, masks, valid):
+        # WEEK 23: 2-channel model input, built via the SAME
+        # build_model_input() sanity_check_real_tiles.py uses on real
+        # tiles -- see module docstring.
+        x = np.stack([build_model_input(norm_tiles[i], valid[i]) for i in range(len(norm_tiles))])
+        self.x = torch.from_numpy(x)                                    # (N,2,64,64)
         self.masks = torch.from_numpy(masks.astype(np.float32)).unsqueeze(1)
         self.valid = torch.from_numpy(valid.astype(np.float32)).unsqueeze(1)
 
     def __len__(self):
-        return self.tiles.shape[0]
+        return self.x.shape[0]
 
     def __getitem__(self, i):
-        return self.tiles[i], self.masks[i], self.valid[i]
+        return self.x[i], self.masks[i], self.valid[i]
 
 
 def load_data():
@@ -118,7 +133,7 @@ def main():
     val_dl = DataLoader(val_ds, batch_size=BATCH_SIZE)
     test_dl = DataLoader(test_ds, batch_size=BATCH_SIZE)
 
-    model = UNetSmall(in_channels=1, base_channels=16).to(device)
+    model = UNetSmall(in_channels=IN_CHANNELS, base_channels=16).to(device)
     n_params = sum(p.numel() for p in model.parameters())
     print(f"Model: UNetSmall, {n_params:,} parameters")
     opt = torch.optim.AdamW(model.parameters(), lr=LR, weight_decay=1e-4)
@@ -206,7 +221,8 @@ def main():
     with torch.no_grad():
         for row, local_i in enumerate(example_idx):
             global_i = test_idx[local_i]
-            x = torch.from_numpy(norm_tiles[global_i]).unsqueeze(0).unsqueeze(0).to(device)
+            x_np = build_model_input(norm_tiles[global_i], valid[global_i])
+            x = torch.from_numpy(x_np).unsqueeze(0).to(device)
             prob = torch.sigmoid(model(x))[0, 0].cpu().numpy()
             pred_mask = prob > MASK_THRESHOLD
 
@@ -240,6 +256,7 @@ def main():
         n_train_tiles=len(train_idx), n_val_tiles=len(val_idx), n_test_tiles=len(test_idx),
         n_train_facilities=n_train_fac, n_val_facilities=n_val_fac, n_test_facilities=n_test_fac,
         model_params=n_params,
+        in_channels=IN_CHANNELS,
         epochs=EPOCHS, batch_size=BATCH_SIZE, lr=LR,
         best_val_dice=best_val_dice,
         train_mean=float(train_mean), train_std=float(train_std),

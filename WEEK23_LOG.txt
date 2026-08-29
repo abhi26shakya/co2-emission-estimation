@@ -1,0 +1,147 @@
+WEEK 23 -- test the NaN-fill-boundary shortcut hypothesis with an
+           explicit second input channel. THIRD AND FINAL DIAGNOSTIC
+           ATTEMPT for this Track B session: STILL a negative result.
+           Confirmed structural finding, not another open question.
+
+CONTEXT
+=======
+Week 21 found the segmentation model's real-tile predictions track the
+input's cloud-coverage PATTERN, not plume shape. Week 22 fixed coverage
+DENSITY (reusing Week 20's validated SAM sampler) and confirmed the
+density change, but the real-tile check still showed the same
+coverage-tracking behavior -- density was not the cause. Week 22's
+diagnosis offered two untested candidates: (a) coverage-mask SHAPE/
+structure still differing from real speckle even at matched density, or
+(b) the model exploiting the NaN-fill VALUE's sharp discontinuity at
+every valid/invalid boundary as an implicit shortcut feature. This week
+tests (b) directly: give the model an EXPLICIT second input channel
+(1=valid, 0=missing) so it no longer has to infer validity from a fill-
+value discontinuity.
+
+Per explicit instruction, this is the THIRD and FINAL attempt at the
+real-tile transfer problem in this session, regardless of outcome.
+
+CONSISTENCY, verified before evaluating anything
+====================================================
+Added unet_segmentation.build_model_input(norm_tile, valid_mask) ->
+(2, H, W) array (channel 0 = normalized tile, channel 1 = valid mask as
+float 0/1). Both train_unet_segmentation.py (simulated tiles) and
+sanity_check_real_tiles.py (real tiles) call THIS EXACT function, same
+argument order, with no independently-written second implementation
+anywhere in the codebase -- the only way two pipelines are guaranteed to
+construct an input identically is to share the literal code, not to
+carefully duplicate matching logic in two files. This is a stronger
+guarantee than a manual side-by-side check, and is additionally covered
+by tests/test_unet_segmentation.py::TestBuildModelInput (channel
+content, shape, dtype-flexibility, and direct compatibility with
+UNetSmall(in_channels=2) are all unit-tested). Model input channels
+increased 1 -> 2 in both scripts; IN_CHANNELS=2 is a shared constant
+checked in both files' headers.
+
+SIMULATED-DATA RESULTS: Week 22 vs Week 23, same facility-held-out
+test split (281 tiles / 75 facilities), same training procedure
+========================================================================
+                          Week 22 (1-channel)   Week 23 (2-channel)
+  best_val_dice             0.4938                0.4748
+  Overall Dice (mean)       0.4434                0.4332
+  Overall Dice (median)     0.4000                0.3750
+  Positive Dice (mean)      0.3705                0.3452
+  Positive Dice (median)    0.2857                0.2857
+  Positive IoU (mean)       0.3078                0.2780
+  Positive IoU (median)     0.1667                0.1667
+  Negative Dice (mean)      0.7800                0.8400
+  Negative Dice (median)    1.0000                1.0000
+  Low-Q Dice (mean)         0.3113                0.2637
+  Low-Q Dice (median)       0.0385                0.0000075
+  High-Q Dice (mean)        0.4056                0.3935
+  High-Q Dice (median)      0.3636                0.3636
+
+Essentially flat, slightly worse if anything -- positive-tile median
+Dice/IoU are IDENTICAL to three decimal places (0.2857/0.1667 both
+weeks), negative-tile mean improved slightly (0.78->0.84) but low-Q
+median collapsed further (0.0385->~0). Adding the explicit valid-mask
+channel did not measurably change simulated-data performance in either
+direction. This alone does not resolve whether the shortcut-learning
+hypothesis was correct (a model that already has other ways to solve
+the simulated task about equally well could still be shortcut-prone on
+OUT-OF-DISTRIBUTION real data) -- the real-tile check is what actually
+tests that, per explicit instruction.
+
+REAL-TILE QUALITATIVE CHECK -- THE DECISIVE TEST
+=====================================================
+Same two facilities (Vindhyachal, Rihand), same script
+(sanity_check_real_tiles.py), same single best-covered real overpass day
+per plant (2020-11-30, both), retrained 2-channel checkpoint, same hard
+constraint (no accuracy metric against real tiles -- still no real
+ground-truth mask exists).
+
+RESULT: unchanged. Visually
+(data/unet_segmentation_real_tile_sanity_check.png, regenerated), the
+predicted "plume" pixels for both plants again cluster in the same
+rough diagonal band that traces the real data's own coverage-speckle
+pattern -- the figure is, on direct visual comparison, nearly
+indistinguishable from Week 22's version of the same check. Predicted
+plume-pixel fraction moved slightly (Vindhyachal 1.1%->1.8%, Rihand
+2.0%->2.4%) but the SHAPE of where those predictions land did not
+become more plume-like. Giving the model an explicit valid-mask channel
+did not change this qualitative behavior in any visible way.
+
+CONCLUSION -- per explicit instruction, this is written as a confirmed
+finding, not left as another open question
+========================================================================
+This project's simulated training data cannot currently produce a
+segmentation model that transfers to real single-overpass OCO-3 tiles,
+across three independently-targeted fixes: coverage DENSITY (Week 22,
+confirmed fixed, did not resolve transfer), coverage-mask SHAPE
+disambiguation via an explicit input channel (Week 23, this week,
+confirmed the channel was correctly and consistently added to both
+pipelines, did not resolve transfer). Both the density hypothesis and
+the NaN-fill-boundary shortcut hypothesis have now been tested directly
+and both failed to explain (or fix) the coverage-tracking behavior. The
+remaining, most likely explanation is not a parameter or an input-
+representation choice within the current single-snapshot forward-
+simulation approach -- it is the approach itself: a model trained
+exclusively on this simulator's tiles, however the coverage mask is
+represented or shaped, may simply be learning simulator-specific
+artifacts (of which the coverage pattern is the most visible, not
+necessarily the only one) rather than genuine XCO2-plume structure,
+because nothing in training ever exposes it to a genuinely different
+kind of tile to force that distinction. This is consistent with, and
+now has direct experimental support for, the open question already
+recorded in SIMULATOR_METHODOLOGY_NOTE.md Sec 6 item 2 -- see that
+file's updated Sec 6 for the resulting change: it is now recorded as
+the ONLY remaining untried path for real-tile transfer, not one of
+several.
+
+WHAT REMAINS UNTESTED, honestly: it has NOT been established that the
+coverage pattern itself is the actual dominant shortcut (versus some
+other simulator-specific artifact); a more diagnostic experiment (e.g.
+training on real coverage patterns overlaid on simulated signal, or
+probing what the model's early layers actually respond to) was not
+attempted and is a candidate for a future, differently-scoped
+investigation -- not this session's, per the explicit instruction to
+stop after this third attempt regardless of outcome.
+
+FILES CHANGED
+=============
+unet_segmentation.py: added build_model_input(norm_tile, valid_mask).
+train_unet_segmentation.py: TileMaskDataset and the qualitative-figure
+  inference path now build 2-channel input via build_model_input();
+  model instantiated with in_channels=2 (IN_CHANNELS constant).
+sanity_check_real_tiles.py: same build_model_input() call, same
+  IN_CHANNELS=2, on real tiles -- the consistency requirement.
+tests/test_unet_segmentation.py: added TestBuildModelInput (3 new
+  tests: channel content/shape, bool/float valid-mask equivalence,
+  direct compatibility with a 2-channel UNetSmall). 98/98 tests pass
+  repo-wide.
+unet_segmentation.pt, data/unet_segmentation_results.json,
+  data/unet_segmentation_qualitative.png,
+  data/unet_segmentation_real_tile_sanity_check.png: retrained/
+  regenerated with the 2-channel model. data/simulated_train/* is
+  UNCHANGED this week -- same Week 22 tiles, only the model input
+  representation changed.
+SIMULATOR_METHODOLOGY_NOTE.md: Sec 6 updated to record the "different
+  label-generation methodology entirely" path as the sole remaining
+  untried candidate for the real-tile transfer problem specifically
+  (distinct from, though related to, that section's original Q-recovery
+  context).

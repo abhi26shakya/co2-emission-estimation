@@ -1,5 +1,5 @@
 """
-Week 21 addendum: QUALITATIVE-ONLY sanity check of the trained
+Reusable QUALITATIVE-ONLY sanity check of the trained
 segmentation U-Net (unet_segmentation.pt) on real OCO-3 tiles for
 Vindhyachal and Rihand -- the paper's best/worst IME cases, chosen for
 continuity with the rest of this project (see RESEARCH_PAPER.md Sec 9).
@@ -10,8 +10,8 @@ in the first place. This script computes NO Dice/IoU/accuracy number
 against real tiles. It only produces an inspectable figure (real tile +
 predicted mask overlay) and is meant to be read qualitatively: does the
 predicted mask fall over a plausible plume-shaped region, or is it
-visibly nonsensical / firing on background noise. See WEEK21_LOG.txt's
-qualitative addendum for the actual read of these figures.
+visibly nonsensical / firing on background noise. See the current week's WEEKnn_LOG.txt
+qualitative addendum (WEEK21/22/23_LOG.txt) for the actual read of these figures.
 
 Real tiles are built by gridding real OCO-3 soundings
 (data/<plant>_soundings.npz: lat, lon, xco2, day) onto the SAME 60km/
@@ -23,6 +23,17 @@ in-tile soundings), since the model was trained on single-snapshot
 tiles, not multi-day composites. Grid cells with no real soundings that
 day are left NaN, handled by the same fill/validity-mask logic used in
 training.
+
+WEEK 23: the model now takes a 2-channel input (normalized tile +
+explicit valid mask, unet_segmentation.build_model_input()) to test the
+NaN-fill-boundary shortcut-learning hypothesis (WEEK22_LOG.txt). This
+script builds that input by calling the EXACT SAME build_model_input()
+function train_unet_segmentation.py uses on simulated tiles -- the only
+way this comparison is meaningful, per explicit instruction. Verified
+directly, not just asserted: both scripts import build_model_input from
+the same module and pass it (normalized_tile, valid_mask) in the same
+argument order; there is no second, independently-written channel-
+construction path anywhere in this codebase.
 """
 import json
 
@@ -32,7 +43,9 @@ import matplotlib.pyplot as plt
 import numpy as np
 import torch
 
-from unet_segmentation import UNetSmall, device_str, fill_nan_and_validity
+from unet_segmentation import UNetSmall, build_model_input, device_str, fill_nan_and_validity
+
+IN_CHANNELS = 2  # must match train_unet_segmentation.py's IN_CHANNELS
 
 KM_PER_DEG = 111.0
 SIZE_KM, PX = 60, 64
@@ -86,13 +99,13 @@ def main():
     results = json.load(open(RESULTS_PATH))
     train_mean, train_std = results["train_mean"], results["train_std"]
 
-    model = UNetSmall(in_channels=1, base_channels=16)
+    model = UNetSmall(in_channels=IN_CHANNELS, base_channels=16)
     model.load_state_dict(torch.load(CHECKPOINT_PATH, map_location="cpu"))
     model.eval()
 
     fig, axes = plt.subplots(len(PLANTS), 3, figsize=(9, 3 * len(PLANTS)))
 
-    print("=== Week 21 addendum: QUALITATIVE-ONLY real-tile sanity check ===")
+    print("=== QUALITATIVE-ONLY real-tile sanity check (no accuracy metric) ===")
     print("No accuracy metric is computed -- no real ground-truth mask exists.\n")
 
     for row_i, name in enumerate(PLANTS):
@@ -107,7 +120,8 @@ def main():
 
         filled, valid = fill_nan_and_validity(tile[None, :, :])
         norm = (filled[0] - train_mean) / train_std
-        x = torch.from_numpy(norm).unsqueeze(0).unsqueeze(0)
+        x_np = build_model_input(norm, valid[0])
+        x = torch.from_numpy(x_np).unsqueeze(0)
         with torch.no_grad():
             prob = torch.sigmoid(model(x))[0, 0].numpy()
         pred_mask = prob > MASK_THRESHOLD
@@ -129,13 +143,13 @@ def main():
         for ax in axes[row_i]:
             ax.axis("off")
 
-    plt.suptitle("Week 21 addendum -- QUALITATIVE sanity check only, NOT a validation\n"
+    plt.suptitle("QUALITATIVE sanity check only, NOT a validation\n"
                   "(no real ground-truth mask exists to score against)", fontsize=10)
     plt.tight_layout()
     plt.savefig(OUT_FIG_PATH, dpi=100)
     plt.close()
     print(f"\nFigure saved to {OUT_FIG_PATH}")
-    print("See WEEK21_LOG.txt for the qualitative visual description.")
+    print("See this week's WEEKnn_LOG.txt for the qualitative visual description.")
 
 
 if __name__ == "__main__":

@@ -104,6 +104,32 @@ def fill_nan_and_validity(tiles, fill_value=BG_XCO2_PPM):
     return filled, valid
 
 
+def build_model_input(norm_tile, valid_mask):
+    """
+    WEEK 23: builds the model's 2-channel input array -- channel 0 the
+    normalized, NaN-filled XCO2 tile, channel 1 the explicit valid/
+    missing mask (1.0=valid, 0.0=missing) -- to test the hypothesis
+    (WEEK22_LOG.txt) that Week 22's persistent coverage-pattern-tracking
+    behavior comes from the model relying on the NaN-fill VALUE's sharp
+    boundary discontinuity as an implicit, poorly-generalizing shortcut
+    feature, rather than genuine signal. Giving the model the valid mask
+    explicitly removes the need to infer it from that discontinuity.
+
+    THIS EXACT FUNCTION is called by both train_unet_segmentation.py
+    (simulated tiles) and sanity_check_real_tiles.py (real tiles) -- the
+    only way to guarantee the two pipelines build this channel
+    identically is to share the literal code, not to duplicate matching
+    logic in two files. norm_tile: already normalized
+    ((filled-train_mean)/train_std). valid_mask: bool or 0/1 array, same
+    shape as norm_tile.
+
+    Returns a (2, H, W) float32 array.
+    """
+    norm_tile = np.asarray(norm_tile, dtype=np.float32)
+    valid_channel = np.asarray(valid_mask, dtype=np.float32)
+    return np.stack([norm_tile, valid_channel], axis=0)
+
+
 def dice_coefficient(pred, target, valid=None, eps=1e-6):
     """
     pred, target: bool/0-1 arrays or tensors, any shape. valid: same

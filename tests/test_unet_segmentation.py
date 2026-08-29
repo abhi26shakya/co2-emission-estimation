@@ -74,6 +74,37 @@ class TestNanHandling(unittest.TestCase):
         np.testing.assert_array_equal(filled, tile)
 
 
+class TestBuildModelInput(unittest.TestCase):
+    def test_shape_and_channel_content(self):
+        # WEEK 23: channel 0 must be the normalized tile untouched,
+        # channel 1 the valid mask as float 0/1 -- this is the exact
+        # function both train_unet_segmentation.py and
+        # sanity_check_real_tiles.py call, so this test is the
+        # consistency guarantee for both pipelines at once.
+        norm_tile = np.array([[1.0, -2.0], [0.5, 3.0]], dtype=np.float32)
+        valid = np.array([[True, False], [True, True]])
+        x = useg.build_model_input(norm_tile, valid)
+        self.assertEqual(x.shape, (2, 2, 2))
+        np.testing.assert_array_equal(x[0], norm_tile)
+        np.testing.assert_array_equal(x[1], valid.astype(np.float32))
+
+    def test_accepts_float_or_bool_valid_mask(self):
+        norm_tile = np.zeros((3, 3), dtype=np.float32)
+        valid_bool = np.array([[True, False, True]] * 3)
+        valid_float = valid_bool.astype(np.float32)
+        x_bool = useg.build_model_input(norm_tile, valid_bool)
+        x_float = useg.build_model_input(norm_tile, valid_float)
+        np.testing.assert_array_equal(x_bool, x_float)
+
+    def test_compatible_with_unet_two_channel_input(self):
+        norm_tile = np.random.default_rng(0).normal(size=(64, 64)).astype(np.float32)
+        valid = np.random.default_rng(1).random((64, 64)) > 0.9
+        x = useg.build_model_input(norm_tile, valid)
+        model = useg.UNetSmall(in_channels=2, base_channels=4)
+        out = model(torch.from_numpy(x).unsqueeze(0))
+        self.assertEqual(out.shape, (1, 1, 64, 64))
+
+
 class TestDiceIou(unittest.TestCase):
     def test_perfect_match_gives_one(self):
         pred = np.array([[1, 1, 0], [0, 1, 0]])
