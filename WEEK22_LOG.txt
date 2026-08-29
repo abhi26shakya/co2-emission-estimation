@@ -1,0 +1,195 @@
+WEEK 22 -- fix training-tile coverage geometry (reuse Week 20 Task 6's
+           validated SAM sampler instead of the random-rectangular-block
+           cloud-gap model) and re-evaluate honestly. NEGATIVE RESULT:
+           density fix confirmed, coverage-tracking behavior NOT fixed.
+
+CONTEXT
+=======
+Week 21's real-tile sanity check (WEEK21_LOG.txt's qualitative addendum)
+found the segmentation model's predicted "plume" pixels tracked real
+data's COVERAGE pattern, not plume shape -- diagnosed cause: training
+tiles' cloud-gap mask (simulate_training_pairs.py's old _cloud_gap_mask,
+large random rectangular blocks, 45-85% valid) looked nothing like real
+single-overpass coverage (sparse scattered speckle, 11-13% valid, per
+the real Vindhyachal/Rihand check). This week fixes that mismatch at
+the source, per explicit instruction: reuse Week 20 Task 6's already-
+validated SAM-mode sparse footprint sampler
+(_sam_scan_footprint_offsets_km, validated against real per-facility
+sounding counts in WEEK20_LOG.txt Tasks 6-7) to build the training
+tile's valid/cloud-gap mask, rather than inventing a second, unverified
+coverage model.
+
+STEP 1: FIX THE MASK GENERATOR, CONFIRM THE DENSITY CHANGE
+=============================================================
+Added _sam_tile_valid_mask(rng, retention_frac) (simulate_training_pairs.py):
+calls the SAME _sam_scan_footprint_offsets_km() used for Task 6's Q
+readout, restricted to the training tile's 60km extent (the background-
+annulus sampler is irrelevant here -- BG_IN_KM=44.4km exceeds the tile's
+own 30km half-width, so background points never land inside a 60km tile
+regardless), maps surviving footprints onto the 64x64 grid, marks those
+cells valid. make_tile() gained an optional retention_frac parameter
+(defaulting to a FACILITY_RETENTION_TABLE bootstrap -- the SAME real-
+data-calibrated table Task 7 uses, not a new range) and now calls this
+instead of _cloud_gap_mask(). main()'s facility loop passes the SAME
+retention_frac already used for that facility's Q-readout SAM scan, so
+one facility has one consistent coverage-density characteristic
+everywhere, not two independently-drawn ones.
+
+Regenerated the full training set (simulate_training_pairs.py, same
+seed=42, same NUM_POSITIVE_FACILITIES=200). Compared the resulting
+valid-pixel-fraction distribution to the real 11-13% figures BEFORE
+doing anything else with it, per explicit instruction:
+
+                    OLD (Week 21)         NEW (Week 22)
+  valid fraction    45-85% (uniform       min 0.9%, p10 2.1%,
+                     range, old model)    median 3.9%, mean 5.5%,
+                                          p90 12.9%, max 14.9%
+
+Real observed (Week 21 sanity check): Vindhyachal 13.3%, Rihand 11.2%.
+
+Confirmed fix: density dropped by roughly 10-15x, landing in the right
+general regime. The real reference points (11-13%) fall near the TOP of
+the new synthetic distribution (p90-max), not at the median -- expected,
+not a bug: Vindhyachal and Rihand are among the best-observed, highest-
+retention real facilities in the full 24-facility table (0.53, 0.48 of
+a 0.044-0.534 range), so a median SYNTHETIC facility (drawn from the
+same real distribution, median retention 0.128) should genuinely have
+lower coverage than these two specific well-observed plants. This is
+the honest, non-cherry-picked shape of the real retention distribution
+showing up correctly, not a miscalibration.
+
+STEP 2/3: RETRAIN AND RE-EVALUATE ON THE FACILITY-HELD-OUT TEST SPLIT
+=========================================================================
+Same facility-level split discipline as Week 21 (never split by tile),
+same architecture, same training procedure (60 epochs, AdamW lr=1e-3,
+masked BCE+Dice loss). Full side-by-side comparison, Week 21 vs Week 22,
+same metrics:
+
+                          Week 21 (old coverage)   Week 22 (SAM coverage)
+  n_train/val/test tiles  1606/329/351             1625/317/281
+  best_val_dice            0.5691                   0.4938
+  Overall Dice (mean)      0.6056                   0.4434
+  Overall Dice (median)    0.8228                   0.4000
+  Positive Dice (mean)     0.5501                   0.3705
+  Positive Dice (median)   0.7273                   0.2857
+  Positive IoU (mean)      0.4855                   0.3078
+  Positive IoU (median)    0.5714                   0.1667
+  Negative Dice (mean)     0.9400                   0.7800
+  Negative Dice (median)   1.0000                   1.0000
+  Low-Q Dice (mean)        0.4096                   0.3113
+  Low-Q Dice (median)      0.3796                   0.0385
+  High-Q Dice (mean)       0.6287                   0.4056
+  High-Q Dice (median)     0.8460                   0.3636
+
+The simulated-data metrics got WORSE across the board, not better --
+positive-tile median Dice roughly halved (0.73 -> 0.29), low-Q median
+Dice collapsed further (0.38 -> 0.04). This is reported plainly, not
+downplayed. WHY, not just that: this is a genuinely harder task now.
+Median valid-pixel coverage dropped from ~65% (midpoint of the old
+45-85% range) to 3.9% -- the model has roughly 15-20x less visual
+evidence per tile to work with, and plume masks are already sparse
+(~4.6% of pixels on positive tiles, WEEK21_LOG.txt) -- at 3.9% median
+input coverage, a typical tile now has ~160 real input pixels total
+against a target region of comparable or smaller size, an intrinsically
+much harder segmentation problem than the old ~65%-coverage regime, not
+evidence the SAM-derived mask is wrong. A worse simulated-data score was
+plausible going in and is not itself the test of whether this fix
+worked -- the real-tile check (Step 4) is.
+
+STEP 4: RE-RUN THE REAL-TILE QUALITATIVE CHECK -- THE ACTUAL TEST
+=====================================================================
+Same two facilities as Week 21 (Vindhyachal, Rihand), same script
+(sanity_check_real_tiles.py), same single best-covered real overpass day
+per plant (2020-11-30, both), retrained checkpoint. Same hard
+constraint: no accuracy metric computed against real tiles -- there is
+still no real ground-truth mask to score against.
+
+RESULT: the coverage-tracking behavior is NOT fixed. Visually
+(data/unet_segmentation_real_tile_sanity_check.png, regenerated): the
+predicted "plume" pixels for both plants again cluster in a rough
+diagonal band that closely resembles the shape of the real data's own
+denser coverage sub-region, and that band again looks similar between
+the two plants (same day, geographically close, so their coverage
+speckle looks alike) -- the same qualitative pattern Week 21 found,
+not visibly more plume-shaped. Predicted plume-pixel fraction changed
+slightly (0.5%->1.1% for Vindhyachal, 0.6%->2.0% for Rihand) but the
+SHAPE of where those predictions land did not become more plausible as
+a plume: still a scattered cluster tracking coverage structure, not an
+elongated streak.
+
+This is a materially different outcome than the simulated-data numbers
+suggest on their own -- exactly the risk this task's own instructions
+flagged going in ("the simulated metric passing is necessary but not
+sufficient evidence the underlying problem is fixed"). Density was
+fixed and confirmed (Step 1); the coverage-PATTERN-tracking behavior
+this whole week targeted was not resolved by that fix alone.
+
+DIAGNOSIS, not just the observation: matching coverage DENSITY was not
+sufficient because the coverage-tracking behavior is not primarily a
+density problem -- it is a STRUCTURE problem. The model appears to have
+learned an association between the SHAPE/geometry of the valid-vs-
+invalid pixel boundary and "plume," largely independent of the actual
+XCO2 values within the valid region, and simply making that boundary
+sparser (rather than changing its geometric character) does not remove
+that association. Two candidate contributing factors, neither confirmed
+this session (flagged for whoever continues this): (a) the fixed
+NaN-fill value (BG_XCO2_PPM=415.0) creates a sharp discontinuity at
+every valid/invalid boundary that a small conv-net can trivially detect
+regardless of density, giving it a shortcut feature correlated with
+SOMETHING in training (facility identity via retention_frac, day-to-day
+geometry, etc.) that generalizes poorly; (b) even now, this project's
+own simulated SAM footprint pattern is a fixed local (east, north)
+raster (no simulated satellite heading, a documented simplification
+since Task 6) cropped to a square tile, which may still be
+structurally different from real coverage speckle's actual shape/
+texture even at matched density -- density and shape are not the same
+property, and this week only fixed the former.
+
+VERDICT: SECOND CONFIRMED NEGATIVE RESULT on the same underlying
+transfer-to-real-data problem (Week 21's first attempt, this week's
+second). Per explicit instruction, applying the same diminishing-
+returns discipline as Week 20: reported honestly, NOT forcing a third
+variant in this session. This now looks like a MORE FUNDAMENTAL sim-
+to-real gap than a single fixable coverage-density parameter -- fixing
+density alone was not enough, and the remaining gap (coverage-mask
+SHAPE/structure, and/or a NaN-fill-boundary shortcut-learning problem)
+is not obviously a one-line fix the way the density mismatch was. This
+echoes, and now provides second-hand evidence for, the open question
+already recorded in SIMULATOR_METHODOLOGY_NOTE.md Sec 6 item 2 ("a
+different label-generation methodology entirely") -- two independent
+attempts (multi-day pooling in Week 20 Task 5, and now geometry-only
+coverage matching here) at making a single-snapshot forward-simulated
+tile behave like real satellite data have both fallen short in ways
+that point toward the SIMULATION METHODOLOGY itself, not a tunable
+parameter within it.
+
+NOT attempted this session, listed so they aren't re-derived from
+scratch: (a) diagnosing whether the NaN-fill-boundary shortcut-learning
+hypothesis above is real (e.g. training with a second input channel
+encoding validity explicitly, rather than relying on a boundary
+discontinuity implicitly, as Week 21's original "either mask out of the
+loss function or treat as a documented input channel" choice already
+flagged as the alternative not taken); (b) modeling real satellite
+ground-track heading/orbit geometry rather than the fixed local-frame
+SAM raster, to test whether coverage SHAPE (not just density) is the
+missing piece; (c) abandoning single-snapshot simulated tiles as the
+segmentation training source entirely, per SIMULATOR_METHODOLOGY_NOTE.md
+Sec 6 item 2.
+
+FILES CHANGED
+=============
+simulate_training_pairs.py: added _sam_tile_valid_mask(); make_tile()
+  gained retention_frac param, now calls the SAM-derived mask instead of
+  _cloud_gap_mask(); main()'s facility loop passes the shared
+  retention_frac through. _cloud_gap_mask() and CLOUD_GAP_FRAC_RANGE
+  remain defined (no longer called by make_tile()) for reference.
+tests/test_simulate_training_pairs.py: replaced the obsolete
+  CLOUD_GAP_FRAC_RANGE-based test with coverage/retention-scaling tests;
+  added direct tests for _sam_tile_valid_mask(). 95/95 tests pass
+  (repo-wide).
+data/simulated_train/simulated_tiles.npz + simulated_tiles_meta.json:
+  regenerated with SAM-derived coverage.
+unet_segmentation.pt, data/unet_segmentation_results.json,
+  data/unet_segmentation_qualitative.png: retrained/regenerated.
+data/unet_segmentation_real_tile_sanity_check.png: regenerated with the
+  retrained checkpoint.
