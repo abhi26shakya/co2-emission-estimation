@@ -255,7 +255,38 @@ PAUSED (not because Task 6 failed, but because partial improvement isn't
 a basis to proceed) — see SIMULATOR_METHODOLOGY_NOTE.md §4.4/§6 for full
 detail and concrete next steps (per-facility retention calibration,
 noise-floor bias correction — neither attempted) and WEEK20_LOG.txt
-(Task 6). U-Net remains not started.
+(Task 6).
+
+Task 7, same session: implemented per-facility retention calibration,
+scoped explicitly to fix ONLY the sounding-COUNT mismatch (Talcher's
+n_used off >10x under Task 6's shared retention range), not the Q-bias.
+Computed (retention, bg_ratio) for all 24 real facilities (not just 5)
+into FACILITY_RETENTION_TABLE; the 200-facility dataset now bootstraps
+a PAIRED sample from a real facility's exact values instead of two
+independent uniform draws. Also found and fixed a real bug along the
+way: n_near/n_bg were counting every footprint in the 80x80km SAM box,
+not just the 27.75km near-zone disk physics_ime.py actually filters to
+(~2.64x over-count, box_area/disk_area exactly) — verified this never
+affected the actual Q-recovery (physics_ime.py computes its own masking
+internally), only the separately-reported count metric.
+RESULT 1 (sounding counts, what this task targeted): CLEAN WIN — all 5
+validated facilities now match real counts within 1% (was 1.7-6.4x).
+RESULT 2 (Q-bias, 200 facilities, NOT targeted): median bias DID move
+(2.11x -> 1.54x, within-2x 43.5% -> 53.0%) — checked why rather than
+assumed a bonus: corr(log_ratio, true_Q) stayed ~unchanged (-0.691 ->
+-0.643, the noise-floor mechanism is NOT fixed); corr(log_ratio,
+retention)=+0.31 shows the SAME bias scales with sample count, and
+Task 7's real-facility-sourced retention distribution has a much lower
+typical value (median 0.124) than Task 6's uniform range's implied mean
+(~0.33) — so the median improvement is a side effect of correcting the
+retention distribution's SHAPE, not evidence the bias's cause was
+addressed. Talcher/Tamnar remain badly biased (2.15x, 2.00x) even with
+their own exact real retention, confirming this. VERDICT: clean win on
+its target, diagnosed non-bonus partial movement on Q-bias, both
+reported separately, not conflated. Remaining problem is now isolated to
+ONE mechanism (fixed per-sounding noise floor vs. true Q) — see
+SIMULATOR_METHODOLOGY_NOTE.md §4.5/§6 and WEEK20_LOG.txt (Task 7).
+PAUSED, same basis as Task 6. U-Net remains not started.
 
 ## Hard rules
 - Never use Climate TRACE as a training label. Benchmark only.

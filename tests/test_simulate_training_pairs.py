@@ -240,5 +240,46 @@ class TestSamQRecovery(unittest.TestCase):
             self.assertGreater(row["near_ratio_sim_over_real"], 0.1)
 
 
+class TestPerFacilityRetentionCalibration(unittest.TestCase):
+    def test_table_covers_all_5_validation_facilities(self):
+        # Task 7: validation must use each facility's OWN real retention,
+        # not a redraw -- this requires every SAM_VALIDATION_FACILITIES
+        # name to exist in FACILITY_RETENTION_TABLE.
+        for name in sim.SAM_VALIDATION_FACILITIES:
+            self.assertIn(name, sim.FACILITY_RETENTION_TABLE)
+
+    def test_validation_uses_facilitys_own_retention_not_shared_range(self):
+        # With per-facility retention (no redraw), near-count match should
+        # be tight (~1x) for all 5 facilities, not scattered 1.7x-6.4x
+        # the way Task 6's shared-range draw was.
+        rows = sim.validate_sam_sounding_counts(seed=42, n_repeats=3)
+        for row in rows:
+            self.assertLess(abs(row["near_ratio_sim_over_real"] - 1.0), 0.15,
+                             f"{row['facility']} near-count match should be tight with its own real retention")
+
+    def test_retention_table_values_in_zero_one_range(self):
+        for name, (retention, bg_ratio, hit_days, n_used) in sim.FACILITY_RETENTION_TABLE.items():
+            self.assertGreater(retention, 0.0)
+            self.assertLessEqual(retention, 1.0)
+            self.assertGreater(bg_ratio, 0.0)
+
+
+class TestNearCountReportingBugFix(unittest.TestCase):
+    def test_n_near_matches_disk_restricted_count_not_whole_box(self):
+        # Regression test for a real bug found this session: n_near
+        # previously counted every SAM-box footprint (~2.6x too many),
+        # not just those within IME_NEAR_KM the way physics_ime.py
+        # actually filters. n_near must match the disk-restricted count.
+        rng = np.random.default_rng(20)
+        retention, bg_ratio, hit_days, _ = sim.FACILITY_RETENTION_TABLE["Sasan"]
+        lat, lon, xco2, day, n_near, n_bg = sim.simulate_sam_day_soundings(
+            rng, 20200101, 3.9279e7, 1.3165, 90.0, 220.0, "B", retention, bg_ratio)
+        dist_km = np.sqrt(lat ** 2 + lon ** 2) * sim.KM_PER_DEG
+        actual_near = int((dist_km < sim.IME_NEAR_KM).sum())
+        self.assertEqual(n_near, actual_near)
+        # Sanity: this must be well below the raw box-wide footprint count.
+        self.assertLess(n_near, sim.RAW_FOOTPRINTS_PER_SAM_SCAN * retention * 0.6)
+
+
 if __name__ == "__main__":
     unittest.main()

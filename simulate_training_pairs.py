@@ -269,22 +269,71 @@ N_FRAMES_PER_SWATH = int(np.ceil(2 * SAM_BOX_HALF_KM / FRAME_SPACING_KM))  # 37 
 RAW_FOOTPRINTS_PER_SAM_SCAN = N_SWATHS * N_FRAMES_PER_SWATH * FOOTPRINTS_PER_FRAME  # 2072
 SAM_BOX_AREA_KM2 = (2 * SAM_BOX_HALF_KM) ** 2  # 6400
 
-# Retention fraction (cloud/data-quality loss applied to the raw 2072-
-# footprint raster) and background/near-zone density ratio, both computed
-# from 5 real facilities' actual sounding density -- not invented. See
-# module docstring for the exact computation (data/plant_results.json
-# "soundings"/hit_days for near-zone raw density against this fix's own
-# theoretical 783 near-zone-only footprint count; data/emission_estimates.json
-# "n_bg_before_month_filter"/hit_days for background density):
-#   Sasan 0.496 / 0.0372, Vindhyachal 0.534 / 0.0352, Talcher 0.132 / 0.0600,
-#   Rihand 0.485 / 0.0390, Tamnar 0.154 / 0.0359
-RETENTION_FRAC_RANGE = (0.132, 0.534)
-BG_DENSITY_RATIO_RANGE = (0.0352, 0.0600)
+# TASK 7 (see WEEK20_LOG.txt Task 7 / SIMULATOR_METHODOLOGY_NOTE.md Sec
+# 4.5): Task 6's original RETENTION_FRAC_RANGE/BG_DENSITY_RATIO_RANGE
+# (below, kept for reference/documentation only, no longer used for
+# sampling) were calibrated from only 5 real facilities and drawn as a
+# single shared CONTINUOUS UNIFORM range across all synthetic facilities.
+# Task 6's own validation showed this produces >10x sounding-count
+# mismatches for facilities whose real retention sits at the range's
+# extremes (Talcher, Tamnar) -- because a uniform range implicitly
+# assumes retention is uniformly distributed between its min and max,
+# which the real data does NOT support (see below: the real distribution
+# is heavily skewed toward LOW retention, median 0.128, not centered
+# near the old range's midpoint ~0.33).
+#
+# Fix: retention_frac and bg_density_ratio are now drawn as a PAIRED
+# bootstrap sample from FACILITY_RETENTION_TABLE -- the ACTUAL per-
+# facility (retention, bg_ratio) values computed from all 24 real
+# facilities present in BOTH data/plant_results.json ("soundings",
+# "hit_days") and data/emission_estimates.json
+# ("n_bg_before_month_filter"), not a continuous range fitted to 5. Each
+# synthetic facility "borrows" one real facility's actual calibrated
+# density characteristics (preserving the real per-facility correlation
+# between retention and bg_ratio), rather than sampling the two
+# independently from an idealized uniform range.
+RETENTION_FRAC_RANGE = (0.132, 0.534)      # Task 6 range; superseded, kept for reference
+BG_DENSITY_RATIO_RANGE = (0.0352, 0.0600)  # Task 6 range; superseded, kept for reference
 
-# The 5 real facilities used to calibrate the two ranges above, kept here
-# for the sounding-count VALIDATION step (run each facility's own real Q,
-# wind speed, and hit_days back through this simulator and compare
-# simulated sounding counts to that facility's real ones).
+# name: (retention_frac, bg_density_ratio, hit_days, n_soundings_used) for
+# all 24 real facilities with both real data sources. retention_frac =
+# (soundings/hit_days) / 783.22 (this fix's own theoretical near-zone-only
+# footprint count); bg_density_ratio = (n_bg_before_month_filter/hit_days
+# density over the 25160 km^2 annulus) / (near-zone density). Computed
+# directly from real data, not fitted or invented.
+FACILITY_RETENTION_TABLE = {
+    "RGundem":          (0.0439, 0.0447, 5, 5),
+    "ShriSingajiMalwa": (0.0582, 0.0506, 5, 36),
+    "Sagardighi":       (0.0784, 0.0716, 7, 3),
+    "Raichur":          (0.0838, 0.0460, 5, 20),
+    "RayalSeema":       (0.0838, 0.0521, 9, 44),
+    "Kahalgaon":        (0.0947, 0.0606, 14, 61),
+    "Korba":            (0.0981, 0.0646, 5, 78),
+    "ChandrapurCoal":   (0.1036, 0.0676, 14, 25),
+    "Kudgi":            (0.1079, 0.0398, 4, 49),
+    "KGudemNew":        (0.1221, 0.0436, 10, 226),
+    "TalwandiSabo":     (0.1235, 0.0412, 4, 23),
+    "Chhabra":          (0.1240, 0.0637, 9, 29),
+    "Talcher":          (0.1316, 0.0600, 21, 105),
+    "Tamnar":           (0.1536, 0.0359, 7, 86),
+    "Farakka":          (0.1600, 0.0444, 12, 153),
+    "Tirora":           (0.1713, 0.0751, 5, 6),
+    "Koradi":           (0.1875, 0.0453, 25, 279),
+    "Mouda":            (0.1937, 0.0449, 19, 422),
+    "Pryagraj(Bara)":   (0.2144, 0.0382, 15, 427),
+    "Dadri(Nctpp)":     (0.3185, 0.0409, 20, 757),
+    "Anpara":           (0.4603, 0.0388, 16, 858),
+    "Rihand":           (0.4845, 0.0390, 16, 1182),
+    "Sasan":            (0.4959, 0.0372, 19, 997),
+    "Vindhyachal":      (0.5343, 0.0352, 17, 1083),
+}
+FACILITY_RETENTION_NAMES = list(FACILITY_RETENTION_TABLE.keys())
+
+# The 5 real facilities used for the sounding-count VALIDATION step (run
+# each facility's own real Q, wind speed, hit_days -- AND, as of Task 7,
+# its own real retention_frac/bg_density_ratio from
+# FACILITY_RETENTION_TABLE, not a redraw -- back through this simulator
+# and compare simulated sounding counts to that facility's real ones).
 SAM_VALIDATION_FACILITIES = {
     # name: (q_t_per_year, wind_speed_ms, hit_days, real_n_soundings_used, real_soundings_total)
     "Sasan":       (3.9279e7, 1.3165, 19, 997, 7379),
@@ -567,7 +616,23 @@ def simulate_sam_day_soundings(rng, day_int, Q_t_per_year, wind_speed_ms, wind_f
     lat_all = north_all / KM_PER_DEG
     lon_all = east_all / KM_PER_DEG
     day_all = np.full(east_all.shape, day_int, dtype=np.int64)
-    return lat_all, lon_all, xco2_all, day_all, len(near_east), len(bg_east)
+
+    # TASK 7 bug fix: n_near/n_bg must report the counts physics_ime.py's
+    # own near_mask/bg_mask would actually select (dist < IME_NEAR_KM /
+    # IME_BG_IN_KM < dist < IME_BG_OUT_KM), NOT len(near_east)/len(bg_east)
+    # -- _sam_scan_footprint_offsets_km() returns footprints across the
+    # WHOLE 80x80km SAM box (needed so physics_ime.py's own masking can
+    # select the disk-restricted subset from real, full-box-shaped data),
+    # so len(near_east) over-counts by (box_area/near_disk_area) ~2.6x.
+    # physics_ime.estimate_emission_rate_from_arrays() computes its own
+    # dist/near_mask internally from lat_all/lon_all and was NEVER
+    # affected by this -- this fixes a reporting-only bug in the
+    # validation/count metrics, not the Q-recovery computation itself.
+    near_dist_km = np.sqrt(near_east ** 2 + near_north ** 2)
+    n_near_disk_restricted = int((near_dist_km < IME_NEAR_KM).sum())
+    bg_dist_km = np.sqrt(bg_east ** 2 + bg_north ** 2) if bg_east.size else np.zeros(0)
+    n_bg_annulus_restricted = int(((bg_dist_km > IME_BG_IN_KM) & (bg_dist_km < IME_BG_OUT_KM)).sum())
+    return lat_all, lon_all, xco2_all, day_all, n_near_disk_restricted, n_bg_annulus_restricted
 
 
 def recover_q_from_sam_scans(rng, facility_name, Q_t_per_year, wind_speed_ms, stack_height_m,
@@ -620,22 +685,25 @@ def recover_q_from_sam_scans(rng, facility_name, Q_t_per_year, wind_speed_ms, st
 
 def validate_sam_sounding_counts(seed=SEED, n_repeats=5):
     """
-    TASK 6 REQUIRED VALIDATION -- run BEFORE trusting anything downstream.
-    For each of SAM_VALIDATION_FACILITIES, replays that REAL facility's
-    own (Q, wind speed, hit_days) through this simulator n_repeats times
-    (retention_frac and bg_density_ratio drawn fresh each repeat from
-    their real-data-calibrated ranges) and compares simulated sounding
-    counts to that facility's actual real counts. If simulated density
-    were off by an order of magnitude from real, the geometry parameters
-    would be wrong and nothing downstream should be trusted.
+    TASK 6/7 REQUIRED VALIDATION -- run BEFORE trusting anything
+    downstream. For each of SAM_VALIDATION_FACILITIES, replays that REAL
+    facility's own (Q, wind speed, hit_days) through this simulator
+    n_repeats times, AS OF TASK 7 using that SAME facility's own real
+    retention_frac/bg_density_ratio from FACILITY_RETENTION_TABLE (not a
+    redraw from a shared range) -- isolating remaining repeat-to-repeat
+    variation to wind direction, background Poisson count, and
+    measurement noise, not "which facility's retention got drawn this
+    time". Compares simulated sounding counts to that facility's actual
+    real counts. If simulated density were off by an order of magnitude
+    from real, the geometry parameters would be wrong and nothing
+    downstream should be trusted.
     """
     rng = np.random.default_rng(seed)
     rows = []
     for name, (q, wind_speed, hit_days, real_n_used, real_soundings) in SAM_VALIDATION_FACILITIES.items():
+        retention, bg_ratio, _, _ = FACILITY_RETENTION_TABLE[name]
         sim_near, sim_bg, sim_n_used, sim_q_ratio = [], [], [], []
         for _ in range(n_repeats):
-            retention = float(rng.uniform(*RETENTION_FRAC_RANGE))
-            bg_ratio = float(rng.uniform(*BG_DENSITY_RATIO_RANGE))
             result, _, n_near, n_bg, _ = recover_q_from_sam_scans(
                 rng, f"{name}_sim", q, wind_speed, 220.0, "B", hit_days, retention, bg_ratio)
             sim_near.append(n_near)
@@ -756,8 +824,11 @@ def main():
         stack_height = float(rng.uniform(*STACK_HEIGHT_RANGE))
         stability = str(rng.choice(STABILITY_CLASSES))
         n_days = int(rng.choice(HIT_DAYS_POOL))
-        retention_frac = float(rng.uniform(*RETENTION_FRAC_RANGE))
-        bg_density_ratio = float(rng.uniform(*BG_DENSITY_RATIO_RANGE))
+        # TASK 7: paired bootstrap from a REAL facility's own (retention,
+        # bg_ratio), not independent draws from a shared continuous range
+        # -- see FACILITY_RETENTION_TABLE's docstring comment.
+        source_facility = str(rng.choice(FACILITY_RETENTION_NAMES))
+        retention_frac, bg_density_ratio, _, _ = FACILITY_RETENTION_TABLE[source_facility]
         day_start = 20200101 + facility_id * 40  # keep each facility's days in a distinct, non-overlapping dummy date block
 
         lat_all, lon_all, xco2_all, day_all = [], [], [], []
@@ -814,6 +885,7 @@ def main():
             n_days=n_days,
             retention_frac=retention_frac,
             bg_density_ratio=bg_density_ratio,
+            retention_source_facility=source_facility,
             per_day_wind_from_deg=day_wind_dirs,
             n_near_soundings_total=n_near_total,
             n_bg_soundings_total=n_bg_total,
@@ -873,8 +945,9 @@ def main():
         n_negative=N_NEGATIVE,
         n_facilities_with_insufficient_soundings=n_facilities_insufficient,
         hit_days_pool_source="data/plant_results.json hit_days, N=30 (min 1, max 25, median 8, mean 9.93)",
-        retention_frac_range=RETENTION_FRAC_RANGE,
-        bg_density_ratio_range=BG_DENSITY_RATIO_RANGE,
+        retention_calibration_method="TASK 7: paired bootstrap from FACILITY_RETENTION_TABLE (24 real facilities), not a shared range",
+        retention_frac_range_legacy_task6=RETENTION_FRAC_RANGE,
+        bg_density_ratio_range_legacy_task6=BG_DENSITY_RATIO_RANGE,
         sam_sounding_count_validation=sam_validation,
         peak_enhancement_ppm_stats=_dist_stats(pos_peaks),
         ime_readout_ppm_stats=_dist_stats(pos_ime_readout),

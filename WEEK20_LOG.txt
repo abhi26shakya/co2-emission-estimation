@@ -627,3 +627,139 @@ noise-floor bias's dependence on true Q so it can be corrected rather
 than only characterized). Both of those are recorded as concrete next
 steps in SIMULATOR_METHODOLOGY_NOTE.md, not attempted this session. The
 U-Net (blueprint Paper 2 stage 1) remains NOT STARTED.
+
+TASK 7: per-facility retention calibration -- CLEAN WIN on sounding
+counts, plus one real bug found and fixed; Q-bias median DID move but
+NOT for the reason it might look like at first glance
+========================================================================
+
+Scoping, per explicit instruction: this task targets ONLY the
+sounding-COUNT mismatch Task 6's validation surfaced (Talcher's n_used
+off by >10x, traced to one shared RETENTION_FRAC_RANGE/BG_DENSITY_RATIO_RANGE
+applied uniformly across facilities with genuinely different real
+retention). It is explicitly a SEPARATE issue from the median Q-bias
+(2.1x, diagnosed in Task 6 as a fixed per-sounding noise floor
+disproportionately inflating weak/low-Q facilities) -- fixing retention
+calibration was NOT expected to move the Q-bias number by itself, and
+if it did, that needed double-checking rather than being assumed a
+bonus win. It did move. Explained below, not just reported.
+
+FIX 1 -- per-facility calibration table: computed retention_frac and
+bg_density_ratio for ALL 24 real facilities present in BOTH
+data/plant_results.json ("soundings", "hit_days") and
+data/emission_estimates.json ("n_bg_before_month_filter"), not just the
+5 used in Task 6 (FACILITY_RETENTION_TABLE). Real retention ranges from
+0.044 (RGundem) to 0.534 (Vindhyachal), median 0.128 -- HEAVILY skewed
+toward low values, not remotely centered near Task 6's old uniform
+range's implied mean (~0.33). This alone is informative: a continuous
+uniform range between the min and max of 5 facilities was a poor proxy
+for the real 24-facility distribution's actual shape. The 200-facility
+main dataset now draws retention_frac/bg_density_ratio as a PAIRED
+bootstrap sample from this table (one real facility's exact values
+"borrowed" together, preserving real per-facility correlation), not two
+independent uniform draws.
+
+FIX 2 (bug found DURING this task, not anticipated going in): while
+testing FIX 1 against the 5 validation facilities using their OWN exact
+retention (expecting near-perfect count matches by construction), the
+match came out consistently ~2.64x too HIGH for every facility, not the
+~1.0x expected. Diagnosed directly: simulate_sam_day_soundings()'s
+returned n_near/n_bg counted EVERY footprint in the 80x80km SAM box
+(after retention thinning), not just those within IME_NEAR_KM
+(27.75km) -- the box (6400 km^2) is ~2.64x larger than the near-zone
+disk (2419 km^2, matching box_area/disk_area exactly). This was a
+REPORTING-ONLY bug: physics_ime.estimate_emission_rate_from_arrays()
+computes its own dist/near_mask internally from the full lat/lon arrays
+and was verified UNAFFECTED (direct check: physics_ime's internal
+near_mask count for Sasan came out 7289, matching the expected
+disk-restricted total of ~7380 almost exactly, while the buggy n_near
+metric reported 19482 for the same run) -- so Task 6's actual Q-recovery
+numbers were never wrong because of this bug, only the separately-
+reported sounding-count metric was. Fixed by restricting n_near/n_bg to
+the same dist<IME_NEAR_KM / IME_BG_IN_KM<dist<IME_BG_OUT_KM masks
+physics_ime.py itself applies. This bug had been PARTIALLY masked in
+Task 6 by the shared-range retention scatter (both errors pushed counts
+up, making the combined mismatch look like "just retention scatter" when
+part of it was this independent counting bug) -- Task 7's precision
+(exact per-facility retention) is what made the residual ~2.64x
+systematic error visible and traceable.
+
+RESULT 1 -- sounding-count match (the thing this task targeted): CLEAN
+WIN, both fixes combined:
+
+  facility      Task 6 near-ratio (sim/real)   Task 7 near-ratio (sim/real)
+  Sasan         1.71x                          0.99x
+  Vindhyachal   1.66x                          0.99x
+  Talcher       6.37x                          0.99x
+  Rihand        2.14x                          0.99x
+  Tamnar        5.22x                          0.99x
+
+Every facility now lands within 1% of its real sounding count, versus a
+1.7x-6.4x scattered mismatch before. This directly and completely closes
+the gap the validation exercise was designed to catch.
+
+RESULT 2 -- Q-recovery bias, 200 facilities (the thing NOT targeted by
+this task):
+
+                    Task 6      Task 7
+  median bias       2.112x      1.540x
+  mean bias         3.321       2.396
+  sd(log ratio)      0.901       0.918
+  within 2x          43.5%       53.0% (106/200)
+
+The median bias DID move, meaningfully (2.11x -> 1.54x, closer to 1.0),
+and within-2x improved (43.5% -> 53.0%). Per the explicit instruction,
+this was checked rather than assumed to be a bonus win:
+
+  corr(log_ratio, true_Q):    Task 6 -0.691  ->  Task 7 -0.643 (essentially unchanged)
+  corr(log_ratio, retention): (not computed in Task 6)  Task 7  +0.310
+  retention distribution actually sampled: Task 6 uniform(0.132,0.534),
+    mean ~0.33  ->  Task 7 real-facility-sourced, median 0.124, mean 0.190
+
+The dominant bias mechanism (corr with true_Q, the weak-signal noise-
+floor effect diagnosed in Task 6) is essentially UNCHANGED -- it was NOT
+fixed by this task, exactly as expected going in. What moved is
+different: corr(log_ratio, retention) = +0.31 confirms Q-recovery bias
+scales UP with sample count/retention (consistent with the IME formula:
+more near-zone samples at a fixed per-sample excess rate roughly scales
+IME_kg linearly and n_used linearly, so L_eff=sqrt(n_used*area) scales
+as sqrt(retention), giving Q ~ retention/sqrt(retention) = sqrt(retention)
+-- higher retention mechanically produces a larger version of the SAME
+bias, not a different one). Task 7's real-facility-sourced retention
+distribution has a much LOWER typical value (median 0.124) than Task 6's
+uniform range's implied average (~0.33) -- because most REAL facilities
+genuinely have low retention and only a few (Sasan, Vindhyachal, Rihand,
+Anpara) have high retention, which a uniform range between the extremes
+did not represent. So the median-bias improvement is a SIDE EFFECT of
+correcting the retention distribution's SHAPE (most synthetic facilities
+now correctly have fewer samples, like most real facilities do), which
+mechanically produces a smaller instance of the SAME still-present bias
+-- not evidence the bias's root cause was addressed. Per-facility
+validation-level accuracy also improved for specific replayed facilities
+(e.g. Sasan's recovered_Q_ratio_mean: Task 6 0.763 -> Task 7 0.970,
+Vindhyachal 0.720 -> 0.955) -- this is a genuine, separate improvement
+from removing scatter (previously, random shared-range draws sometimes
+gave these high-retention facilities a much-too-low retention value,
+pulling their average Q_ratio down; using their own exact retention
+removes that scatter). Talcher and Tamnar (the smallest true-Q
+facilities) remain badly biased even with their own EXACT real retention
+(2.155x, 2.003x mean) -- direct confirmation the weak-signal noise-floor
+mechanism is untouched by this fix, exactly where Task 6's diagnosis
+said it would be.
+
+VERDICT: Task 7 is a CLEAN WIN on its stated target (sounding-count
+match, now within 1% for all 5 validated facilities, plus an
+independently-found and fixed reporting bug) and a DIAGNOSED, EXPLAINED,
+NOT-a-bonus-win partial movement on the Q-bias number (median improved
+from a distribution-shape side effect, root-cause mechanism confirmed
+unchanged). Both are reported plainly, not conflated. The underlying
+weak-signal noise-floor bias (corr with true_Q ~-0.65 to -0.69,
+consistent across both tasks) remains the open problem -- still not
+closed, and this session's own diminishing-returns discipline says stop
+patching Q-bias attempts without a specifically-targeted fix (e.g. a
+Q-dependent noise correction, or reconsidering SOUNDING_NOISE_STD_PPM's
+fixed-constant assumption), neither attempted here. This
+sub-investigation remains PAUSED (not resolved) on the same basis as
+Task 6 -- see SIMULATOR_METHODOLOGY_NOTE.md Sec 4.5/6 for the updated
+recommendation. The U-Net (blueprint Paper 2 stage 1) remains NOT
+STARTED.

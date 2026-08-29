@@ -1,9 +1,10 @@
 # Simulator Methodology Note: `simulate_training_pairs.py`
 
-**Status: PAUSED. Two confirmed negative results (Tasks 3, 5) plus one
-genuinely mixed result (Task 6) — not a clean success, not a clean
-failure.** This document exists so a future session doesn't have to
-re-derive six rounds of debugging from WEEK20_LOG.txt alone, the same
+**Status: PAUSED. Two confirmed negative results (Tasks 3, 5); Task 6 a
+genuinely mixed result; Task 7 a clean win on sounding-count accuracy
+that further isolates (without fixing) the one remaining Q-bias
+mechanism.** This document exists so a future session doesn't have to
+re-derive seven rounds of debugging from WEEK20_LOG.txt alone, the same
 role NOVEL_METHODOLOGY_PROPOSAL.md served for the hotspot-map work. It
 records what was tried, what was ruled out and why, and what genuinely
 remains open. Nothing here claims the simulator is fixed — as of Week 20
@@ -288,64 +289,169 @@ from a small positive noise fluctuation), inflating both `IME_kg` and
 down by. This mirrors, structurally, this project's own Week 13
 signal-to-noise reasoning for Rihand.
 
-## 5. Current best explanation (three consistent findings, not one)
+### 4.5 Per-facility retention calibration (Task 7) — clean win on sounding counts, plus a real bug found and fixed; Q-bias moved for a diagnosed, non-obvious reason
+
+**Scoping, per explicit instruction**: this task targets ONLY the
+sounding-COUNT mismatch §4.4's validation surfaced (Talcher's `n_used`
+off by >10x, traced to Task 6's single shared `RETENTION_FRAC_RANGE`/
+`BG_DENSITY_RATIO_RANGE` applied uniformly across facilities with
+genuinely different real retention). This is explicitly a SEPARATE issue
+from the median Q-bias (2.1x, §4.4's weak-signal noise-floor diagnosis)
+— fixing retention calibration was not expected to move the Q-bias
+number by itself, and if it did, that needed double-checking, not
+assuming a bonus win. It did move; explained below, not just reported.
+
+**Fix 1 — full per-facility calibration table.** Computed
+`(retention_frac, bg_density_ratio)` for all 24 real facilities present
+in both `data/plant_results.json` and `data/emission_estimates.json`
+(`FACILITY_RETENTION_TABLE`), not just the 5 used in Task 6. Real
+retention ranges from 0.044 (RGundem) to 0.534 (Vindhyachal), **median
+0.128** — heavily skewed low, nowhere near Task 6's uniform range's
+implied mean (~0.33). The 200-facility dataset now draws
+`(retention_frac, bg_density_ratio)` as a **paired bootstrap sample**
+from one real facility's exact values (preserving real per-facility
+correlation), not two independent uniform draws.
+
+**Fix 2 — a real bug found during this task.** Testing Fix 1 against the
+5 validation facilities with their own exact retention (expecting
+near-perfect count matches by construction) instead showed a consistent
+~2.64x over-count for every facility. Diagnosed directly:
+`simulate_sam_day_soundings()`'s `n_near`/`n_bg` counted every footprint
+in the 80×80km SAM box, not just those within `IME_NEAR_KM` (27.75km) —
+the box (6400 km²) is exactly `box_area/disk_area` = ~2.64x larger than
+the near-zone disk (2419 km²). Verified this was **reporting-only**:
+`physics_ime.estimate_emission_rate_from_arrays()` computes its own
+`dist`/`near_mask` internally from the full lat/lon arrays — direct
+check showed its internal near count for Sasan was 7289 (matching the
+expected disk-restricted ~7380), while the buggy `n_near` metric
+reported 19482 for the same run. Task 6's Q-recovery numbers were never
+wrong from this bug; only the separately-reported count metric was.
+Fixed by restricting `n_near`/`n_bg` to the same masks `physics_ime.py`
+applies. This bug had been *partially masked* in Task 6 by the
+shared-range retention scatter (both errors inflated counts together) —
+Task 7's precision is what made it visible.
+
+**Result 1 — sounding-count match (what this task targeted): clean win.**
+
+| Facility | Task 6 near-ratio (sim/real) | Task 7 near-ratio (sim/real) |
+|---|---|---|
+| Sasan | 1.71x | 0.99x |
+| Vindhyachal | 1.66x | 0.99x |
+| Talcher | 6.37x | 0.99x |
+| Rihand | 2.14x | 0.99x |
+| Tamnar | 5.22x | 0.99x |
+
+Every facility now lands within 1% of its real sounding count.
+
+**Result 2 — Q-recovery bias, 200 facilities (not targeted by this task):**
+
+| | Task 6 | Task 7 |
+|---|---|---|
+| Median bias | 2.112x | 1.540x |
+| Mean bias | 3.321 | 2.396 |
+| sd(log ratio) | 0.901 | 0.918 |
+| Within 2x | 43.5% | 53.0% (106/200) |
+
+The median DID move. Checked, not assumed:
+
+- `corr(log_ratio, true_Q)`: -0.691 → -0.643 (**essentially unchanged**
+  — the dominant weak-signal noise-floor mechanism was NOT fixed).
+- `corr(log_ratio, retention)` = **+0.310** in Task 7 (not computed in
+  Task 6) — Q-recovery bias scales *up* with sample count, consistent
+  with the IME formula: more near-zone samples at a roughly fixed
+  per-sample excess rate scales `IME_kg` and `n_used` ~linearly, so
+  `L_eff = sqrt(n_used * area)` scales as `sqrt(retention)`, giving
+  `Q ~ retention / sqrt(retention) = sqrt(retention)` — higher retention
+  mechanically produces a *larger instance of the same bias*, not a
+  different one.
+- Task 7's real-facility-sourced retention distribution has a much lower
+  typical value (median 0.124) than Task 6's uniform range's implied
+  average (~0.33), because most real facilities genuinely have low
+  retention.
+
+So the median-bias improvement is a **side effect of correcting the
+retention distribution's shape** (most synthetic facilities now
+correctly have fewer samples, like most real facilities do), which
+mechanically produces a smaller instance of the same still-present bias
+— **not evidence the bias's root cause was addressed**. Per-facility
+validation accuracy also genuinely improved for specific replayed
+facilities (Sasan's `recovered_Q_ratio_mean`: 0.763 → 0.970; Vindhyachal
+0.720 → 0.955) — from removing scatter (random shared-range draws
+previously sometimes gave these high-retention facilities a
+too-low retention, pulling their average down). Talcher and Tamnar (the
+smallest true-Q facilities) remain badly biased even with their own
+**exact** real retention (2.155x, 2.003x mean) — direct confirmation the
+weak-signal mechanism is untouched, exactly where §4.4 said it would be.
+
+**Verdict**: Task 7 is a clean win on its stated target (sounding-count
+match, now within 1% for all 5 validated facilities, plus an
+independently-found and fixed reporting bug) and a diagnosed, explained,
+not-a-bonus-win partial movement on the Q-bias number. Both reported
+plainly, not conflated.
+
+## 5. Current best explanation (four consistent findings, not one)
 
 1. A naive mean-difference readout cannot be fixed by sampling geometry
    alone — confirmed four times now (Tasks 4, 5, and twice within
    Task 6's own comparison).
 2. `physics_ime.py`'s actual Q-recovery formula, applied to realistically
    sparse SAM-mode soundings, substantially closes the SCALE of the gap
-   (from 10-100x off to ~2x median off) — the first approach in this
+   (from 10-100x off to ~1.5-2x median off) — the first approach in this
    investigation to land in the same range as the real method's own
    real-world accuracy, rather than off by orders of magnitude.
-3. That improvement is not complete: a diagnosed, systematic weak-signal
-   bias (driven by a fixed per-sounding noise floor becoming
-   proportionally larger for smaller true-Q facilities) keeps only 43.5%
-   of simulated facilities within 2x, and the validation step surfaced a
-   real, disclosed sampling-density limitation (shared retention range
-   vs. facility-specific real conditions) for facilities at the range's
-   extremes.
+3. Sounding-count/geometry accuracy is now a solved sub-problem
+   (Task 7): every validated facility matches real counts within 1%,
+   with the calibration table sourced from all 24 real facilities and
+   one real reporting bug found and fixed along the way.
+4. The remaining gap is now isolated to ONE mechanism, confirmed stable
+   across two independent tasks: a fixed per-sounding noise floor
+   (`SOUNDING_NOISE_STD_PPM = 0.8ppm`) disproportionately inflates
+   recovered Q for facilities with smaller true Q
+   (`corr(log_ratio, true_Q) ≈ -0.65 to -0.69` in both Task 6 and
+   Task 7), independent of sounding density or sampling geometry, both
+   of which are now correctly calibrated.
 
 ## 6. Recommendation: PAUSE this sub-investigation
 
-Six rounds have now been run against this gap — near-field/wind-floor/
-resolution fixes and area-averaging (Tasks 1-2, correct and kept, but
-insufficient alone), Q-source falsification (Task 3, ruled out, made
-things worse), IME-consistent readout geometry (Task 4, confirmed the
-mismatch but flipped the error direction), multi-day pooling (Task 5,
-confirmed again, near-zero effect, specific analytical cause), and real
-orbital sampling geometry with native IME Q-recovery (Task 6, the first
-genuinely mixed result — substantially improved scale, still not fully
-closed, with a diagnosed residual bias). This matches this project's own
-diminishing-returns discipline — see WEEK13_LOG.txt's Rihand
-investigation, paused after four independently rejected explanations.
-Task 6 is NOT a rejected explanation the way Tasks 3 and 5 were; it is
-paused because a partially-improved, partially-still-biased result is
-not, on its own, a basis to proceed to the U-Net without further
-targeted work — not because the approach failed outright.
+Seven rounds have now been run against this gap. Tasks 1-2 (near-field/
+wind-floor/resolution fixes, area-averaging) are correct and kept, but
+insufficient alone. Task 3 (Q-source falsification) was ruled out, made
+things worse. Task 4 (IME-consistent readout geometry) confirmed the
+forward/inverse mismatch but flipped the error direction. Task 5
+(multi-day pooling) confirmed again, near-zero effect, specific
+analytical cause. Task 6 (real orbital sampling geometry with native IME
+Q-recovery) was the first genuinely mixed result — substantially
+improved scale, not fully closed, diagnosed residual bias. Task 7
+(per-facility retention calibration) cleanly solved the sounding-count
+sub-problem and further isolated — without fixing — the one remaining
+bias mechanism. This matches this project's own diminishing-returns
+discipline — see WEEK13_LOG.txt's Rihand investigation, paused after
+four independently rejected explanations. Tasks 6 and 7 are NOT rejected
+explanations the way Tasks 3 and 5 were; this is paused because a
+partially-improved, partially-still-biased result — now precisely
+isolated to one mechanism — is not, on its own, a basis to proceed to
+the U-Net without a fix specifically targeting that mechanism.
 
 ### Paths forward — not attempted, listed so they aren't re-derived from scratch
 
-1. **Per-facility (or per-region) retention calibration**, rather than
-   one shared range across all synthetic facilities. Task 6's own
-   validation showed this is where the largest remaining count mismatch
-   (Talcher, >10x) comes from — a smaller, more targeted fix than
-   anything else on this list.
-2. **Model or correct the weak-signal noise-floor bias directly**, now
-   that it's diagnosed (§4.4): e.g. a Q-dependent correction informed by
-   the measured `corr(log_ratio, true_Q) = -0.691` relationship, or
-   revisiting whether `SOUNDING_NOISE_STD_PPM` should scale with
-   local background variability rather than being a single fixed
-   constant.
-3. **Different label-generation methodology entirely.** Abandon
+1. **Model or correct the weak-signal noise-floor bias directly** — now
+   the SOLE remaining candidate, confirmed stable and isolated across
+   Tasks 6 and 7 (`corr(log_ratio, true_Q) ≈ -0.65 to -0.69`,
+   independent of sounding density/geometry, both now correctly
+   calibrated per Task 7). E.g. a Q-dependent correction informed by
+   this measured relationship, or reconsidering whether
+   `SOUNDING_NOISE_STD_PPM` should scale with local background
+   variability rather than being a single fixed constant.
+2. **Different label-generation methodology entirely.** Abandon
    single-snapshot forward Gaussian simulation as the training-label
    source and generate segmentation masks/Q labels through a method
    structurally consistent with IME's own multi-day aggregation
    assumption.
-4. **Re-scope what the U-Net is meant to learn.** If none of the above
-   converges, train the segmentation stage on the spatial *shape* of the
-   plume only (mask quality), with Q regression handled by a separate
-   mechanism not dependent on this simulator's ppm calibration at all.
+3. **Re-scope what the U-Net is meant to learn.** If neither of the
+   above converges, train the segmentation stage on the spatial *shape*
+   of the plume only (mask quality), with Q regression handled by a
+   separate mechanism not dependent on this simulator's ppm calibration
+   at all.
 
 ## 7. What is NOT open
 
@@ -353,10 +459,13 @@ targeted work — not because the approach failed outright.
   unchanged throughout all of this — see `tests/test_plume_model.py`.
 - The near-field guard, wind floor, resolution match, and area-averaging
   fixes (§3) are all independently verified and not implicated in the
-  Task 3/4/5/6 findings.
+  Task 3/4/5/6/7 findings.
 - The multi-day pooling MECHANISM itself (§4.3) is verified correct — it
   reduces variance as expected; it simply doesn't address a bias that
   turned out not to be a sampling-count problem.
+- Sounding-count/geometry accuracy (§4.5) is CLOSED as of Task 7 — every
+  validated facility matches real counts within 1%. It is not the
+  remaining open problem.
 - The SAM raw footprint GEOMETRY itself (§4.4) is validated correct in
   scale against 4 of 5 real facilities before retention calibration is
   even applied — the residual mismatch traces to the shared-range
