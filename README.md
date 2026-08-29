@@ -1,5 +1,11 @@
 # CO2 Emission Estimation (Now Validated Against Real Ground Truth)
 
+## Live Demo
+
+**https://co2-estimation-project.streamlit.app/**
+
+Interactive Streamlit app: the 30-plant Q-vs-CEA comparison map and the four Week 13 Rihand-style diagnostic checks per facility (§5.2.7/§5.2.9 of `RESEARCH_PAPER.md`). Deployed via Streamlit Community Cloud directly from this repo's `main` branch — everything shown is read from this repo's own committed result files at runtime, nothing is recomputed live. (Hugging Face Spaces was attempted first, per the project blueprint's recommendation, but its free tier only supports Static Spaces, which cannot run a Python backend; see `WEEK25_LOG.txt` for the full deployment story.)
+
 Research and implementation work on detecting and estimating CO2 emissions from coal power plants using satellite data and deep learning. The project has two parallel tracks:
 
 1. **Plant detector (Track A)** — a small CNN that classifies satellite tiles as "power plant" vs. "not a power plant," built up incrementally by fusing more pollutant/thermal channels (Weeks 2–5, described below). Since expanded to 20 positive-class facilities; exhaustive leave-one-facility-out recall is currently **69.1%**.

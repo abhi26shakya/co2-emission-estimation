@@ -94,14 +94,60 @@ to any analysis, physics, or model code.
   as the account's quota is provisioned (typically resolved by email
   verification and/or a short wait after account creation).
 
-STATUS at end of this session: Space fully packaged and pushed
+STATUS at end of that session: Space fully packaged and pushed to HF
 (app.py, physics_ime.py, trimmed requirements.txt, data/ subset,
-README.md with live sdk config), blocked on the account-level quota
-above. README.md's live-demo-link update is deferred until the Space
-is confirmed actually running -- adding a link to a paused/broken Space
-would be a worse outcome than the current honestly-reported gap.
+README.md with live sdk config), blocked on what the runtime API
+reported as a cpu-basic quota (current=0, limit=0).
 
-Files changed: RESEARCH_PAPER.md (§3 Data Sources table, new §3.2),
-data/vindhyachal_soundings.npz -> data/Vindhyachal_soundings.npz
-(rename, real bug fix), WEEK25_LOG.txt (this file). README.md not yet
-touched -- pending quota resolution and a live-URL verification pass.
+Files changed that session: RESEARCH_PAPER.md (§3 Data Sources table,
+new §3.2), data/vindhyachal_soundings.npz ->
+data/Vindhyachal_soundings.npz (rename, real bug fix), WEEK25_LOG.txt.
+README.md not yet touched -- deferred pending a live-URL verification
+pass, since adding a link to a paused/broken Space would be a worse
+outcome than the honestly-reported gap.
+
+--- Follow-up (same week, later): HF Spaces blocker confirmed as an
+account-tier restriction, not a quota-timing issue -- deployed to
+Streamlit Community Cloud instead ---
+
+- The earlier entry above characterized the HF blocker as a
+  provisioning/timing issue ("typically resolved by email verification
+  and/or a short wait"). That assumption was wrong. Checked the actual
+  Space-creation page on huggingface.co directly (not just the API
+  error text): for this account's plan, only the **Static** SDK is
+  offered free of charge. Gradio and Docker Spaces (Streamlit runs as
+  one of these two internally) require HF PRO, a paid plan -- confirmed
+  on the page itself, not inferred from the API's quota-timing wording.
+  A Static Space cannot run a Python backend at all, so app.py (a
+  live-reactive Streamlit script, not a static site) could never have
+  run there under the free tier regardless of how long the account
+  waited or whether it verified its email. The earlier framing was a
+  reasonable read of the API error alone but turned out to be the wrong
+  diagnosis once checked against the actual account-tier restriction.
+- Decision: deploy via Streamlit Community Cloud instead --
+  streamlit.io's own free hosting, which deploys directly from a
+  GitHub repo (this project's own `main` branch) rather than requiring
+  a separate git remote/push step the way Spaces does. No further
+  file-trimming was needed beyond what was already prepared for the HF
+  attempt (app.py, physics_ime.py, requirements.txt, and the specific
+  data/ files listed above all already live in this repo's own `main`
+  branch, so Streamlit Community Cloud's GitHub-native deploy needed no
+  separate packaged copy the way HF Spaces' own git remote did).
+- Live URL: **https://co2-estimation-project.streamlit.app/**. Verified
+  live by the user, who performed this deployment step directly (this
+  session does not have Streamlit Community Cloud credentials).
+- Documentation updated to reference the live link: README.md gained a
+  "Live Demo" section near the top (with the URL and a one-line note on
+  why HF Spaces was not used); RESEARCH_PAPER.md gained a new §5.2.9
+  "Interactive demo" subsection (placed in Track B's results section,
+  where the demo's actual content -- Q-vs-CEA and the Week 13
+  diagnostics -- is reported, rather than §9, which covers the
+  unrelated segmentation-only DL extension); WEEK25_LOG.txt (this
+  follow-up entry).
+- The HF Space itself (https://huggingface.co/spaces/Abhishek-shakya/
+  co2-emission-q-vs-cea) remains pushed but not live, and is not being
+  pursued further -- Streamlit Community Cloud is now this project's
+  actual live demo.
+
+Files changed (follow-up): README.md (new "Live Demo" section),
+RESEARCH_PAPER.md (new §5.2.9), WEEK25_LOG.txt (this entry).
