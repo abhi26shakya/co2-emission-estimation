@@ -72,6 +72,19 @@ physics_gaussian_crosssection.py         # alternate Q estimator (Gaussian cross
 
 Full facility-level results are in `data/plant_results.json`, `data/emission_estimates.json`, `data/climate_trace_comparison.json`, `data/cea_ground_truth_2020_21.json`, `data/q_correction_model_results.json`, `data/baseline_capacity_results.json`, and `data/gaussian_crosssection_results.json`.
 
+## Track B, DL extension: segmentation-only U-Net (confirmed negative real-tile result)
+
+A segmentation-only deep-learning extension (Weeks 20–23, `RESEARCH_PAPER.md` §9) toward the project's original blueprint architecture. Trains a compact U-Net on simulated (XCO2 tile, plume mask) pairs from a physics-based simulator (reusing `plume_model.py`'s validated Gaussian plume physics and Week 20's real-OCO-3-orbital-geometry sampler) since no real labeled dataset exists at this scale. Reaches moderate quality on simulated data (positive-tile median Dice 0.29) but its predictions on real single-overpass OCO-3 tiles consistently track satellite coverage patterns rather than true plume shape — confirmed across three independent fixes, a closed negative result, not an open question.
+
+**Run order:**
+```
+simulate_training_pairs.py      # generates data/simulated_train/simulated_tiles.npz (already committed; no need to regenerate to reproduce below)
+train_unet_segmentation.py      # trains UNetSmall (488K params) on the simulated pairs -> unet_segmentation.pt, data/unet_segmentation_results.json
+sanity_check_real_tiles.py      # illustrative-only: runs the trained checkpoint on real Vindhyachal/Rihand OCO-3 tiles (no accuracy metric -- no real ground-truth mask exists)
+```
+
+`unet_segmentation.pt` (the trained checkpoint) is **not** committed — `*.pt` is gitignored for this file, unlike the Track A detector checkpoints, which are force-added exceptions. `sanity_check_real_tiles.py` therefore requires running `train_unet_segmentation.py` first on a fresh clone. This is deterministic (seed 42, `torch`/`numpy` fixed) and fast (60 epochs, ~2 min on an M1 MacBook Air's `mps` backend; `torch` — already in `requirements.txt` for Track A's CNN, no new dependency): a fresh-clone run reproduces the paper's exact positive-tile median Dice (0.286) and the real-tile coverage figures (13.3%/11.2% for Vindhyachal/Rihand) reported in §9.5–§9.6. No other new package was needed for this extension.
+
 ## Requirements
 
 Python 3, with:
@@ -111,6 +124,7 @@ Doesn't cover Earth Engine, OCO-3 downloads, or model training end-to-end. Runs 
 * Climate TRACE and CEA ground-truth bracketing rates (35.3% and 47.1% respectively) measure different things and should not be conflated — Climate TRACE is itself a satellite-inferred estimator (independent benchmark, not ground truth); CEA is bottom-up from reported fuel consumption (genuine ground truth). Neither number supersedes the other.
 * CI (`.github/workflows/tests.yml`) only runs the fast unit-test suite on push/PR; it does not cover Earth Engine, OCO-3 downloads, or model training end-to-end — those still require running the pipeline scripts manually before trusting a change.
 * Scripts have historically been run under two different Python installations (a conda env at `/opt/miniconda3/envs/co2` with everything needed, and a separate macOS framework Python missing `earthaccess`/`xarray`/`geemap`) — use `requirements.txt` and the conda env to avoid import errors on `process_plant.py` or other OCO-3-touching scripts.
+* Track B's segmentation-only U-Net extension (§9, Weeks 20–23) is a **confirmed negative result for real-tile transfer**: the model does not transfer from simulated to real single-overpass OCO-3 tiles, across three independently-targeted fixes. `unet_segmentation.pt` is not committed (unlike Track A's detector checkpoints) — verified (Week 24 fresh-clone audit) that `train_unet_segmentation.py` reproduces it deterministically in ~2 minutes, so this is a documented gap, not a broken reproduction path.
 
 ## Original Week 2–7 walkthrough (historical record, superseded)
 

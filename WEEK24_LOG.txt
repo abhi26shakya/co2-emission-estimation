@@ -1,0 +1,116 @@
+WEEK 24 — consolidation and consistency audit (Weeks 18-23), matching
+                Week 17's methodology; two deferred items closed out
+
+- Question, same discipline as Week 17: after a burst of new work (Weeks
+  18-23: the DL segmentation extension, §9), do the paper's summary-
+  facing sections (Abstract, Contributions, Conclusion) still reference
+  the actual, final state of that work, or has a real documentation gap
+  formed the same way §5.2.1b's capacity finding was absent until Week
+  17 caught it? Scoped as a wrap-up week: no new experiments, no new
+  fixes to the DL transfer problem itself.
+
+- Task 1 audit result: THE SAME FAILURE MODE Week 17 caught, recurred.
+  RESEARCH_PAPER.md's top-of-file revision note, Abstract, §1.3
+  Contributions, and §8 Conclusion's opening paragraph had ZERO mention
+  of §9 (the segmentation-only DL extension) despite it being fully
+  written up in the body across Weeks 20-23 and correctly reflected in
+  §8's numbered roadmap item 15. This is not stale content (an earlier,
+  more optimistic version) -- it was a total absence, exactly like
+  Week 17's capacity-baseline gap. Fixed by adding: a sentence to the
+  revision note; a new paragraph to the Abstract stating §9's actual,
+  final, three-times-confirmed negative real-tile-transfer result; a new
+  bullet to §1.3 Contributions leading with the finding; and a new
+  sentence to §8's opening paragraph. All four additions cite the
+  confirmed (not partial) Week 23 conclusion -- density fix and valid-
+  mask-channel fix both tested, both failed to close the gap -- not an
+  earlier Week 21/22 snapshot.
+
+- Task 2: added DEFENSE_SHEET.md Q7, "why does the paper include a
+  deep-learning model that doesn't work on real data?" Answered in 3
+  sentences sourced only from §9/§1.3: the DL extension is reported as a
+  confirmed negative result, not a working capability; it closes off two
+  specific plausible causes (coverage density, NaN-fill shortcut) rather
+  than leaving the blueprint's architecture untested; and it names the
+  one remaining untried path explicitly rather than implying the tested
+  paths are still open. Also tightened Q3's Rihand cross-reference to
+  point at the new §8 item 16 (below) instead of a vague "untested"
+  list.
+
+- Task 3: fresh-clone reproducibility test (same method as Week 19),
+  scoped to the new Track B DL artifacts. `git clone` from the local
+  repo (confirmed HEAD == origin/main, no unpushed commits besides this
+  session's own in-progress edits) into a scratch directory, conda env
+  `co2`.
+    1. `python -m unittest discover -s tests -v`: 98/98 pass, matching
+       the prior session's reported count.
+    2. `train_unet_segmentation.py`: ran with ZERO modification, exit 0,
+       ~2 minutes on M1 `mps`. Reproduced the paper's exact positive-tile
+       median Dice (0.286) and IoU (0.167) to 3 decimal places --
+       confirms determinism (seed 42) survives a genuinely fresh clone.
+    3. `sanity_check_real_tiles.py`: ran against the freshly-trained
+       checkpoint, exit 0, reproduced the paper's exact real-tile
+       coverage figures (Vindhyachal 13.3%, Rihand 11.2%, both within
+       §9.4's stated 11-13% range) and the same coverage-tracking
+       qualitative behavior.
+    4. GAP FOUND: `unet_segmentation.pt` is NOT git-tracked (`*.pt` is
+       gitignored for this file specifically -- unlike Track A's
+       detector checkpoints, which are force-added exceptions). A fresh
+       clone cannot run `sanity_check_real_tiles.py` without first
+       training. This was previously undocumented anywhere in README.md
+       -- in fact README.md had ZERO mention of any of the four DL-
+       extension scripts (`simulate_training_pairs.py`,
+       `train_unet_segmentation.py`, `sanity_check_real_tiles.py`,
+       `unet_segmentation.py`) at all, a gap as complete as the §1
+       omission Task 1 found. Fixed: added a "Track B, DL extension"
+       README section documenting the run order, the checkpoint-not-
+       committed fact (verified reproducible, not broken), and the
+       reproduced numbers above; added a matching Known Limitations
+       bullet.
+    5. requirements.txt: confirmed `torch==2.12.1` (already present for
+       Track A) is the only dependency the U-Net work needed -- no new
+       package required. Annotated inline to make this explicit rather
+       than leaving it implicit.
+
+- Task 4: closed both long-standing deferred items rather than letting
+  them recur as loose ends every session.
+    (a) USA/EU EPA-CEMS replication. Confirmed (grep across
+        RESEARCH_PAPER.md, RESEARCH_PLAN.md, NEXT_STEPS.md,
+        NOVEL_METHODOLOGY_PROPOSAL.md, SIMULATOR_METHODOLOGY_NOTE.md)
+        this exists only as RESEARCH_PLAN.md background context (why
+        Climate TRACE's US/EU ground truth is CEMS-based), never as an
+        actual stated future-work item anywhere -- the same absence
+        Week 17 flagged and explicitly declined to fabricate. DECISION:
+        write it up now as new §8 item 17, ~190 words -- a scoped,
+        honestly-bounded replication idea (same benchmark methodology,
+        different country/facility-list/data-pipeline), explicitly
+        flagged as a materially larger scope change than any other item
+        on the list, not attempted.
+    (b) Rihand's plume-geometry angle. Already scoped inline in §5.2.7's
+        "untested" list and §8 item 11's "remaining, not yet attempted."
+        DECISION: promoted to its own new §8 item 16, ~180 words, with a
+        concrete, checkable next step (overlay Rihand's already-exported
+        Track A tile against its OCO-3 near-plant disk to check for a
+        second combustion source; compare footprint/layout against
+        similarly-sized well-bracketed facilities) rather than leaving
+        it as a one-clause mention. Cross-referenced from §7's Rihand
+        limitations bullet and DEFENSE_SHEET Q3.
+    Neither item was attempted as new research this week, per the
+    session's explicit wrap-up-only scope -- both are now a genuine,
+    bounded piece of Future Work instead of a recurring unresolved
+    mention.
+
+- VERDICT: the audit process worked exactly as designed a second time --
+  it found a real, consequential documentation gap (§9's total absence
+  from the paper's summary-facing sections, and from README entirely),
+  not a false-positive staleness scare; confirmed the DL extension's
+  actual pipeline still reproduces byte-for-byte-in-the-numbers-that-
+  matter from a genuinely fresh clone; and converted two dangling
+  "still open" mentions into real, bounded Future Work paragraphs. No
+  new experiments were run and no fix was attempted for the DL
+  transfer problem itself, per this session's explicit scope.
+
+Files changed: RESEARCH_PAPER.md (revision note, Abstract, §1.3, §7,
+§8 items 16-17, §8 opening paragraph), DEFENSE_SHEET.md (Q3 cross-ref,
+new Q7), README.md (new "Track B, DL extension" section, new Known
+Limitations bullet), requirements.txt (inline annotation, no version
+change), WEEK24_LOG.txt (this file).

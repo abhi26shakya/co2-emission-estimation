@@ -20,7 +20,10 @@
 
 numpy==2.4.6
 pandas==3.0.3
-torch==2.12.1
+torch==2.12.1   # Track A CNN detector training/inference; also used by the Weeks 20-23
+                # Track B segmentation-only U-Net extension (unet_segmentation.py,
+                # train_unet_segmentation.py) -- no separate/newer torch pin was
+                # needed for that work, confirmed during the Week 24 audit.
 matplotlib==3.11.0
 requests==2.34.2
 earthaccess==0.17.0
